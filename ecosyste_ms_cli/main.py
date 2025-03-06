@@ -13,11 +13,9 @@ app = typer.Typer(
 )
 
 # Import commands
-# These will be uncommented as we implement each command group
-# from ecosyste_ms_cli.commands import topics
-# from ecosyste_ms_cli.commands import repositories
-# from ecosyste_ms_cli.commands import packages
-# from ecosyste_ms_cli.commands import summary
+from ecosyste_ms_cli.commands import repos
+from ecosyste_ms_cli.commands import packages
+from ecosyste_ms_cli.commands import summary
 
 
 @app.callback()
@@ -35,6 +33,12 @@ def version():
     """
     import ecosyste_ms_cli
     typer.echo(f"Ecosyste.ms CLI version: {ecosyste_ms_cli.__version__}")
+
+
+# Add command groups to the main app
+app.add_typer(repos.app)
+app.add_typer(packages.app)
+app.add_typer(summary.app)
 
 
 def main():
