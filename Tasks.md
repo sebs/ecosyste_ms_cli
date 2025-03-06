@@ -15,7 +15,6 @@
 - [x] Generate Python client for packages API
 - [x] Generate Python client for summary API
 - [x] Organize generated clients in the project structure
-- [x] Create client utility wrappers for common operations
 
 ## Phase 3: CLI Framework Implementation
 - [ ] Set up Typer app instance

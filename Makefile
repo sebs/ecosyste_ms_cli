@@ -34,15 +34,44 @@ venv:
 	@$(PIP) install --upgrade pip
 
 # Dependencies
-dependencies: venv
+dependencies: venv ensure-client-wheels
 	@echo "Installing dependencies..."
 	@$(VENV_BIN)/pip install -r requirements.txt
-	@$(VENV_BIN)/pip install -e .
+	@echo "Installing client wheels..."
+	@$(VENV_BIN)/pip install -r requirements-wheels.txt
+	@echo "Installing project..."
+	@$(VENV_BIN)/pip install --use-pep517 .
+
+# Ensure client wheels exist
+ensure-client-wheels:
+	@echo "Checking for OpenAPI clients..."
+	@if [ ! -d "$(GENERATED_DIR)/repos/python-client" ] || \
+	   [ ! -d "$(GENERATED_DIR)/packages/python-client" ] || \
+	   [ ! -d "$(GENERATED_DIR)/summary/python-client" ]; then \
+		echo "Generating missing API clients first..."; \
+		$(MAKE) generate-openapi-clients; \
+	fi
+	@echo "Checking for client wheels..."
+	@if [ ! -f "$(GENERATED_DIR)/repos/python-client/dist/ecosystems_repos_client-1.0.0-py2.py3-none-any.whl" ] || \
+	   [ ! -f "$(GENERATED_DIR)/packages/python-client/dist/ecosystems_packages_client-1.0.0-py2.py3-none-any.whl" ] || \
+	   [ ! -f "$(GENERATED_DIR)/summary/python-client/dist/ecosystems_summary_client-1.0.0-py2.py3-none-any.whl" ]; then \
+		echo "Building missing client wheels..."; \
+		$(MAKE) build-client-wheels; \
+	else \
+		echo "All client wheels already exist."; \
+	fi
 
 # Clean project
 clean:
 	@echo "Cleaning project..."
-	@rm -rf $(VENV_DIR) __pycache__ *.egg-info dist build .pytest_cache .coverage $(GENERATED_DIR)
+	@rm -rf __pycache__ *.egg-info dist build wheels .pytest_cache .coverage $(GENERATED_DIR)
+
+# Build wheel for the main project
+build-wheel:
+	@echo "Building wheel for main project..."
+	@$(VENV_BIN)/python -m pip install --upgrade build wheel
+	@$(VENV_BIN)/python -m build --wheel
+	@echo "Wheel built successfully in dist/ directory"
 
 # Test
 test: venv

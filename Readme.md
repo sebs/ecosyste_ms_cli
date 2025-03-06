@@ -104,6 +104,24 @@ make format
 make lint
 ```
 
+### Makefile Reference
+
+The project includes a comprehensive Makefile to streamline development tasks:
+
+| Target | Description |
+|--------|-------------|
+| `setup` | Complete project setup (venv + dependencies) |
+| `venv` | Create virtual environment |
+| `dependencies` | Install all project dependencies including API client wheels |
+| `clean` | Remove build artifacts and temporary files |
+| `test` | Run test suite |
+| `lint` | Run linting checks |
+| `format` | Auto-format code with black and isort |
+| `generate-openapi-clients` | Generate API clients from OpenAPI specs |
+| `build-client-wheels` | Build wheels for all API clients |
+| `build-wheel` | Build wheel for main project |
+| `ensure-client-wheels` | Check if clients exist and build wheels if needed |
+
 ## License
 
 MIT
