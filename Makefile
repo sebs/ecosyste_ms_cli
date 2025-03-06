@@ -85,3 +85,21 @@ generate-client-%:
 	@echo "$* API client generation completed. Client available in $(GENERATED_DIR)/$*"
 
 
+# Create universal wheel setup.cfg file
+create-wheel-config:
+	@echo '[bdist_wheel]' > wheel-setup.cfg
+	@echo 'universal=1' >> wheel-setup.cfg
+
+# Build wheels for all generated clients
+build-client-wheels: create-wheel-config
+	@echo "Building wheels for all API clients..."
+	@for service in $(API_SERVICES); do \
+		echo "Building wheel for $$service client..."; \
+		cp wheel-setup.cfg $(GENERATED_DIR)/$$service/python-client/setup.cfg; \
+		cd $(GENERATED_DIR)/$$service/python-client && \
+		python -m pip install --upgrade build wheel && \
+		python -m build --wheel && \
+		cd - > /dev/null; \
+	done
+	@rm wheel-setup.cfg
+	@echo "All client wheels built successfully (universal wheels compatible with Python 2 and 3)"
