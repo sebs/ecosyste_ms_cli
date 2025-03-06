@@ -1,0 +1,67 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ecosyste_ms_cli"
+version = "0.1.0"
+description = "Command line interface for Ecosyste.ms APIs"
+readme = "README.md"
+requires-python = ">=3.12"
+license = {text = "MIT"}
+authors = [
+    {name = "ecosyste.ms", email = "support@ecosyste.ms"}
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+    "typer>=0.9.0",
+    "rich>=13.6.0",
+    "httpx>=0.25.0",
+    "pydantic>=2.4.0",
+    "click>=8.1.7",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.3",
+    "black>=23.10.1",
+    "isort>=5.12.0",
+    "flake8>=6.1.0",
+    "mypy>=1.6.1",
+]
+
+[project.urls]
+"Homepage" = "https://ecosyste.ms"
+"Bug Tracker" = "https://github.com/ecosyste-ms/cli/issues"
+
+[project.scripts]
+ecosystems = "ecosyste_ms_cli.main:main"
+
+[tool.setuptools.packages.find]
+include = ["ecosyste_ms_cli*"]
+
+[tool.black]
+line-length = 88
+target-version = ["py312"]
+
+[tool.isort]
+profile = "black"
+line_length = 88
+
+[tool.mypy]
+python_version = "3.12"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
