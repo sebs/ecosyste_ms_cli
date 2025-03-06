@@ -1,0 +1,4 @@
+# Local client wheels
+./generated-clients/repos/python-client/dist/ecosystems_repos_client-1.0.0-py2.py3-none-any.whl
+./generated-clients/packages/python-client/dist/ecosystems_packages_client-1.0.0-py2.py3-none-any.whl
+./generated-clients/summary/python-client/dist/ecosystems_summary_client-1.0.0-py2.py3-none-any.whl
