@@ -31,6 +31,15 @@ Each command includes helpful examples in its help text. Use `--help` with any c
 ecosystems --help
 ```
 
+### Global Options
+
+- `--timeout`: Set the timeout in seconds for all HTTP requests (default: 20 seconds)
+
+```bash
+# Example: Set a 30-second timeout for all requests
+ecosystems --timeout 30 repos topics
+```
+
 ### Repos API
 
 ```bash
@@ -79,16 +88,6 @@ ecosystems summary package https://www.npmjs.com/package/express
 ### Advanced Usage
 
 #### API Operation Calls
-
-You can call any API operation directly:
-
-```bash
-# Call an operation with parameters
-ecosystems repos call topic --path-params '{"topic": "javascript"}'
-ecosystems repos call topics --query-params '{"sort": "repositories_count"}'
-ecosystems packages call getRegistry --path-params '{"name": "npm"}'
-ecosystems summary call getRepositorySummary --query-params '{"url": "https://github.com/facebook/react"}'
-```
 
 #### List Available Operations
 
