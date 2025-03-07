@@ -1,5 +1,14 @@
 # Changelog
 
+## [v0.3.3] - 2025-03-07
+
+### Changes since v0.3.2
+
+- chore(release): bump version 0.3.2 → 0.3.3
+- fix: get all actions to run on release
+- docs: update CHANGELOG for v0.3.2
+
+
 ## [v0.3.2] - 2025-03-07
 
 ### Changes since v0.3.1
