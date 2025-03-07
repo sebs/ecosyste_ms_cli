@@ -1,5 +1,13 @@
 # Changelog
 
+## [v0.2.1] - 2025-03-07
+
+### Changes since v0.2.0
+
+- chore(release): bump version 0.2.0 → 0.2.1
+- docs: update CHANGELOG for v0.2.0
+
+
 ## [v0.2.0] - 2025-03-07
 
 ### Changes since v0.1.2
