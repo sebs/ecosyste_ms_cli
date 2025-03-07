@@ -36,7 +36,24 @@ jobs:
         with:
           name: dist
           path: dist/
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.workflow_run.id }}
+        if: ${{ github.event_name == 'workflow_run' }}
+
+      - name: Build package if triggered by tag
+        if: ${{ github.event_name == 'push' }}
+        run: |
+          pip install build wheel
+          python -m build
 
       - name: Get tag version
         id: get_version
         run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+        if: ${{ github.event_name == 'push' }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        if: ${{ github.event_name == 'push' }}
+        with:
+          files: dist/*
+          generate_release_notes: true
