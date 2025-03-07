@@ -1,9 +1,14 @@
-name: Build
+name: build-test-lint
 
 on:
   push:
     branches:
       - main
+      - 'feature/**'
+      - 'fix/**'
+      - 'refactor/**'
+    tags:
+      - 'v*'
 
 jobs:
   build:
@@ -21,11 +26,11 @@ jobs:
       - name: Install dependencies
         run: make setup
 
-      - name: Lint code
-        run: make lint
-
       - name: Run tests
         run: make test
+
+      - name: Lint code
+        run: make lint
 
       - name: Clean build artifacts
         run: make clean
