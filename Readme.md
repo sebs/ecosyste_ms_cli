@@ -9,7 +9,7 @@ Requirements:
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/ecosyste_ms_cli.git
+git clone git@github.com:sebs/ecosyste_ms_cli.git
 cd ecosyste_ms_cli
 
 # Set up virtual environment and install dependencies
@@ -149,6 +149,21 @@ make format
 # Clean up
 make clean
 ```
+
+### Releases
+
+This project uses GitHub Actions for automated builds. When you're ready to create a release:
+
+1. Tag your commit with a version number:
+   ```bash
+   git tag v0.1.0
+   git push origin v0.1.0
+   ```
+
+2. The GitHub Action will automatically:
+   - Run tests and linting
+   - Build the package
+   - Create a draft GitHub release with the built package
 
 ### Conventional Commits
 
