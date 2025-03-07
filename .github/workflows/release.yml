@@ -10,27 +10,17 @@ on:
       - 'v*'
 
 jobs:
-  release:
+  release-from-workflow:
     runs-on: ubuntu-latest
-    # Run this job if either:
-    # 1. The build-test-lint workflow succeeded (for workflow_run events)
-    # 2. We're on a v* tag (for push events)
-    if: ${{ (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success') || (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')) }}
+    if: github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success'
     steps:
       - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.12'
-
       - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install build wheel twine
-
+        run: pip install twine
       - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
@@ -38,22 +28,22 @@ jobs:
           path: dist/
           github-token: ${{ secrets.GITHUB_TOKEN }}
           run-id: ${{ github.event.workflow_run.id }}
-        if: ${{ github.event_name == 'workflow_run' }}
 
-      - name: Build package if triggered by tag
-        if: ${{ github.event_name == 'push' }}
-        run: |
-          pip install build wheel
-          python -m build
-
-      - name: Get tag version
-        id: get_version
-        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
-        if: ${{ github.event_name == 'push' }}
-
+  release-from-tag:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: pip install build wheel
+      - name: Build package
+        run: python -m build
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
-        if: ${{ github.event_name == 'push' }}
         with:
           files: dist/*
           generate_release_notes: true
