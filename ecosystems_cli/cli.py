@@ -1,13 +1,13 @@
 """Command line interface for ecosystems CLI."""
 
 import json
-import sys
-from typing import Dict, List, Optional, Any
+from typing import Any, Dict, List, Optional
 
 import click
 from rich.console import Console
-from rich.syntax import Syntax
 from rich.panel import Panel
+from rich.syntax import Syntax
+
 from ecosystems_cli.api_client import get_client
 
 console = Console()
@@ -15,7 +15,9 @@ console = Console()
 
 @click.group()
 @click.option("--timeout", default=20, help="Timeout in seconds for API requests. Default is 20 seconds.")
-@click.option("--format", default="table", type=click.Choice(["table", "json", "tsv", "jsonl"]), help="Output format. Default is table.")
+@click.option(
+    "--format", default="table", type=click.Choice(["table", "json", "tsv", "jsonl"]), help="Output format. Default is table."
+)
 @click.pass_context
 def main(ctx, timeout, format):
     """Ecosystems CLI for interacting with ecosyste.ms APIs."""
@@ -81,6 +83,7 @@ def list_summary_operations(ctx):
 # Convenience commands for common operations
 
 # Repos API commands
+
 
 @repos.command("topics")
 @click.pass_context
@@ -163,6 +166,7 @@ def get_repository(ctx, host: str, owner: str, repo: str):
 
 # Packages API commands
 
+
 @packages.command("registries")
 @click.pass_context
 def get_registries(ctx):
@@ -231,6 +235,7 @@ def get_package_version(ctx, registry: str, package: str, version: str):
 
 
 # Summary API commands
+
 
 @summary.command("repo")
 @click.argument("url")
@@ -405,7 +410,7 @@ def get_list_projects(ctx, id: str):
 
 @awesome.command("topics")
 @click.pass_context
-def get_topics(ctx):
+def get_awesome_topics(ctx):
     """Get all topics.
 
     Example:
@@ -419,7 +424,7 @@ def get_topics(ctx):
 @awesome.command("topic")
 @click.argument("slug")
 @click.pass_context
-def get_topic(ctx, slug: str):
+def get_awesome_topic(ctx, slug: str):
     """Get a specific topic by slug.
 
     Example:
@@ -455,10 +460,15 @@ def _parse_json_param(param: Optional[str]) -> Optional[Dict]:
         raise click.BadParameter(f"Invalid JSON: {param}")
 
 
-def _call_operation(api: str, operation: str, path_params: str, query_params: str, body: str, ctx=None):
+def _call_operation(api: str, operation: str, path_params: str, query_params: str, body: str, context=None):
     """Call an operation on the specified API."""
-    timeout = ctx.obj.get("timeout", 20) if ctx else 20
-    format_type = ctx.obj.get("format", "table") if ctx else "table"
+    # Get timeout and format from context if available
+    if context and hasattr(context, "obj"):
+        timeout = context.obj.get("timeout", 20)
+        format_type = context.obj.get("format", "table")
+    else:
+        timeout = 20
+        format_type = "table"
     client = get_client(api, timeout=timeout)
 
     # Parse parameters
@@ -468,10 +478,7 @@ def _call_operation(api: str, operation: str, path_params: str, query_params: st
 
     try:
         result = client.call(
-            operation_id=operation,
-            path_params=path_params_dict,
-            query_params=query_params_dict,
-            body=body_dict
+            operation_id=operation, path_params=path_params_dict, query_params=query_params_dict, body=body_dict
         )
         _print_output(result, format_type)
     except Exception as e:
@@ -505,20 +512,18 @@ def create_dynamic_command(api_name: str, operation_id: str, client):
                     query_params[param_name] = value
 
         try:
-            result = client.call(
-                operation_id=operation_id,
-                path_params=path_params,
-                query_params=query_params
-            )
-            _print_output(result, ctx.obj.get("format", "table"))
+            result = client.call(operation_id=operation_id, path_params=path_params, query_params=query_params)
+            # Default to table format
+            _print_output(result, "table")
         except Exception as e:
             _print_error(str(e))
 
     # Set the docstring
     dynamic_command.__doc__ = summary
     if required_params:
-        param_docs = [f"\n  {name}: {details.get('description', 'No description')}"
-                     for name, details in required_params.items()]
+        param_docs = [
+            f"\n  {name}: {details.get('description', 'No description')}" for name, details in required_params.items()
+        ]
         dynamic_command.__doc__ += "\n\nParameters:" + "".join(param_docs)
 
     # Create a proper Click command
@@ -577,7 +582,7 @@ def _print_output(data: Any, format_type: str = "table"):
                 # Fields specific to awesome API
                 "awesome": ["id", "name", "title", "url"],
                 # Fields specific to summary API
-                "summary": ["name", "description", "url"]
+                "summary": ["name", "description", "url"],
             }
 
             # Determine which API we're dealing with based on the fields
@@ -632,6 +637,7 @@ def _print_output(data: Any, format_type: str = "table"):
             # For non-list data, create a table with key-value pairs
             if isinstance(data, dict):
                 from rich.table import Table
+
                 table = Table(title="API Response", show_header=True, header_style="bold cyan")
                 table.add_column("Field")
                 table.add_column("Value")
@@ -646,6 +652,7 @@ def _print_output(data: Any, format_type: str = "table"):
                 json_str = json.dumps(data, indent=2)
                 syntax = Syntax(json_str, "json", theme="monokai", line_numbers=False)
                 console.print(syntax)
+
 
 def _format_value(value: Any) -> str:
     """Format a value for display in a table or TSV."""
@@ -667,7 +674,8 @@ def _format_value(value: Any) -> str:
                 return f"[...] ({len(value)} items)"
     return str(value)
 
-def _flatten_dict(d, parent_key='', sep='_'):
+
+def _flatten_dict(d, parent_key="", sep="_"):
     """Flatten a nested dictionary for TSV output."""
     items = []
     for k, v in d.items():
@@ -678,13 +686,16 @@ def _flatten_dict(d, parent_key='', sep='_'):
             items.append((new_key, v))
     return dict(items)
 
+
 def _print_json(data: Any):
     """Print JSON data in a nicely formatted way."""
     _print_output(data, "json")
 
+
 def _print_error(error_msg: str):
     """Print error message in a nicely formatted way."""
     console.print(Panel(f"[bold red]Error:[/bold red] {error_msg}", border_style="red"))
+
 
 def _print_operations(operations: List[Dict]):
     """Print operations in a formatted table."""
@@ -698,14 +709,24 @@ def _print_operations(operations: List[Dict]):
     path_width = max(len(op["path"]) for op in operations)
 
     # Create table header
-    header = f"[bold cyan]{'OPERATION'.ljust(id_width)}[/bold cyan] | [bold green]{'METHOD'.ljust(method_width)}[/bold green] | [bold yellow]{'PATH'.ljust(path_width)}[/bold yellow] | [bold magenta]DESCRIPTION[/bold magenta]"
+    header = (
+        f"[bold cyan]{'OPERATION'.ljust(id_width)}[/bold cyan] | "
+        f"[bold green]{'METHOD'.ljust(method_width)}[/bold green] | "
+        f"[bold yellow]{'PATH'.ljust(path_width)}[/bold yellow] | "
+        f"[bold magenta]DESCRIPTION[/bold magenta]"
+    )
     divider = "─" * (id_width + method_width + path_width + 40)
 
     # Create table rows
     rows = []
     for op in sorted(operations, key=lambda x: x["id"]):
         summary = op.get("summary", "")[:50] + ("..." if len(op.get("summary", "")) > 50 else "")
-        row = f"[cyan]{op['id'].ljust(id_width)}[/cyan] | [green]{op['method'].ljust(method_width)}[/green] | [yellow]{op['path'].ljust(path_width)}[/yellow] | [magenta]{summary}[/magenta]"
+        row = (
+            f"[cyan]{op['id'].ljust(id_width)}[/cyan] | "
+            f"[green]{op['method'].ljust(method_width)}[/green] | "
+            f"[yellow]{op['path'].ljust(path_width)}[/yellow] | "
+            f"[magenta]{summary}[/magenta]"
+        )
         rows.append(row)
 
     # Print table
