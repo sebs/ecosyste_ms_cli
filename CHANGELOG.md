@@ -1,5 +1,14 @@
 # Changelog
 
+## [v0.3.2] - 2025-03-07
+
+### Changes since v0.3.1
+
+- chore(release): bump version 0.3.1 → 0.3.2
+- fix: run release on completion of build-test-lint
+- docs: update CHANGELOG for v0.3.1
+
+
 ## [v0.3.1] - 2025-03-07
 
 ### Changes since v0.3.0
