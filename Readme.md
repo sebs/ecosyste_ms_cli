@@ -115,6 +115,30 @@ make format
 make clean
 ```
 
+### Conventional Commits
+
+This project uses [Conventional Commits](https://www.conventionalcommits.org/) for standardized commit messages. The format helps maintain a readable history and automates versioning and changelog generation.
+
+Commit messages should follow this pattern:
+```
+<type>[optional scope]: <description>
+
+[optional body]
+
+[optional footer(s)]
+```
+
+Common types include:
+- `feat`: A new feature
+- `fix`: A bug fix
+- `docs`: Documentation changes
+- `style`: Code style changes (formatting, etc.)
+- `refactor`: Code changes that neither fix bugs nor add features
+- `test`: Adding or modifying tests
+- `chore`: Changes to the build process or auxiliary tools
+
+Example: `feat(cli): add examples to command help text`
+
 ## API Structure
 
 The CLI provides access to three ecosyste.ms APIs:
@@ -124,4 +148,3 @@ The CLI provides access to three ecosyste.ms APIs:
 3. **summary** - Summary data
 
 Each API has its own set of operations that can be accessed through convenience commands or the generic `call` command.
-
