@@ -1,5 +1,14 @@
 # Changelog
 
+## [v0.3.1] - 2025-03-07
+
+### Changes since v0.3.0
+
+- chore(release): bump version 0.3.0 → 0.3.1
+- fix: release pipeline conditional
+- docs: update CHANGELOG for v0.3.0
+
+
 ## [v0.3.0] - 2025-03-07
 
 ### Changes since v0.2.1
