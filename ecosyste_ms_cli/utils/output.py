@@ -4,8 +4,9 @@ Output formatting utilities for Ecosyste.ms CLI.
 import json
 import csv
 import io
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Union, Optional
 
+import tabulate
 from ..commands.common import OutputFormat
 
 
@@ -44,3 +45,24 @@ def format_output(data: Union[Dict[str, Any], List[Dict[str, Any]]],
     
     else:
         return str(data)
+
+
+def format_table(data: List[Dict[str, Any]], headers: Union[List[str], str] = "keys") -> str:
+    """
+    Format data as a table for terminal display.
+    
+    Args:
+        data: List of dictionaries to format
+        headers: Column headers ("keys" for dict keys, list for custom headers)
+        
+    Returns:
+        Formatted table string
+    """
+    return tabulate.tabulate(data, headers=headers, tablefmt="grid")
+
+
+def truncate_string(s: str, max_length: int = 50) -> str:
+    """Truncate a string to max_length with ellipsis if needed."""
+    if len(s) <= max_length:
+        return s
+    return s[:max_length-3] + "..."
