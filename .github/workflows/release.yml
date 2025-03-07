@@ -4,6 +4,7 @@ on:
   workflow_run:
     workflows: ["build-test-lint"]
     types: [completed]
+    branches: [main]
   push:
     tags:
       - 'v*'
@@ -11,8 +12,10 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
-    # Only run this job if the build-test-lint workflow succeeded and we're on a v* tag
-    if: ${{ github.event.workflow_run.conclusion == 'success' && startsWith(github.ref, 'refs/tags/v') }}
+    # Run this job if either:
+    # 1. The build-test-lint workflow succeeded (for workflow_run events)
+    # 2. We're on a v* tag (for push events)
+    if: ${{ (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success') || (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')) }}
     steps:
       - uses: actions/checkout@v3
         with:
