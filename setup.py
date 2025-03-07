@@ -3,8 +3,18 @@ from setuptools import find_packages, setup
 setup(
     name="ecosystems-cli",
     version="0.3.5",
+    description="CLI for ecosyste.ms API",
+    author="Sebastian Schürmann",
+    author_email="sebastian.schurmann@gmail.com",
+    url="https://github.com/sebs/ecosyste_ms_cli",
     packages=find_packages(),
     include_package_data=True,
+    license="MIT",
+    classifiers=[
+        "License :: OSI Approved :: MIT License",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.12",
+    ],
     install_requires=[
         "click",
         "requests",
