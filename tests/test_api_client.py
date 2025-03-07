@@ -60,10 +60,10 @@ class TestAPIClient:
         mock_open = mock.mock_open(read_data=yaml.dump(mock_spec))
         monkeypatch.setattr("builtins.open", mock_open)
         monkeypatch.setattr(Path, "exists", lambda self: True)
-        
+
         # Act
         client = APIClient("test")
-        
+
         # Assert
         assert client.spec == mock_spec
 
@@ -73,10 +73,10 @@ class TestAPIClient:
         mock_open = mock.mock_open(read_data=yaml.dump(mock_spec))
         monkeypatch.setattr("builtins.open", mock_open)
         monkeypatch.setattr(Path, "exists", lambda self: True)
-        
+
         # Act
         client = APIClient("test")
-        
+
         # Assert
         assert client.base_url == "https://test.example.com/api/v1"
 
@@ -86,10 +86,10 @@ class TestAPIClient:
         mock_open = mock.mock_open(read_data=yaml.dump(mock_spec))
         monkeypatch.setattr("builtins.open", mock_open)
         monkeypatch.setattr(Path, "exists", lambda self: True)
-        
+
         # Act
         client = APIClient("test")
-        
+
         # Assert
         assert "getTest" in client.endpoints
         assert "getItem" in client.endpoints
@@ -103,10 +103,10 @@ class TestAPIClient:
         monkeypatch.setattr("builtins.open", mock_open)
         monkeypatch.setattr(Path, "exists", lambda self: True)
         client = APIClient("test")
-        
+
         # Act
         url = client._build_url("/items/{itemId}", {"itemId": "123"})
-        
+
         # Assert
         assert url == "https://test.example.com/api/v1/items/123"
 
@@ -118,18 +118,18 @@ class TestAPIClient:
         monkeypatch.setattr("builtins.open", mock_open)
         monkeypatch.setattr(Path, "exists", lambda self: True)
         client = APIClient("test")
-        
+
         mock_response = mock.Mock()
         mock_response.json.return_value = {"data": "test"}
         mock_request.return_value = mock_response
-        
+
         # Act
         result = client._make_request(
-            "get", 
-            "/test", 
+            "get",
+            "/test",
             query_params={"id": "123"}
         )
-        
+
         # Assert
         assert result == {"data": "test"}
         mock_request.assert_called_once_with(
@@ -137,7 +137,8 @@ class TestAPIClient:
             url="https://test.example.com/api/v1/test",
             params={"id": "123"},
             json=None,
-            headers={"Content-Type": "application/json"}
+            headers={"Content-Type": "application/json"},
+            timeout=20
         )
 
     @mock.patch("requests.request")
@@ -148,17 +149,17 @@ class TestAPIClient:
         monkeypatch.setattr("builtins.open", mock_open)
         monkeypatch.setattr(Path, "exists", lambda self: True)
         client = APIClient("test")
-        
+
         mock_response = mock.Mock()
         mock_response.json.return_value = {"data": "test"}
         mock_request.return_value = mock_response
-        
+
         # Act
         result = client.call(
-            "getItem", 
+            "getItem",
             path_params={"itemId": "123"}
         )
-        
+
         # Assert
         assert result == {"data": "test"}
         mock_request.assert_called_once_with(
@@ -166,7 +167,8 @@ class TestAPIClient:
             url="https://test.example.com/api/v1/items/123",
             params={},
             json=None,
-            headers={"Content-Type": "application/json"}
+            headers={"Content-Type": "application/json"},
+            timeout=20
         )
 
     def test_call_invalid_operation(self, monkeypatch, mock_spec):
@@ -176,7 +178,7 @@ class TestAPIClient:
         monkeypatch.setattr("builtins.open", mock_open)
         monkeypatch.setattr(Path, "exists", lambda self: True)
         client = APIClient("test")
-        
+
         # Act & Assert
         with pytest.raises(ValueError, match="Operation 'invalidOp' not found in test API"):
             client.call("invalidOp")
@@ -188,6 +190,6 @@ def test_get_client():
     with mock.patch.object(APIClient, "__init__", return_value=None) as mock_init:
         # Act
         get_client("test", "https://custom.example.com")
-        
+
         # Assert
-        mock_init.assert_called_once_with(api_name="test", base_url="https://custom.example.com")
+        mock_init.assert_called_once_with(api_name="test", base_url="https://custom.example.com", timeout=20)

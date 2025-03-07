@@ -9,6 +9,7 @@ setup(
         "click",
         "requests",
         "pyyaml",
+        "rich",
     ],
     extras_require={
         "dev": [
