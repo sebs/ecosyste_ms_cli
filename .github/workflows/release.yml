@@ -4,7 +4,6 @@ on:
   workflow_run:
     workflows: ["build-test-lint"]
     types: [completed]
-    branches: [main]
   push:
     tags:
       - 'v*'
