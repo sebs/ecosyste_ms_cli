@@ -1,5 +1,14 @@
 # Changelog
 
+## [v0.3.0] - 2025-03-07
+
+### Changes since v0.2.1
+
+- chore(release): bump version 0.2.1 → 0.3.0
+- fix: less filtering makes the release pipeline go brrrrrr
+- docs: update CHANGELOG for v0.2.1
+
+
 ## [v0.2.1] - 2025-03-07
 
 ### Changes since v0.2.0
