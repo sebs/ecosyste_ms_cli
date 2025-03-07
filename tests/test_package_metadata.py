@@ -11,7 +11,7 @@ def test_license_in_setup():
 
     # Read setup.py file
     setup_path = project_root / "setup.py"
-    with open(setup_path, 'r') as f:
+    with open(setup_path, "r") as f:
         setup_content = f.read()
 
     # Extract license from setup.py using regex
@@ -24,7 +24,7 @@ def test_license_in_setup():
 
     # Read LICENSE file
     license_path = project_root / "LICENSE"
-    with open(license_path, 'r') as f:
+    with open(license_path, "r") as f:
         license_content = f.read().strip()
 
     # Check if LICENSE file contains MIT license text

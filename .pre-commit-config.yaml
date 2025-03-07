@@ -12,3 +12,19 @@ repos:
     hooks:
       - id: commitizen
         stages: [commit-msg]
+
+  - repo: local
+    hooks:
+      - id: lint
+        name: lint
+        entry: make lint
+        language: system
+        pass_filenames: false
+        types: [python]
+
+      - id: test
+        name: test
+        entry: make test
+        language: system
+        pass_filenames: false
+        types: [python]
