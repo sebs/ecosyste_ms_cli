@@ -1,4 +1,14 @@
-# CHANGELOG
+# Changelog
+
+## [v0.2.0] - 2025-03-07
+
+### Changes since v0.1.2
+
+- chore(release): bump version 0.1.2 → 0.2.0
+- chore(release): bump version 0.1.1 → 0.1.2
+- chore: update bump2version commit message format
+- chore: switch to bump2version for release management
+
 
 
 ## v0.1.2 (2025-03-07)
