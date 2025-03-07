@@ -1,7 +1,5 @@
 """Tests for the API client."""
 
-import json
-import os
 from pathlib import Path
 from unittest import mock
 
@@ -124,11 +122,7 @@ class TestAPIClient:
         mock_request.return_value = mock_response
 
         # Act
-        result = client._make_request(
-            "get",
-            "/test",
-            query_params={"id": "123"}
-        )
+        result = client._make_request("get", "/test", query_params={"id": "123"})
 
         # Assert
         assert result == {"data": "test"}
@@ -138,7 +132,7 @@ class TestAPIClient:
             params={"id": "123"},
             json=None,
             headers={"Content-Type": "application/json"},
-            timeout=20
+            timeout=20,
         )
 
     @mock.patch("requests.request")
@@ -155,10 +149,7 @@ class TestAPIClient:
         mock_request.return_value = mock_response
 
         # Act
-        result = client.call(
-            "getItem",
-            path_params={"itemId": "123"}
-        )
+        result = client.call("getItem", path_params={"itemId": "123"})
 
         # Assert
         assert result == {"data": "test"}
@@ -168,7 +159,7 @@ class TestAPIClient:
             params={},
             json=None,
             headers={"Content-Type": "application/json"},
-            timeout=20
+            timeout=20,
         )
 
     def test_call_invalid_operation(self, monkeypatch, mock_spec):

@@ -1,8 +1,7 @@
 """API client for ecosystems CLI using requests."""
 
-import os
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional
 
 import requests
 import yaml
@@ -57,7 +56,7 @@ class APIClient:
                             "params": self._parse_parameters(details),
                             "description": details.get("description", ""),
                             "summary": details.get("summary", ""),
-                            "required_params": self._get_required_params(details)
+                            "required_params": self._get_required_params(details),
                         }
 
         return endpoints
@@ -72,7 +71,7 @@ class APIClient:
                     required_params[param_name] = {
                         "in": param.get("in"),
                         "schema": param.get("schema", {}),
-                        "description": param.get("description", "")
+                        "description": param.get("description", ""),
                     }
         return required_params
 
@@ -86,7 +85,7 @@ class APIClient:
                     "in": param.get("in"),
                     "required": param.get("required", False),
                     "schema": param.get("schema", {}),
-                    "description": param.get("description", "")
+                    "description": param.get("description", ""),
                 }
 
         return params
@@ -108,7 +107,7 @@ class APIClient:
         path_params: Dict[str, Any] = None,
         query_params: Dict[str, Any] = None,
         body: Dict[str, Any] = None,
-        headers: Dict[str, str] = None
+        headers: Dict[str, str] = None,
     ) -> Dict[str, Any]:
         """Make HTTP request to API."""
         path_params = path_params or {}
@@ -122,12 +121,7 @@ class APIClient:
             headers["Content-Type"] = "application/json"
 
         response = requests.request(
-            method=method,
-            url=url,
-            params=query_params,
-            json=body,
-            headers=headers,
-            timeout=self.timeout
+            method=method, url=url, params=query_params, json=body, headers=headers, timeout=self.timeout
         )
 
         # Raise exception for error status codes
@@ -145,7 +139,7 @@ class APIClient:
         path_params: Dict[str, Any] = None,
         query_params: Dict[str, Any] = None,
         body: Dict[str, Any] = None,
-        headers: Dict[str, str] = None
+        headers: Dict[str, str] = None,
     ) -> Dict[str, Any]:
         """Call API endpoint by operation ID."""
         if operation_id not in self.endpoints:
@@ -159,7 +153,7 @@ class APIClient:
             path_params=path_params,
             query_params=query_params,
             body=body,
-            headers=headers
+            headers=headers,
         )
 
     def list_operations(self) -> List[Dict[str, str]]:
@@ -167,12 +161,9 @@ class APIClient:
         operations = []
 
         for op_id, details in self.endpoints.items():
-            operations.append({
-                "id": op_id,
-                "method": details["method"].upper(),
-                "path": details["path"],
-                "summary": details["summary"]
-            })
+            operations.append(
+                {"id": op_id, "method": details["method"].upper(), "path": details["path"], "summary": details["summary"]}
+            )
 
         return operations
 
@@ -214,11 +205,9 @@ class APIClient:
         """Get a specific package version (packages API)."""
         if self.api_name != "packages":
             raise ValueError("This method is only available for the packages API")
-        return self.call("getPackageVersion", path_params={
-            "registryName": registry_name,
-            "packageName": package_name,
-            "version": version
-        })
+        return self.call(
+            "getPackageVersion", path_params={"registryName": registry_name, "packageName": package_name, "version": version}
+        )
 
     # Additional convenience methods for repos API
 
