@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 
 setup(
     name="ecosystems-cli",
-    version="0.3.3",
+    version="0.3.4",
     packages=find_packages(),
     include_package_data=True,
     install_requires=[
