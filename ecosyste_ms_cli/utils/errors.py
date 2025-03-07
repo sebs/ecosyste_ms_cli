@@ -21,8 +21,24 @@ class ValidationError(Exception):
         super().__init__(self.message)
 
 
+class TopicNotFoundError(APIError):
+    """Exception for when a topic cannot be found."""
+    def __init__(self, topic: str):
+        super().__init__(f"Topic '{topic}' not found", status_code=404)
+
+
+class RepositoryNotFoundError(APIError):
+    """Exception for when a repository cannot be found."""
+    def __init__(self, repo_url: str):
+        super().__init__(f"Repository at '{repo_url}' not found", status_code=404)
+
+
 def handle_api_error(func: Callable) -> Callable:
     """Decorator to handle API exceptions."""
+    from functools import wraps
+    import inspect
+    
+    @wraps(func)
     def wrapper(*args, **kwargs):
         try:
             return func(*args, **kwargs)
@@ -30,11 +46,14 @@ def handle_api_error(func: Callable) -> Callable:
             typer.echo(f"Error: {e.message}", err=True)
             if e.status_code:
                 typer.echo(f"Status code: {e.status_code}", err=True)
-            sys.exit(1)
+            raise typer.Exit(code=1)
         except ValidationError as e:
             typer.echo(f"Validation Error: {e.message}", err=True)
-            sys.exit(1)
+            raise typer.Exit(code=1)
         except Exception as e:
             typer.echo(f"Unexpected error: {str(e)}", err=True)
-            sys.exit(1)
+            raise typer.Exit(code=1)
+            
+    # Preserve Typer's signature inspection
+    wrapper.__signature__ = inspect.signature(func)
     return wrapper
