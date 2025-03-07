@@ -5,6 +5,10 @@ on:
     workflows: ["build-test-lint"]
     types: [completed]
 
+permissions:
+  contents: write
+  packages: write
+
 jobs:
   release:
     runs-on: ubuntu-latest
