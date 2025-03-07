@@ -16,6 +16,9 @@
 - .gitignore dist
   ([`75b1da4`](https://github.com/sebs/ecosyste_ms_cli/commit/75b1da4eb67f5aff223259236f8dd1a3d8121b0e))
 
+- Add semantic-release configuration
+  ([`0b8220f`](https://github.com/sebs/ecosyste_ms_cli/commit/0b8220fbbe90171bc685ca48a4c78873a8f1207c))
+
 - Fix linter errors
   ([`f056174`](https://github.com/sebs/ecosyste_ms_cli/commit/f05617445fbdbf8bfcc42f1884654cabb091e91b))
 
