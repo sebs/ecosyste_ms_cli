@@ -21,3 +21,13 @@ exclude = '''
 profile = "black"
 line_length = 128
 skip = [".venv"]
+
+[tool.semantic_release]
+version_variable = ["setup.py:version"]
+branch = "main"
+changelog_file = "CHANGELOG.md"
+build_command = "python -m build"
+dist_path = "dist/"
+upload_to_repository = true
+commit_version_number = true
+tag_commit = true
