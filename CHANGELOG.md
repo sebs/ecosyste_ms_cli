@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.1.2 (2025-03-07)
+
+### Chores
+
+- Disable remote operations in semantic-release
+  ([`f235a4c`](https://github.com/sebs/ecosyste_ms_cli/commit/f235a4ced57cef49cf062c2fec284c1204e088f5))
+
+
 ## v0.1.1 (2025-03-07)
 
 ### Bug Fixes
