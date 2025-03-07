@@ -1,5 +1,9 @@
 # Ecosystems CLI
 
+[![Build-Test-Lint](https://github.com/sebs/ecosyste_ms_cli/actions/workflows/build-test-lint.yml/badge.svg)](https://github.com/sebs/ecosyste_ms_cli/actions/workflows/build-test-lint.yml)
+[![Latest Release](https://img.shields.io/github/v/release/sebs/ecosyste_ms_cli)](https://github.com/sebs/ecosyste_ms_cli/releases/latest)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 A command-line interface for interacting with ecosyste.ms APIs.
 
 ## Installation
@@ -14,12 +18,6 @@ cd ecosyste_ms_cli
 
 # Set up virtual environment and install dependencies
 make setup
-
-# Activate virtual environment
-source .venv/bin/activate
-
-# Install in development mode
-pip install -e .
 ```
 
 ## Usage
@@ -36,6 +34,11 @@ ecosystems --help
 - `--timeout`: Set the timeout in seconds for all HTTP requests (default: 20 seconds)
 - `--format`: Set the output format (default: table). Available formats: table, json, tsv, jsonl
 
+
+## Output Formats
+
+The CLI supports multiple output formats:
+
 ```bash
 # Example: Set a 30-second timeout for all requests
 ecosystems --timeout 30 repos topics
@@ -50,151 +53,51 @@ ecosystems --format tsv repos topics
 ecosystems --format jsonl repos topics
 ```
 
+## Available Commands
+
 ### Repos API
-
-```bash
-# List all topics
-ecosystems repos topics
-
-# Get a specific topic
-ecosystems repos topic javascript
-
-# List all repository hosts
-ecosystems repos hosts
-
-# Get a specific host
-ecosystems repos host GitHub
-
-# Get a specific repository
-ecosystems repos repository GitHub facebook react
-```
+- `repos topics` - List all topics
+- `repos topic` - Get a specific topic
+- `repos hosts` - List all repository hosts
+- `repos host` - Get a specific host
+- `repos repository` - Get a specific repository
+- `repos list` - List available operations
+- `repos call` - Call an operation directly
 
 ### Packages API
-
-```bash
-# List all registries
-ecosystems packages registries
-
-# Get a specific registry
-ecosystems packages registry npm
-
-# Get a specific package
-ecosystems packages package npm express
-
-# Get a specific package version
-ecosystems packages version npm express 4.17.1
-```
+- `packages registries` - List all registries
+- `packages registry` - Get a specific registry
+- `packages package` - Get a specific package
+- `packages version` - Get a specific package version
+- `packages list` - List available operations
+- `packages call` - Call an operation directly
 
 ### Summary API
-
-```bash
-# Get repository summary
-ecosystems summary repo https://github.com/facebook/react
-
-# Get package summary
-ecosystems summary package https://www.npmjs.com/package/express
-```
+- `summary repo` - Get repository summary
+- `summary package` - Get package summary
+- `summary list` - List available operations
+- `summary call` - Call an operation directly
 
 ### Awesome API
+- `awesome projects` - List all projects
+- `awesome project` - Get a specific project
+- `awesome lists` - List all lists
+- `awesome list` - Get a specific list
+- `awesome list-projects` - Get projects in a list
+- `awesome topics` - List all topics
+- `awesome topic` - Get a specific topic
+- `awesome operations` - List available operations
+- `awesome call` - Call an operation directly
+
+## Example
 
 ```bash
-# List all projects
+# Get all projects from the awesome API
 ecosystems awesome projects
-
-# Get a specific project by ID
-ecosystems awesome project 123456
-
-# List all lists
-ecosystems awesome lists
-
-# Get a specific list by ID
-ecosystems awesome list 123
-
-# Get projects in a specific list
-ecosystems awesome list-projects 123
-
-# List all topics
-ecosystems awesome topics
-
-# Get a specific topic by slug
-ecosystems awesome topic javascript
 ```
 
-### Advanced Usage
+## Documentation
 
-#### API Operation Calls
-
-#### List Available Operations
-
-```bash
-# List operations for a specific API
-ecosystems packages list
-ecosystems repos list
-ecosystems summary list
-ecosystems awesome operations
-```
-
-## Development
-
-```bash
-# Run tests
-make test
-
-# Run linting
-make lint
-
-# Format code
-make format
-
-# Clean up
-make clean
-```
-
-### Releases
-
-This project uses GitHub Actions for automated builds. When you're ready to create a release:
-
-1. Tag your commit with a version number:
-   ```bash
-   git tag v0.1.0
-   git push origin v0.1.0
-   ```
-
-2. The GitHub Action will automatically:
-   - Run tests and linting
-   - Build the package
-   - Create a draft GitHub release with the built package
-
-### Conventional Commits
-
-This project uses [Conventional Commits](https://www.conventionalcommits.org/) for standardized commit messages. The format helps maintain a readable history and automates versioning and changelog generation.
-
-Commit messages should follow this pattern:
-```
-<type>[optional scope]: <description>
-
-[optional body]
-
-[optional footer(s)]
-```
-
-Common types include:
-- `feat`: A new feature
-- `fix`: A bug fix
-- `docs`: Documentation changes
-- `style`: Code style changes (formatting, etc.)
-- `refactor`: Code changes that neither fix bugs nor add features
-- `test`: Adding or modifying tests
-- `chore`: Changes to the build process or auxiliary tools
-
-Example: `feat(cli): add examples to command help text`
-
-## API Structure
-
-The CLI provides access to three ecosyste.ms APIs:
-
-1. **packages** - Package registry data
-2. **repos** - Repository data
-3. **summary** - Summary data
-
-Each API has its own set of operations that can be accessed through convenience commands or the generic `call` command.
+- [Development Guide](Development.md) - Information about development, testing, and release processes
+- [Changelog](CHANGELOG.md) - History of changes and releases
+- [License](LICENSE) - MIT License details
