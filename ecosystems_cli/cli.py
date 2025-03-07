@@ -15,11 +15,13 @@ console = Console()
 
 @click.group()
 @click.option("--timeout", default=20, help="Timeout in seconds for API requests. Default is 20 seconds.")
+@click.option("--format", default="table", type=click.Choice(["table", "json", "tsv", "jsonl"]), help="Output format. Default is table.")
 @click.pass_context
-def main(ctx, timeout):
+def main(ctx, timeout, format):
     """Ecosystems CLI for interacting with ecosyste.ms APIs."""
     ctx.ensure_object(dict)
     ctx.obj["timeout"] = timeout
+    ctx.obj["format"] = format
 
 
 @main.group()
@@ -37,6 +39,12 @@ def repos():
 @main.group()
 def summary():
     """Commands for the summary API."""
+    pass
+
+
+@main.group()
+def awesome():
+    """Commands for the awesome API."""
     pass
 
 
@@ -84,7 +92,7 @@ def get_topics(ctx):
     """
     client = get_client("repos", timeout=ctx.obj.get("timeout", 20))
     result = client.get_topics()
-    _print_json(result)
+    _print_output(result, ctx.obj.get("format", "table"))
 
 
 @repos.command("topic")
@@ -99,7 +107,7 @@ def get_topic(ctx, name: str):
     client = get_client("repos", timeout=ctx.obj.get("timeout", 20))
     try:
         result = client.get_topic(name)
-        _print_json(result)
+        _print_output(result, ctx.obj.get("format", "table"))
     except Exception as e:
         _print_error(str(e))
 
@@ -114,7 +122,7 @@ def get_hosts(ctx):
     """
     client = get_client("repos", timeout=ctx.obj.get("timeout", 20))
     result = client.get_hosts()
-    _print_json(result)
+    _print_output(result, ctx.obj.get("format", "table"))
 
 
 @repos.command("host")
@@ -129,7 +137,7 @@ def get_host(ctx, name: str):
     client = get_client("repos", timeout=ctx.obj.get("timeout", 20))
     try:
         result = client.get_host(name)
-        _print_json(result)
+        _print_output(result, ctx.obj.get("format", "table"))
     except Exception as e:
         _print_error(str(e))
 
@@ -148,7 +156,7 @@ def get_repository(ctx, host: str, owner: str, repo: str):
     client = get_client("repos", timeout=ctx.obj.get("timeout", 20))
     try:
         result = client.get_repository(host, owner, repo)
-        _print_json(result)
+        _print_output(result, ctx.obj.get("format", "table"))
     except Exception as e:
         _print_error(str(e))
 
@@ -165,7 +173,7 @@ def get_registries(ctx):
     """
     client = get_client("packages", timeout=ctx.obj.get("timeout", 20))
     result = client.get_registries()
-    _print_json(result)
+    _print_output(result, ctx.obj.get("format", "table"))
 
 
 @packages.command("registry")
@@ -180,7 +188,7 @@ def get_registry(ctx, name: str):
     client = get_client("packages", timeout=ctx.obj.get("timeout", 20))
     try:
         result = client.get_registry(name)
-        _print_json(result)
+        _print_output(result, ctx.obj.get("format", "table"))
     except Exception as e:
         _print_error(str(e))
 
@@ -198,7 +206,7 @@ def get_package(ctx, registry: str, package: str):
     client = get_client("packages", timeout=ctx.obj.get("timeout", 20))
     try:
         result = client.get_package(registry, package)
-        _print_json(result)
+        _print_output(result, ctx.obj.get("format", "table"))
     except Exception as e:
         _print_error(str(e))
 
@@ -217,7 +225,7 @@ def get_package_version(ctx, registry: str, package: str, version: str):
     client = get_client("packages", timeout=ctx.obj.get("timeout", 20))
     try:
         result = client.get_package_version(registry, package, version)
-        _print_json(result)
+        _print_output(result, ctx.obj.get("format", "table"))
     except Exception as e:
         _print_error(str(e))
 
@@ -236,7 +244,7 @@ def get_repo_summary(ctx, url: str):
     client = get_client("summary", timeout=ctx.obj.get("timeout", 20))
     try:
         result = client.get_repo_summary(url)
-        _print_json(result)
+        _print_output(result, ctx.obj.get("format", "table"))
     except Exception as e:
         _print_error(str(e))
 
@@ -253,7 +261,7 @@ def get_package_summary(ctx, url: str):
     client = get_client("summary", timeout=ctx.obj.get("timeout", 20))
     try:
         result = client.get_package_summary(url)
-        _print_json(result)
+        _print_output(result, ctx.obj.get("format", "table"))
     except Exception as e:
         _print_error(str(e))
 
@@ -303,6 +311,140 @@ def call_summary_operation(ctx, operation: str, path_params: str, query_params: 
     _call_operation("summary", operation, path_params, query_params, body, ctx)
 
 
+@awesome.command("projects")
+@click.pass_context
+def get_projects(ctx):
+    """Get all projects.
+
+    Example:
+        ecosystems awesome projects
+    """
+    client = get_client("awesome", timeout=ctx.obj.get("timeout", 20))
+    result = client.call("getProjects")
+    _print_output(result, ctx.obj.get("format", "table"))
+
+
+@awesome.command("project")
+@click.argument("id")
+@click.pass_context
+def get_project(ctx, id: str):
+    """Get a specific project by ID.
+
+    Example:
+        ecosystems awesome project 123
+    """
+    client = get_client("awesome", timeout=ctx.obj.get("timeout", 20))
+    try:
+        result = client.call("getProject", path_params={"id": id})
+        _print_output(result, ctx.obj.get("format", "table"))
+    except Exception as e:
+        _print_error(str(e))
+
+
+@awesome.command("call")
+@click.argument("operation")
+@click.option("--path-params", help="Path parameters as JSON")
+@click.option("--query-params", help="Query parameters as JSON")
+@click.option("--body", help="Request body as JSON")
+@click.pass_context
+def call_awesome_operation(ctx, operation: str, path_params: str, query_params: str, body: str):
+    """Call an operation on the awesome API.
+
+    Example:
+        ecosystems awesome call getProject --path-params '{"id": "123"}'
+    """
+    _call_operation("awesome", operation, path_params, query_params, body, ctx)
+
+
+@awesome.command("lists")
+@click.pass_context
+def get_lists(ctx):
+    """Get all lists.
+
+    Example:
+        ecosystems awesome lists
+    """
+    client = get_client("awesome", timeout=ctx.obj.get("timeout", 20))
+    result = client.call("getLists")
+    _print_output(result, ctx.obj.get("format", "table"))
+
+
+@awesome.command("list")
+@click.argument("id")
+@click.pass_context
+def get_list(ctx, id: str):
+    """Get a specific list by ID.
+
+    Example:
+        ecosystems awesome list 123
+    """
+    client = get_client("awesome", timeout=ctx.obj.get("timeout", 20))
+    try:
+        result = client.call("getList", path_params={"id": id})
+        _print_output(result, ctx.obj.get("format", "table"))
+    except Exception as e:
+        _print_error(str(e))
+
+
+@awesome.command("list-projects")
+@click.argument("id")
+@click.pass_context
+def get_list_projects(ctx, id: str):
+    """Get projects in a specific list.
+
+    Example:
+        ecosystems awesome list-projects 123
+    """
+    client = get_client("awesome", timeout=ctx.obj.get("timeout", 20))
+    try:
+        result = client.call("getListProjects", path_params={"id": id})
+        _print_output(result, ctx.obj.get("format", "table"))
+    except Exception as e:
+        _print_error(str(e))
+
+
+@awesome.command("topics")
+@click.pass_context
+def get_topics(ctx):
+    """Get all topics.
+
+    Example:
+        ecosystems awesome topics
+    """
+    client = get_client("awesome", timeout=ctx.obj.get("timeout", 20))
+    result = client.call("getTopics")
+    _print_output(result, ctx.obj.get("format", "table"))
+
+
+@awesome.command("topic")
+@click.argument("slug")
+@click.pass_context
+def get_topic(ctx, slug: str):
+    """Get a specific topic by slug.
+
+    Example:
+        ecosystems awesome topic javascript
+    """
+    client = get_client("awesome", timeout=ctx.obj.get("timeout", 20))
+    try:
+        result = client.call("getTopic", path_params={"slug": slug})
+        _print_output(result, ctx.obj.get("format", "table"))
+    except Exception as e:
+        _print_error(str(e))
+
+
+@awesome.command("operations")
+@click.pass_context
+def list_awesome_operations(ctx):
+    """List available operations for the awesome API.
+
+    Example:
+        ecosystems awesome operations
+    """
+    client = get_client("awesome", timeout=ctx.obj.get("timeout", 20))
+    _print_operations(client.list_operations())
+
+
 def _parse_json_param(param: Optional[str]) -> Optional[Dict]:
     """Parse JSON parameter if provided."""
     if not param:
@@ -316,6 +458,7 @@ def _parse_json_param(param: Optional[str]) -> Optional[Dict]:
 def _call_operation(api: str, operation: str, path_params: str, query_params: str, body: str, ctx=None):
     """Call an operation on the specified API."""
     timeout = ctx.obj.get("timeout", 20) if ctx else 20
+    format_type = ctx.obj.get("format", "table") if ctx else "table"
     client = get_client(api, timeout=timeout)
 
     # Parse parameters
@@ -330,7 +473,7 @@ def _call_operation(api: str, operation: str, path_params: str, query_params: st
             query_params=query_params_dict,
             body=body_dict
         )
-        _print_json(result)
+        _print_output(result, format_type)
     except Exception as e:
         _print_error(str(e))
 
@@ -367,7 +510,7 @@ def create_dynamic_command(api_name: str, operation_id: str, client):
                 path_params=path_params,
                 query_params=query_params
             )
-            _print_json(result)
+            _print_output(result, ctx.obj.get("format", "table"))
         except Exception as e:
             _print_error(str(e))
 
@@ -382,11 +525,162 @@ def create_dynamic_command(api_name: str, operation_id: str, client):
     return click.command(name=operation_id)(dynamic_command)
 
 
+def _print_output(data: Any, format_type: str = "table"):
+    """Print data in the specified format.
+
+    Args:
+        data: The data to print
+        format_type: One of 'table', 'json', 'tsv', or 'jsonl'
+    """
+    if format_type == "json":
+        json_str = json.dumps(data, indent=2)
+        syntax = Syntax(json_str, "json", theme="monokai", line_numbers=False)
+        console.print(syntax)
+    elif format_type == "tsv":
+        if isinstance(data, list) and len(data) > 0:
+            # Get headers from first item
+            headers = list(data[0].keys())
+            # Print headers
+            console.print("\t".join(headers))
+            # Print rows
+            for item in data:
+                console.print("\t".join(str(_format_value(item.get(h, ""))) for h in headers))
+        else:
+            # For non-list data, convert to flat dictionary
+            flat_data = _flatten_dict(data) if isinstance(data, dict) else {"value": str(data)}
+            console.print("\t".join(flat_data.keys()))
+            console.print("\t".join(str(v) for v in flat_data.values()))
+    elif format_type == "jsonl":
+        if isinstance(data, list):
+            for item in data:
+                console.print(json.dumps(item))
+        else:
+            console.print(json.dumps(data))
+    else:  # Default to table
+        if isinstance(data, list) and len(data) > 0:
+            from rich.table import Table
+
+            # Get headers from first item
+            headers = list(data[0].keys())
+
+            # Show only 2 columns by default for table format
+            # Choose the most important fields based on the API response
+
+            # Define priority fields for different APIs
+            priority_fields = {
+                # Common priority fields across all APIs
+                "common": ["id", "name", "title"],
+                # Fields specific to repos API
+                "repos": ["full_name", "description", "url", "host"],
+                # Fields specific to packages API
+                "packages": ["name", "description", "latest_version", "registry"],
+                # Fields specific to awesome API
+                "awesome": ["id", "name", "title", "url"],
+                # Fields specific to summary API
+                "summary": ["name", "description", "url"]
+            }
+
+            # Determine which API we're dealing with based on the fields
+            api_type = "common"
+            for api_name, fields in priority_fields.items():
+                if api_name != "common" and any(field in headers for field in fields):
+                    api_type = api_name
+                    break
+
+            # Always select exactly 2 columns
+            selected_fields = []
+
+            # First try the API-specific priority fields
+            for field in priority_fields[api_type]:
+                if field in headers and len(selected_fields) < 2:
+                    selected_fields.append(field)
+
+            # If we still need more fields, try common fields
+            if len(selected_fields) < 2:
+                for field in priority_fields["common"]:
+                    if field in headers and field not in selected_fields and len(selected_fields) < 2:
+                        selected_fields.append(field)
+
+            # If we still need more fields, add any remaining fields
+            if len(selected_fields) < 2:
+                for field in headers:
+                    if field not in selected_fields and len(selected_fields) < 2:
+                        selected_fields.append(field)
+
+            # Ensure we have exactly 2 fields if possible
+            if len(selected_fields) == 1 and len(headers) > 0:
+                # If we only have one field but more are available, add another
+                for field in headers:
+                    if field not in selected_fields:
+                        selected_fields.append(field)
+                        break
+
+            headers = selected_fields
+
+            table = Table(title="API Response", show_header=True, header_style="bold cyan")
+
+            # Add columns
+            for header in headers:
+                table.add_column(header.capitalize())
+
+            # Add rows
+            for item in data:
+                table.add_row(*[_format_value(item.get(h, "")) for h in headers])
+
+            console.print(table)
+        else:
+            # For non-list data, create a table with key-value pairs
+            if isinstance(data, dict):
+                from rich.table import Table
+                table = Table(title="API Response", show_header=True, header_style="bold cyan")
+                table.add_column("Field")
+                table.add_column("Value")
+
+                # Add rows for each key-value pair
+                for key, value in data.items():
+                    table.add_row(key, _format_value(value))
+
+                console.print(table)
+            else:
+                # Fall back to JSON format for non-dict data
+                json_str = json.dumps(data, indent=2)
+                syntax = Syntax(json_str, "json", theme="monokai", line_numbers=False)
+                console.print(syntax)
+
+def _format_value(value: Any) -> str:
+    """Format a value for display in a table or TSV."""
+    if isinstance(value, (dict, list)):
+        # For complex objects, show a simplified representation
+        if isinstance(value, dict):
+            if len(value) == 0:
+                return "{}"
+            elif len(value) <= 3:
+                return ", ".join(f"{k}: {_format_value(v)}" for k, v in value.items())
+            else:
+                return f"{{...}} ({len(value)} items)"
+        elif isinstance(value, list):
+            if len(value) == 0:
+                return "[]"
+            elif len(value) <= 3:
+                return ", ".join(_format_value(v) for v in value)
+            else:
+                return f"[...] ({len(value)} items)"
+    return str(value)
+
+def _flatten_dict(d, parent_key='', sep='_'):
+    """Flatten a nested dictionary for TSV output."""
+    items = []
+    for k, v in d.items():
+        new_key = f"{parent_key}{sep}{k}" if parent_key else k
+        if isinstance(v, dict):
+            items.extend(_flatten_dict(v, new_key, sep=sep).items())
+        else:
+            items.append((new_key, v))
+    return dict(items)
+
 def _print_json(data: Any):
     """Print JSON data in a nicely formatted way."""
-    json_str = json.dumps(data, indent=2)
-    syntax = Syntax(json_str, "json", theme="monokai", line_numbers=False)
-    console.print(syntax)
+    _print_output(data, "json")
 
 def _print_error(error_msg: str):
     """Print error message in a nicely formatted way."""
@@ -421,7 +715,7 @@ def _print_operations(operations: List[Dict]):
 def register_dynamic_commands():
     """Register dynamic commands for all API operations."""
     # Create API clients
-    apis = ["packages", "repos", "summary"]
+    apis = ["packages", "repos", "summary", "awesome"]
     clients = {api: get_client(api) for api in apis}
 
     # Create subgroups for each API

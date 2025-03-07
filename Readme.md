@@ -34,10 +34,20 @@ ecosystems --help
 ### Global Options
 
 - `--timeout`: Set the timeout in seconds for all HTTP requests (default: 20 seconds)
+- `--format`: Set the output format (default: table). Available formats: table, json, tsv, jsonl
 
 ```bash
 # Example: Set a 30-second timeout for all requests
 ecosystems --timeout 30 repos topics
+
+# Example: Get output in JSON format
+ecosystems --format json repos topics
+
+# Example: Get output in TSV format (tab-separated values)
+ecosystems --format tsv repos topics
+
+# Example: Get output in JSONL format (JSON Lines)
+ecosystems --format jsonl repos topics
 ```
 
 ### Repos API
@@ -85,6 +95,31 @@ ecosystems summary repo https://github.com/facebook/react
 ecosystems summary package https://www.npmjs.com/package/express
 ```
 
+### Awesome API
+
+```bash
+# List all projects
+ecosystems awesome projects
+
+# Get a specific project by ID
+ecosystems awesome project 123456
+
+# List all lists
+ecosystems awesome lists
+
+# Get a specific list by ID
+ecosystems awesome list 123
+
+# Get projects in a specific list
+ecosystems awesome list-projects 123
+
+# List all topics
+ecosystems awesome topics
+
+# Get a specific topic by slug
+ecosystems awesome topic javascript
+```
+
 ### Advanced Usage
 
 #### API Operation Calls
@@ -96,6 +131,7 @@ ecosystems summary package https://www.npmjs.com/package/express
 ecosystems packages list
 ecosystems repos list
 ecosystems summary list
+ecosystems awesome operations
 ```
 
 ## Development
