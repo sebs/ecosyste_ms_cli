@@ -1,5 +1,14 @@
 # Changelog
 
+## [v0.3.5] - 2025-03-07
+
+### Changes since v0.3.4
+
+- chore(release): bump version 0.3.4 → 0.3.5
+- fix: add permissions to push a package to the action
+- docs: update CHANGELOG for v0.3.4
+
+
 ## [v0.3.4] - 2025-03-07
 
 ### Changes since v0.3.3
