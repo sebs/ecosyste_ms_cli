@@ -22,12 +22,7 @@ setup(
         "rich",
     ],
     extras_require={
-        "dev": [
-            "pytest",
-            "black",
-            "isort",
-            "flake8",
-        ],
+        "dev": ["pytest", "black", "isort", "flake8", "bandit"],
     },
     entry_points={
         "console_scripts": [

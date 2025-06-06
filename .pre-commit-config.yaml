@@ -28,3 +28,10 @@ repos:
         language: system
         pass_filenames: false
         types: [python]
+
+      - id: bandit
+        name: bandit
+        entry: make bandit
+        language: system
+        pass_filenames: false
+        types: [python]

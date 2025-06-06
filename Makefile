@@ -27,6 +27,9 @@ lint:
 	$(BIN)/black --check .
 	$(BIN)/isort --check .
 
+bandit:
+	$(BIN)/bandit -r ./ecosystems_cli
+
 format:
 	$(BIN)/black .
 	$(BIN)/isort .
