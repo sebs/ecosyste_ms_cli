@@ -32,6 +32,9 @@ jobs:
       - name: Lint code
         run: make lint
 
+      - name: Security check with Bandit
+        run: make bandit
+
       - name: Clean build artifacts
         run: make clean
 
