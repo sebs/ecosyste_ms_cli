@@ -174,6 +174,34 @@ class TestAPIClient:
         with pytest.raises(ValueError, match="Operation 'invalidOp' not found in test API"):
             client.call("invalidOp")
 
+    def test_get_required_params(self, monkeypatch, mock_spec):
+        """Test that _get_required_params returns only required parameters."""
+        # Arrange
+        mock_open = mock.mock_open(read_data=yaml.dump(mock_spec))
+        monkeypatch.setattr("builtins.open", mock_open)
+        monkeypatch.setattr(Path, "exists", lambda self: True)
+        client = APIClient("test")
+
+        # Act
+        required_params = client._get_required_params(mock_spec["paths"]["/test"]["get"])
+
+        # Assert
+        assert "id" in required_params
+        assert required_params["id"]["required"] is True
+        # Should not include non-required params (if any were present)
+        # Add a non-required param and test
+        details = mock_spec["paths"]["/test"]["get"].copy()
+        details["parameters"] = details["parameters"] + [
+            {
+                "name": "optional_param",
+                "in": "query",
+                "required": False,
+                "schema": {"type": "string"},
+            }
+        ]
+        required_params2 = client._get_required_params(details)
+        assert "optional_param" not in required_params2
+
 
 def test_get_client():
     """Test the get_client function."""
