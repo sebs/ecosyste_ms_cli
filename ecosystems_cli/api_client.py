@@ -6,6 +6,9 @@ from typing import Any, Dict, List, Optional
 import requests
 import yaml
 
+from ecosystems_cli.helpers.build_url import build_url
+from ecosystems_cli.helpers.parse_parameters import parse_parameters
+
 
 class APIClient:
     """Client for interacting with ecosyste.ms APIs."""
@@ -76,29 +79,12 @@ class APIClient:
         return required_params
 
     def _parse_parameters(self, details: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
-        """Parse parameters from endpoint details."""
-        params = {}
-        for param in details.get("parameters", []):
-            param_name = param.get("name")
-            if param_name:
-                params[param_name] = {
-                    "in": param.get("in"),
-                    "required": param.get("required", False),
-                    "schema": param.get("schema", {}),
-                    "description": param.get("description", ""),
-                }
-
-        return params
+        """Parse parameters from endpoint details (delegated to helper)."""
+        return parse_parameters(details)
 
     def _build_url(self, path: str, path_params: Dict[str, Any]) -> str:
-        """Build URL with path parameters."""
-        url = f"{self.base_url}{path}"
-
-        # Replace path parameters
-        for param, value in path_params.items():
-            url = url.replace(f"{{{param}}}", str(value))
-
-        return url
+        """Build URL with path parameters (delegated to helper)."""
+        return build_url(self.base_url, path, path_params)
 
     def _make_request(
         self,
