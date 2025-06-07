@@ -1,5 +1,21 @@
 # Changelog
 
+## [v0.3.6] - 2025-06-07
+
+### Changes since v0.3.5
+
+- chore(release): bump version 0.3.5 → 0.3.6
+- feat: complexipy
+- chore: remove leftovers
+- refactor: more extracted helpers
+- refactor: extract more helper methods
+- refactor: extract helper methods
+- feat: use bandit to do a sec check before commit or ci run pass
+- chore: run lint and test on precommit hook
+- docs: License information & better docs
+- docs: update CHANGELOG for v0.3.5
+
+
 ## [v0.3.5] - 2025-03-07
 
 ### Changes since v0.3.4
