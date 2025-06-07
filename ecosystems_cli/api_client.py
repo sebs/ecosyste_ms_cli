@@ -1,12 +1,12 @@
 """API client for ecosystems CLI using requests."""
 
-from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 import requests
-import yaml
 
 from ecosystems_cli.helpers.build_url import build_url
+from ecosystems_cli.helpers.load_api_spec import load_api_spec
+from ecosystems_cli.helpers.parse_endpoints import parse_endpoints
 from ecosystems_cli.helpers.parse_parameters import parse_parameters
 
 
@@ -22,19 +22,10 @@ class APIClient:
             timeout: Timeout in seconds for HTTP requests. Default is 20 seconds.
         """
         self.api_name = api_name
-        self.spec = self._load_api_spec()
+        self.spec = load_api_spec(api_name)
         self.base_url = base_url or self._get_default_base_url()
-        self.endpoints = self._parse_endpoints()
+        self.endpoints = parse_endpoints(self.spec)
         self.timeout = timeout
-
-    def _load_api_spec(self) -> Dict[str, Any]:
-        """Load OpenAPI specification from file."""
-        api_file = Path(__file__).parent.parent / "apis" / f"{self.api_name}.openapi.yaml"
-        if not api_file.exists():
-            raise ValueError(f"API specification for '{self.api_name}' not found")
-
-        with open(api_file, "r") as f:
-            return yaml.safe_load(f)
 
     def _get_default_base_url(self) -> str:
         """Get default base URL from OpenAPI specification."""
@@ -43,40 +34,9 @@ class APIClient:
             return servers[0]["url"]
         return f"https://{self.api_name}.ecosyste.ms/api/v1"
 
-    def _parse_endpoints(self) -> Dict[str, Dict[str, Any]]:
-        """Parse endpoints from OpenAPI specification."""
-        endpoints = {}
-        paths = self.spec.get("paths", {})
-
-        for path, methods in paths.items():
-            for method, details in methods.items():
-                if method in ["get", "post", "put", "delete", "patch"]:
-                    operation_id = details.get("operationId")
-                    if operation_id:
-                        endpoints[operation_id] = {
-                            "path": path,
-                            "method": method,
-                            "params": self._parse_parameters(details),
-                            "description": details.get("description", ""),
-                            "summary": details.get("summary", ""),
-                            "required_params": self._get_required_params(details),
-                        }
-
-        return endpoints
-
     def _get_required_params(self, details: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
-        """Get required parameters from endpoint details."""
-        required_params = {}
-        for param in details.get("parameters", []):
-            if param.get("required", False):
-                param_name = param.get("name")
-                if param_name:
-                    required_params[param_name] = {
-                        "in": param.get("in"),
-                        "schema": param.get("schema", {}),
-                        "description": param.get("description", ""),
-                    }
-        return required_params
+        """Get required parameters from endpoint details (delegated to helper)."""
+        return {k: v for k, v in parse_parameters(details).items() if v.get("required", False)}
 
     def _parse_parameters(self, details: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
         """Parse parameters from endpoint details (delegated to helper)."""
