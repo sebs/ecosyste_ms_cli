@@ -30,6 +30,9 @@ lint:
 bandit:
 	$(BIN)/bandit -r ./ecosystems_cli
 
+complexipy:
+	$(BIN)/complexipy ./ecosystems_cli
+
 format:
 	$(BIN)/black .
 	$(BIN)/isort .
