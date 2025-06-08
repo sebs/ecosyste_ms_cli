@@ -9,6 +9,8 @@ from rich.panel import Panel
 from rich.syntax import Syntax
 
 from ecosystems_cli.api_client import get_client
+from ecosystems_cli.helpers.parse_endpoints import flatten_dict
+from ecosystems_cli.helpers.print_operations import print_operations
 
 console = Console()
 
@@ -552,7 +554,7 @@ def _print_output(data: Any, format_type: str = "table"):
                 console.print("\t".join(str(_format_value(item.get(h, ""))) for h in headers))
         else:
             # For non-list data, convert to flat dictionary
-            flat_data = _flatten_dict(data) if isinstance(data, dict) else {"value": str(data)}
+            flat_data = flatten_dict(data) if isinstance(data, dict) else {"value": str(data)}
             console.print("\t".join(flat_data.keys()))
             console.print("\t".join(str(v) for v in flat_data.values()))
     elif format_type == "jsonl":
@@ -675,18 +677,6 @@ def _format_value(value: Any) -> str:
     return str(value)
 
 
-def _flatten_dict(d, parent_key="", sep="_"):
-    """Flatten a nested dictionary for TSV output."""
-    items = []
-    for k, v in d.items():
-        new_key = f"{parent_key}{sep}{k}" if parent_key else k
-        if isinstance(v, dict):
-            items.extend(_flatten_dict(v, new_key, sep=sep).items())
-        else:
-            items.append((new_key, v))
-    return dict(items)
-
-
 def _print_json(data: Any):
     """Print JSON data in a nicely formatted way."""
     _print_output(data, "json")
@@ -698,64 +688,4 @@ def _print_error(error_msg: str):
 
 
 def _print_operations(operations: List[Dict]):
-    """Print operations in a formatted table."""
-    if not operations:
-        console.print(Panel("No operations available.", title="Operations", border_style="yellow"))
-        return
-
-    # Find the maximum width for each column
-    id_width = max(len(op["id"]) for op in operations)
-    method_width = max(len(op["method"]) for op in operations)
-    path_width = max(len(op["path"]) for op in operations)
-
-    # Create table header
-    header = (
-        f"[bold cyan]{'OPERATION'.ljust(id_width)}[/bold cyan] | "
-        f"[bold green]{'METHOD'.ljust(method_width)}[/bold green] | "
-        f"[bold yellow]{'PATH'.ljust(path_width)}[/bold yellow] | "
-        f"[bold magenta]DESCRIPTION[/bold magenta]"
-    )
-    divider = "─" * (id_width + method_width + path_width + 40)
-
-    # Create table rows
-    rows = []
-    for op in sorted(operations, key=lambda x: x["id"]):
-        summary = op.get("summary", "")[:50] + ("..." if len(op.get("summary", "")) > 50 else "")
-        row = (
-            f"[cyan]{op['id'].ljust(id_width)}[/cyan] | "
-            f"[green]{op['method'].ljust(method_width)}[/green] | "
-            f"[yellow]{op['path'].ljust(path_width)}[/yellow] | "
-            f"[magenta]{summary}[/magenta]"
-        )
-        rows.append(row)
-
-    # Print table
-    console.print(Panel("\n".join([header, divider] + rows), title="Available Operations", border_style="blue"))
-
-
-def register_dynamic_commands():
-    """Register dynamic commands for all API operations."""
-    # Create API clients
-    apis = ["packages", "repos", "summary", "awesome"]
-    clients = {api: get_client(api) for api in apis}
-
-    # Create subgroups for each API
-    for api_name, client in clients.items():
-        # Create a group for this API
-        api_group = click.Group(name=api_name, help=f"Operations for {api_name} API")
-        op.add_command(api_group)
-
-        # Add commands for each operation
-        for operation_id in client.endpoints:
-            # Create a dynamic command for this operation
-            command = create_dynamic_command(api_name, operation_id, client)
-            # Add the command to the API group
-            api_group.add_command(command)
-
-
-# Register dynamic commands
-register_dynamic_commands()
-
-
-if __name__ == "__main__":
-    main()
+    print_operations(operations, console=console)
