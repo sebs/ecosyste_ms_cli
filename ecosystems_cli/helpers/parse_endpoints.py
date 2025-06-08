@@ -22,3 +22,9 @@ def parse_endpoints(spec: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
                         "required_params": {k: v for k, v in parse_parameters(details).items() if v.get("required", False)},
                     }
     return endpoints
+
+
+def flatten_dict(d, parent_key="", sep="_"):
+    from ecosystems_cli.helpers.flatten_dict import flatten_dict
+
+    return flatten_dict(d, parent_key, sep)
