@@ -9,6 +9,7 @@ from rich.panel import Panel
 from rich.syntax import Syntax
 
 from ecosystems_cli.api_client import get_client
+from ecosystems_cli.helpers.format_value import format_value
 from ecosystems_cli.helpers.parse_endpoints import flatten_dict
 from ecosystems_cli.helpers.print_operations import print_operations
 
@@ -657,24 +658,8 @@ def _print_output(data: Any, format_type: str = "table"):
 
 
 def _format_value(value: Any) -> str:
-    """Format a value for display in a table or TSV."""
-    if isinstance(value, (dict, list)):
-        # For complex objects, show a simplified representation
-        if isinstance(value, dict):
-            if len(value) == 0:
-                return "{}"
-            elif len(value) <= 3:
-                return ", ".join(f"{k}: {_format_value(v)}" for k, v in value.items())
-            else:
-                return f"{{...}} ({len(value)} items)"
-        elif isinstance(value, list):
-            if len(value) == 0:
-                return "[]"
-            elif len(value) <= 3:
-                return ", ".join(_format_value(v) for v in value)
-            else:
-                return f"[...] ({len(value)} items)"
-    return str(value)
+    """Deprecated: use format_value from helpers.format_value instead."""
+    return format_value(value)
 
 
 def _print_json(data: Any):
