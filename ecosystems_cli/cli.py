@@ -6,12 +6,11 @@ from typing import Any, Dict, List, Optional
 import click
 from rich.console import Console
 from rich.panel import Panel
-from rich.syntax import Syntax
 
 from ecosystems_cli.api_client import get_client
 from ecosystems_cli.helpers.format_value import format_value
-from ecosystems_cli.helpers.parse_endpoints import flatten_dict
 from ecosystems_cli.helpers.print_operations import print_operations
+from ecosystems_cli.helpers.print_output import print_output
 
 console = Console()
 
@@ -534,127 +533,8 @@ def create_dynamic_command(api_name: str, operation_id: str, client):
 
 
 def _print_output(data: Any, format_type: str = "table"):
-    """Print data in the specified format.
-
-    Args:
-        data: The data to print
-        format_type: One of 'table', 'json', 'tsv', or 'jsonl'
-    """
-    if format_type == "json":
-        json_str = json.dumps(data, indent=2)
-        syntax = Syntax(json_str, "json", theme="monokai", line_numbers=False)
-        console.print(syntax)
-    elif format_type == "tsv":
-        if isinstance(data, list) and len(data) > 0:
-            # Get headers from first item
-            headers = list(data[0].keys())
-            # Print headers
-            console.print("\t".join(headers))
-            # Print rows
-            for item in data:
-                console.print("\t".join(str(_format_value(item.get(h, ""))) for h in headers))
-        else:
-            # For non-list data, convert to flat dictionary
-            flat_data = flatten_dict(data) if isinstance(data, dict) else {"value": str(data)}
-            console.print("\t".join(flat_data.keys()))
-            console.print("\t".join(str(v) for v in flat_data.values()))
-    elif format_type == "jsonl":
-        if isinstance(data, list):
-            for item in data:
-                console.print(json.dumps(item))
-        else:
-            console.print(json.dumps(data))
-    else:  # Default to table
-        if isinstance(data, list) and len(data) > 0:
-            from rich.table import Table
-
-            # Get headers from first item
-            headers = list(data[0].keys())
-
-            # Show only 2 columns by default for table format
-            # Choose the most important fields based on the API response
-
-            # Define priority fields for different APIs
-            priority_fields = {
-                # Common priority fields across all APIs
-                "common": ["id", "name", "title"],
-                # Fields specific to repos API
-                "repos": ["full_name", "description", "url", "host"],
-                # Fields specific to packages API
-                "packages": ["name", "description", "latest_version", "registry"],
-                # Fields specific to awesome API
-                "awesome": ["id", "name", "title", "url"],
-                # Fields specific to summary API
-                "summary": ["name", "description", "url"],
-            }
-
-            # Determine which API we're dealing with based on the fields
-            api_type = "common"
-            for api_name, fields in priority_fields.items():
-                if api_name != "common" and any(field in headers for field in fields):
-                    api_type = api_name
-                    break
-
-            # Always select exactly 2 columns
-            selected_fields = []
-
-            # First try the API-specific priority fields
-            for field in priority_fields[api_type]:
-                if field in headers and len(selected_fields) < 2:
-                    selected_fields.append(field)
-
-            # If we still need more fields, try common fields
-            if len(selected_fields) < 2:
-                for field in priority_fields["common"]:
-                    if field in headers and field not in selected_fields and len(selected_fields) < 2:
-                        selected_fields.append(field)
-
-            # If we still need more fields, add any remaining fields
-            if len(selected_fields) < 2:
-                for field in headers:
-                    if field not in selected_fields and len(selected_fields) < 2:
-                        selected_fields.append(field)
-
-            # Ensure we have exactly 2 fields if possible
-            if len(selected_fields) == 1 and len(headers) > 0:
-                # If we only have one field but more are available, add another
-                for field in headers:
-                    if field not in selected_fields:
-                        selected_fields.append(field)
-                        break
-
-            headers = selected_fields
-
-            table = Table(title="API Response", show_header=True, header_style="bold cyan")
-
-            # Add columns
-            for header in headers:
-                table.add_column(header.capitalize())
-
-            # Add rows
-            for item in data:
-                table.add_row(*[_format_value(item.get(h, "")) for h in headers])
-
-            console.print(table)
-        else:
-            # For non-list data, create a table with key-value pairs
-            if isinstance(data, dict):
-                from rich.table import Table
-
-                table = Table(title="API Response", show_header=True, header_style="bold cyan")
-                table.add_column("Field")
-                table.add_column("Value")
-
-                # Add rows for each key-value pair
-                for key, value in data.items():
-                    table.add_row(key, _format_value(value))
-
-                console.print(table)
-            else:
-                # Fall back to JSON format for non-dict data
-                json_str = json.dumps(data, indent=2)
-                syntax = Syntax(json_str, "json", theme="monokai", line_numbers=False)
-                console.print(syntax)
+    """Print data in the specified format."""
+    print_output(data, format_type, console=console)
 
 
 def _format_value(value: Any) -> str:
