@@ -38,6 +38,14 @@ isort:
 	$(BIN)/isort ./ecosystems_cli
 	$(BIN)/isort ./tests
 
+fix-all:
+	$(BIN)/isort ./ecosystems_cli
+	$(BIN)/isort ./tests
+	$(BIN)/flake8 ./ecosystems_cli
+	$(BIN)/flake8 ./tests
+	$(BIN)/black ./ecosystems_cli
+	$(BIN)/black ./tests
+
 complexipy:
 	$(BIN)/complexipy ./ecosystems_cli
 
