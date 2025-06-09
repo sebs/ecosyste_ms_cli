@@ -1,24 +1,12 @@
 import click
 from rich.console import Console
-from rich.panel import Panel
 
 from ecosystems_cli.api_client import get_client
+from ecosystems_cli.helpers.print_error import print_error
 from ecosystems_cli.helpers.print_operations import print_operations
 from ecosystems_cli.helpers.print_output import print_output
 
 console = Console()
-
-
-def _print_output(data, format_type):
-    print_output(data, format_type, console=console)
-
-
-def _print_error(error_msg):
-    console.print(Panel(f"[bold red]Error:[/bold red] {error_msg}", border_style="red"))
-
-
-def _print_operations(operations):
-    print_operations(operations, console=console)
 
 
 @click.group()
@@ -32,7 +20,7 @@ def repos():
 def list_repos_operations(ctx):
     """List available operations for repos API."""
     client = get_client("repos", timeout=ctx.obj.get("timeout", 20))
-    _print_operations(client.list_operations())
+    print_operations(client.list_operations(), console)
 
 
 @repos.command("topics")
@@ -41,7 +29,7 @@ def get_topics(ctx):
     """Get all topics."""
     client = get_client("repos", timeout=ctx.obj.get("timeout", 20))
     result = client.get_topics()
-    _print_output(result, ctx.obj.get("format", "table"))
+    print_output(result, ctx.obj.get("format", "table"), console=console)
 
 
 @repos.command("topic")
@@ -52,9 +40,9 @@ def get_topic(ctx, name: str):
     client = get_client("repos", timeout=ctx.obj.get("timeout", 20))
     try:
         result = client.get_topic(name)
-        _print_output(result, ctx.obj.get("format", "table"))
+        print_output(result, ctx.obj.get("format", "table"), console=console)
     except Exception as e:
-        _print_error(str(e))
+        print_error(str(e))
 
 
 @repos.command("hosts")
@@ -63,7 +51,7 @@ def get_hosts(ctx):
     """Get all repository hosts."""
     client = get_client("repos", timeout=ctx.obj.get("timeout", 20))
     result = client.get_hosts()
-    _print_output(result, ctx.obj.get("format", "table"))
+    print_output(result, ctx.obj.get("format", "table"), console=console)
 
 
 @repos.command("host")
@@ -74,9 +62,9 @@ def get_host(ctx, name: str):
     client = get_client("repos", timeout=ctx.obj.get("timeout", 20))
     try:
         result = client.get_host(name)
-        _print_output(result, ctx.obj.get("format", "table"))
+        print_output(result, ctx.obj.get("format", "table"), console=console)
     except Exception as e:
-        _print_error(str(e))
+        print_error(str(e))
 
 
 @repos.command("repository")
@@ -89,9 +77,9 @@ def get_repository(ctx, host: str, owner: str, repo: str):
     client = get_client("repos", timeout=ctx.obj.get("timeout", 20))
     try:
         result = client.get_repository(host, owner, repo)
-        _print_output(result, ctx.obj.get("format", "table"))
+        print_output(result, ctx.obj.get("format", "table"), console=console)
     except Exception as e:
-        _print_error(str(e))
+        print_error(str(e))
 
 
 @repos.command("call")

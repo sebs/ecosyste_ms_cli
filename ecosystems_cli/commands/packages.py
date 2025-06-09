@@ -1,24 +1,12 @@
 import click
 from rich.console import Console
-from rich.panel import Panel
 
 from ecosystems_cli.api_client import get_client
+from ecosystems_cli.helpers.print_error import print_error
 from ecosystems_cli.helpers.print_operations import print_operations
 from ecosystems_cli.helpers.print_output import print_output
 
 console = Console()
-
-
-def _print_output(data, format_type):
-    print_output(data, format_type, console=console)
-
-
-def _print_error(error_msg):
-    console.print(Panel(f"[bold red]Error:[/bold red] {error_msg}", border_style="red"))
-
-
-def _print_operations(operations):
-    print_operations(operations, console=console)
 
 
 @click.group()
@@ -32,7 +20,7 @@ def packages():
 def list_packages_operations(ctx):
     """List available operations for packages API."""
     client = get_client("packages", timeout=ctx.obj.get("timeout", 20))
-    _print_operations(client.list_operations())
+    print_operations(client.list_operations(), console=console)
 
 
 @packages.command("registries")
@@ -41,7 +29,7 @@ def get_registries(ctx):
     """Get all package registries."""
     client = get_client("packages", timeout=ctx.obj.get("timeout", 20))
     result = client.get_registries()
-    _print_output(result, ctx.obj.get("format", "table"))
+    print_output(result, ctx.obj.get("format", "table"), console=console)
 
 
 @packages.command("registry")
@@ -52,9 +40,9 @@ def get_registry(ctx, name: str):
     client = get_client("packages", timeout=ctx.obj.get("timeout", 20))
     try:
         result = client.get_registry(name)
-        _print_output(result, ctx.obj.get("format", "table"))
+        print_output(result, ctx.obj.get("format", "table"), console=console)
     except Exception as e:
-        _print_error(str(e))
+        print_error(str(e), console=console)
 
 
 @packages.command("package")
@@ -66,9 +54,9 @@ def get_package(ctx, registry: str, package: str):
     client = get_client("packages", timeout=ctx.obj.get("timeout", 20))
     try:
         result = client.get_package(registry, package)
-        _print_output(result, ctx.obj.get("format", "table"))
+        print_output(result, ctx.obj.get("format", "table"), console=console)
     except Exception as e:
-        _print_error(str(e))
+        print_error(str(e), console=console)
 
 
 @packages.command("version")
@@ -81,9 +69,9 @@ def get_package_version(ctx, registry: str, package: str, version: str):
     client = get_client("packages", timeout=ctx.obj.get("timeout", 20))
     try:
         result = client.get_package_version(registry, package, version)
-        _print_output(result, ctx.obj.get("format", "table"))
+        print_output(result, ctx.obj.get("format", "table"), console=console)
     except Exception as e:
-        _print_error(str(e))
+        print_error(str(e), console=console)
 
 
 @packages.command("call")
