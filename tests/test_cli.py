@@ -1,5 +1,6 @@
 """Tests for the CLI."""
 
+import re
 from unittest import mock
 
 import pytest
@@ -16,23 +17,17 @@ def runner():
 
 @pytest.fixture
 def mock_api_client():
-    """Create a mock API client."""
+    """Create a mock API client for all API groups."""
     with mock.patch("ecosystems_cli.cli.get_client") as mock_client:
-        # Mock client instance
         client_instance = mock.MagicMock()
-        mock_client.return_value = client_instance
-
-        # Mock list_operations
+        # Always return the test operation for list_operations
         client_instance.list_operations.return_value = [
             {"id": "test_op", "method": "GET", "path": "/test", "summary": "Test operation"}
         ]
-
         # Mock call method
         client_instance.call.return_value = {"result": "success"}
-
         # Mock convenience methods
         client_instance.get_topics.return_value = [{"name": "test_topic"}]
-        client_instance.get_topic.return_value = {"name": "test_topic", "repositories": []}
         client_instance.get_hosts.return_value = [{"name": "GitHub"}]
         client_instance.get_host.return_value = {"name": "GitHub", "url": "https://github.com"}
         client_instance.get_repository.return_value = {"full_name": "owner/repo"}
@@ -43,6 +38,11 @@ def mock_api_client():
         client_instance.get_repo_summary.return_value = {"url": "https://github.com/owner/repo"}
         client_instance.get_package_summary.return_value = {"url": "https://npmjs.com/package/express"}
 
+        def get_topic(name):
+            return {"name": "test_topic", "repositories": []}
+
+        client_instance.get_topic.side_effect = get_topic
+        mock_client.return_value = client_instance
         yield client_instance
 
 
@@ -58,7 +58,14 @@ class TestReposCommands:
 
         # Assert
         assert result.exit_code == 0
-        assert "test_op" in result.output
+
+        # Strip ANSI escape codes for robust matching
+        def strip_ansi(text):
+            ansi_escape = re.compile(r"\x1B[@-_][0-?]*[ -/]*[@-~]")
+            return ansi_escape.sub("", text)
+
+        clean_output = strip_ansi(result.output)
+        assert "test_op" in clean_output
 
     def test_get_topics(self, runner, mock_api_client):
         """Test getting all topics."""
@@ -116,7 +123,14 @@ class TestPackagesCommands:
 
         # Assert
         assert result.exit_code == 0
-        assert "test_op" in result.output
+
+        # Strip ANSI escape codes and whitespace for robust matching
+        def strip_ansi(text):
+            ansi_escape = re.compile(r"\x1B[@-_][0-?]*[ -/]*[@-~]")
+            return ansi_escape.sub("", text)
+
+        clean_output = strip_ansi(result.output).replace(" ", "")
+        assert "test_op" in clean_output
 
     def test_get_registries(self, runner, mock_api_client):
         """Test getting all registries."""
@@ -205,10 +219,17 @@ class TestErrorHandling:
     def test_api_error_handling(self, runner, mock_api_client):
         """Test handling API errors."""
         # Arrange
-        mock_api_client.get_topic.side_effect = ValueError("Topic not found")
+        from ecosystems_cli.cli import get_client
+
+        get_client.return_value.get_topic.side_effect = ValueError("Topic not found")
 
         # Act
         result = runner.invoke(main, ["repos", "topic", "nonexistent"])
 
         # Assert
-        assert "Error: Topic not found" in result.output
+        def strip_ansi(text):
+            ansi_escape = re.compile(r"\x1B[@-_][0-?]*[ -/]*[@-~]")
+            return ansi_escape.sub("", text)
+
+        clean_output = strip_ansi(result.output)
+        assert "Error: Topic not found" in clean_output

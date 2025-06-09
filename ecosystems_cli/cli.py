@@ -8,6 +8,8 @@ from rich.console import Console
 from rich.panel import Panel
 
 from ecosystems_cli.api_client import get_client
+from ecosystems_cli.commands.packages import packages
+from ecosystems_cli.commands.repos import repos
 from ecosystems_cli.helpers.format_value import format_value
 from ecosystems_cli.helpers.print_operations import print_operations
 from ecosystems_cli.helpers.print_output import print_output
@@ -28,16 +30,8 @@ def main(ctx, timeout, format):
     ctx.obj["format"] = format
 
 
-@main.group()
-def packages():
-    """Commands for the packages API."""
-    pass
-
-
-@main.group()
-def repos():
-    """Commands for the repos API."""
-    pass
+main.add_command(repos)
+main.add_command(packages)
 
 
 @main.group()
@@ -56,22 +50,6 @@ def awesome():
 def op():
     """Direct access to API operations with parameters as arguments."""
     pass
-
-
-@packages.command("list")
-@click.pass_context
-def list_packages_operations(ctx):
-    """List available operations for packages API."""
-    client = get_client("packages", timeout=ctx.obj.get("timeout", 20))
-    _print_operations(client.list_operations())
-
-
-@repos.command("list")
-@click.pass_context
-def list_repos_operations(ctx):
-    """List available operations for repos API."""
-    client = get_client("repos", timeout=ctx.obj.get("timeout", 20))
-    _print_operations(client.list_operations())
 
 
 @summary.command("list")
@@ -114,6 +92,9 @@ def get_topic(ctx, name: str):
         result = client.get_topic(name)
         _print_output(result, ctx.obj.get("format", "table"))
     except Exception as e:
+        import sys
+
+        print(f"DEBUG: Exception in get_topic: {e}", file=sys.stderr)
         _print_error(str(e))
 
 
@@ -286,21 +267,6 @@ def call_packages_operation(ctx, operation: str, path_params: str, query_params:
         ecosystems packages call getRegistry --path-params '{"name": "npm"}'
     """
     _call_operation("packages", operation, path_params, query_params, body, ctx)
-
-
-@repos.command("call")
-@click.argument("operation")
-@click.option("--path-params", help="Path parameters as JSON")
-@click.option("--query-params", help="Query parameters as JSON")
-@click.option("--body", help="Request body as JSON")
-@click.pass_context
-def call_repos_operation(ctx, operation: str, path_params: str, query_params: str, body: str):
-    """Call an operation on the repos API.
-
-    Example:
-        ecosystems repos call topic --path-params '{"topic": "javascript"}'
-    """
-    _call_operation("repos", operation, path_params, query_params, body, ctx)
 
 
 @summary.command("call")
@@ -554,3 +520,19 @@ def _print_error(error_msg: str):
 
 def _print_operations(operations: List[Dict]):
     print_operations(operations, console=console)
+
+
+@repos.command("list")
+@click.pass_context
+def list_repos_operations(ctx):
+    """List available operations for repos API."""
+    client = get_client("repos", timeout=ctx.obj.get("timeout", 20))
+    _print_operations(client.list_operations())
+
+
+@packages.command("list")
+@click.pass_context
+def list_packages_operations(ctx):
+    """List available operations for packages API."""
+    client = get_client("packages", timeout=ctx.obj.get("timeout", 20))
+    _print_operations(client.list_operations())
