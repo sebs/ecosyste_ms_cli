@@ -65,19 +65,6 @@ def list_summary_operations(ctx):
 # Repos API commands
 
 
-@repos.command("topics")
-@click.pass_context
-def get_topics(ctx):
-    """Get all topics.
-
-    Example:
-        ecosystems repos topics
-    """
-    client = get_client("repos", timeout=ctx.obj.get("timeout", 20))
-    result = client.get_topics()
-    _print_output(result, ctx.obj.get("format", "table"))
-
-
 @repos.command("topic")
 @click.argument("name")
 @click.pass_context
@@ -92,9 +79,6 @@ def get_topic(ctx, name: str):
         result = client.get_topic(name)
         _print_output(result, ctx.obj.get("format", "table"))
     except Exception as e:
-        import sys
-
-        print(f"DEBUG: Exception in get_topic: {e}", file=sys.stderr)
         _print_error(str(e))
 
 
@@ -145,6 +129,19 @@ def get_repository(ctx, host: str, owner: str, repo: str):
         _print_output(result, ctx.obj.get("format", "table"))
     except Exception as e:
         _print_error(str(e))
+
+
+@repos.command("topics")
+@click.pass_context
+def get_topics(ctx):
+    """Get all topics.
+
+    Example:
+        ecosystems repos topics
+    """
+    client = get_client("repos", timeout=ctx.obj.get("timeout", 20))
+    result = client.get_topics()
+    _print_output(result, ctx.obj.get("format", "table"))
 
 
 # Packages API commands
