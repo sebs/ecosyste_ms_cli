@@ -42,7 +42,7 @@ def get_topic(ctx, name: str):
         result = client.get_topic(name)
         print_output(result, ctx.obj.get("format", "table"), console=console)
     except Exception as e:
-        print_error(str(e))
+        print_error(str(e), console=console)
 
 
 @repos.command("hosts")
@@ -64,7 +64,7 @@ def get_host(ctx, name: str):
         result = client.get_host(name)
         print_output(result, ctx.obj.get("format", "table"), console=console)
     except Exception as e:
-        print_error(str(e))
+        print_error(str(e), console=console)
 
 
 @repos.command("repository")
@@ -79,7 +79,7 @@ def get_repository(ctx, host: str, owner: str, repo: str):
         result = client.get_repository(host, owner, repo)
         print_output(result, ctx.obj.get("format", "table"), console=console)
     except Exception as e:
-        print_error(str(e))
+        print_error(str(e), console=console)
 
 
 @repos.command("call")
