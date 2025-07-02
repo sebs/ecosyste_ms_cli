@@ -137,7 +137,7 @@ class TestBaseCommand:
         runner.invoke(test_func, ["value1"], obj={"timeout": 20})
 
         # Verify error handling
-        mock_print_error.assert_called_once_with("API Error", console=self.base_command.console)
+        mock_print_error.assert_called_once_with("Unexpected error: API Error", console=self.base_command.console)
 
     @patch("ecosystems_cli.cli._call_operation")
     def test_call_operation(self, mock_call_operation):

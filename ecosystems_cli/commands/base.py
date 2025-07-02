@@ -7,6 +7,7 @@ import click
 from rich.console import Console
 
 from ecosystems_cli.api_client import get_client
+from ecosystems_cli.exceptions import EcosystemsCLIError
 from ecosystems_cli.helpers.print_error import print_error
 from ecosystems_cli.helpers.print_operations import print_operations
 from ecosystems_cli.helpers.print_output import print_output
@@ -49,19 +50,23 @@ class BaseCommand:
 
         return self.group.command("list")(list_operations_impl)
 
-    def create_simple_command(self, name: str, method_name: str, description: str) -> Callable:
+    def create_simple_command(self, name: str, method_name: str, description: str, operation_id: str = None) -> Callable:
         """Create a simple command that calls an API method without parameters.
 
         Args:
             name: Command name
             method_name: API client method name
             description: Command description
+            operation_id: Optional operation ID for 'call' method
         """
 
         @click.pass_context
         def command_impl(ctx):
             client = get_client(self.api_name, timeout=ctx.obj.get("timeout", 20))
-            result = getattr(client, method_name)()
+            if operation_id and method_name == "call":
+                result = client.call(operation_id)
+            else:
+                result = getattr(client, method_name)()
             print_output(result, ctx.obj.get("format", "table"), console=self.console)
 
         command_impl.__doc__ = description
@@ -85,8 +90,60 @@ class BaseCommand:
                 try:
                     result = getattr(client, method_name)(*args, **kwargs)
                     print_output(result, ctx.obj.get("format", "table"), console=self.console)
-                except Exception as e:
+                except EcosystemsCLIError as e:
                     print_error(str(e), console=self.console)
+                except Exception as e:
+                    print_error(f"Unexpected error: {str(e)}", console=self.console)
+
+            # Apply click decorators in reverse order
+            for arg in reversed(args):
+                wrapper = arg(wrapper)
+
+            wrapper.__doc__ = description
+            return self.group.command(name)(wrapper)
+
+        return decorator
+
+    def create_command_with_operation(self, name: str, operation_id: str, description: str, *args) -> Callable:
+        """Create a command that calls a specific operation ID.
+
+        Args:
+            name: Command name
+            operation_id: Operation ID to call
+            description: Command description
+            *args: Click argument decorators
+        """
+
+        def decorator(func):
+            @click.pass_context
+            @wraps(func)
+            def wrapper(ctx, *args, **kwargs):
+                client = get_client(self.api_name, timeout=ctx.obj.get("timeout", 20))
+                try:
+                    # Build params based on operation requirements
+                    path_params = {}
+                    query_params = {}
+                    # Check both args and kwargs for parameters
+                    all_args = list(args) + list(kwargs.values())
+                    if len(all_args) > 0:
+                        # Map arguments to params based on operation ID
+                        if (
+                            operation_id
+                            in ["getProject", "getList", "getListProjects", "getCollection", "getCollectionProjects"]
+                            and len(all_args) == 1
+                        ):
+                            path_params = {"id": all_args[0]}
+                        elif operation_id == "getTopic" and len(all_args) == 1:
+                            path_params = {"slug": all_args[0]}
+                        elif operation_id == "lookupProject" and len(all_args) == 1:
+                            query_params = {"url": all_args[0]}
+
+                    result = client.call(operation_id, path_params=path_params, query_params=query_params)
+                    print_output(result, ctx.obj.get("format", "table"), console=self.console)
+                except EcosystemsCLIError as e:
+                    print_error(str(e), console=self.console)
+                except Exception as e:
+                    print_error(f"Unexpected error: {str(e)}", console=self.console)
 
             # Apply click decorators in reverse order
             for arg in reversed(args):
