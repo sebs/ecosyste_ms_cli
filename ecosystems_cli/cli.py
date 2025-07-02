@@ -10,6 +10,14 @@ from rich.panel import Panel
 from ecosystems_cli.api_client import get_client
 from ecosystems_cli.commands.packages import packages
 from ecosystems_cli.commands.repos import repos
+from ecosystems_cli.constants import (
+    DEFAULT_OUTPUT_FORMAT,
+    DEFAULT_TIMEOUT,
+    ERROR_PANEL_STYLE,
+    ERROR_PREFIX,
+    OUTPUT_FORMATS,
+    SUPPORTED_APIS,
+)
 from ecosystems_cli.helpers.format_value import format_value
 from ecosystems_cli.helpers.print_operations import print_operations
 from ecosystems_cli.helpers.print_output import print_output
@@ -18,9 +26,16 @@ console = Console()
 
 
 @click.group()
-@click.option("--timeout", default=20, help="Timeout in seconds for API requests. Default is 20 seconds.")
 @click.option(
-    "--format", default="table", type=click.Choice(["table", "json", "tsv", "jsonl"]), help="Output format. Default is table."
+    "--timeout",
+    default=DEFAULT_TIMEOUT,
+    help=f"Timeout in seconds for API requests. Default is {DEFAULT_TIMEOUT} seconds.",
+)
+@click.option(
+    "--format",
+    default=DEFAULT_OUTPUT_FORMAT,
+    type=click.Choice(OUTPUT_FORMATS),
+    help=f"Output format. Default is {DEFAULT_OUTPUT_FORMAT}.",
 )
 @click.pass_context
 def main(ctx, timeout, format):
@@ -56,7 +71,7 @@ def op():
 @click.pass_context
 def list_summary_operations(ctx):
     """List available operations for summary API."""
-    client = get_client("summary", timeout=ctx.obj.get("timeout", 20))
+    client = get_client(SUPPORTED_APIS[2], timeout=ctx.obj.get("timeout", DEFAULT_TIMEOUT))
     _print_operations(client.list_operations())
 
 
@@ -74,10 +89,10 @@ def get_topic(ctx, name: str):
     Example:
         ecosystems repos topic javascript
     """
-    client = get_client("repos", timeout=ctx.obj.get("timeout", 20))
+    client = get_client(SUPPORTED_APIS[0], timeout=ctx.obj.get("timeout", DEFAULT_TIMEOUT))
     try:
         result = client.get_topic(name)
-        _print_output(result, ctx.obj.get("format", "table"))
+        _print_output(result, ctx.obj.get("format", DEFAULT_OUTPUT_FORMAT))
     except Exception as e:
         _print_error(str(e))
 
@@ -90,7 +105,7 @@ def get_hosts(ctx):
     Example:
         ecosystems repos hosts
     """
-    client = get_client("repos", timeout=ctx.obj.get("timeout", 20))
+    client = get_client(SUPPORTED_APIS[0], timeout=ctx.obj.get("timeout", DEFAULT_TIMEOUT))
     result = client.get_hosts()
     _print_output(result, ctx.obj.get("format", "table"))
 
@@ -104,10 +119,10 @@ def get_host(ctx, name: str):
     Example:
         ecosystems repos host GitHub
     """
-    client = get_client("repos", timeout=ctx.obj.get("timeout", 20))
+    client = get_client(SUPPORTED_APIS[0], timeout=ctx.obj.get("timeout", DEFAULT_TIMEOUT))
     try:
         result = client.get_host(name)
-        _print_output(result, ctx.obj.get("format", "table"))
+        _print_output(result, ctx.obj.get("format", DEFAULT_OUTPUT_FORMAT))
     except Exception as e:
         _print_error(str(e))
 
@@ -123,10 +138,10 @@ def get_repository(ctx, host: str, owner: str, repo: str):
     Example:
         ecosystems repos repository GitHub facebook react
     """
-    client = get_client("repos", timeout=ctx.obj.get("timeout", 20))
+    client = get_client(SUPPORTED_APIS[0], timeout=ctx.obj.get("timeout", DEFAULT_TIMEOUT))
     try:
         result = client.get_repository(host, owner, repo)
-        _print_output(result, ctx.obj.get("format", "table"))
+        _print_output(result, ctx.obj.get("format", DEFAULT_OUTPUT_FORMAT))
     except Exception as e:
         _print_error(str(e))
 
@@ -139,7 +154,7 @@ def get_topics(ctx):
     Example:
         ecosystems repos topics
     """
-    client = get_client("repos", timeout=ctx.obj.get("timeout", 20))
+    client = get_client(SUPPORTED_APIS[0], timeout=ctx.obj.get("timeout", DEFAULT_TIMEOUT))
     result = client.get_topics()
     _print_output(result, ctx.obj.get("format", "table"))
 
@@ -155,7 +170,7 @@ def get_registries(ctx):
     Example:
         ecosystems packages registries
     """
-    client = get_client("packages", timeout=ctx.obj.get("timeout", 20))
+    client = get_client(SUPPORTED_APIS[1], timeout=ctx.obj.get("timeout", DEFAULT_TIMEOUT))
     result = client.get_registries()
     _print_output(result, ctx.obj.get("format", "table"))
 
@@ -169,10 +184,10 @@ def get_registry(ctx, name: str):
     Example:
         ecosystems packages registry npm
     """
-    client = get_client("packages", timeout=ctx.obj.get("timeout", 20))
+    client = get_client(SUPPORTED_APIS[1], timeout=ctx.obj.get("timeout", DEFAULT_TIMEOUT))
     try:
         result = client.get_registry(name)
-        _print_output(result, ctx.obj.get("format", "table"))
+        _print_output(result, ctx.obj.get("format", DEFAULT_OUTPUT_FORMAT))
     except Exception as e:
         _print_error(str(e))
 
@@ -187,10 +202,10 @@ def get_package(ctx, registry: str, package: str):
     Example:
         ecosystems packages package npm express
     """
-    client = get_client("packages", timeout=ctx.obj.get("timeout", 20))
+    client = get_client(SUPPORTED_APIS[1], timeout=ctx.obj.get("timeout", DEFAULT_TIMEOUT))
     try:
         result = client.get_package(registry, package)
-        _print_output(result, ctx.obj.get("format", "table"))
+        _print_output(result, ctx.obj.get("format", DEFAULT_OUTPUT_FORMAT))
     except Exception as e:
         _print_error(str(e))
 
@@ -206,10 +221,10 @@ def get_package_version(ctx, registry: str, package: str, version: str):
     Example:
         ecosystems packages version npm express 4.17.1
     """
-    client = get_client("packages", timeout=ctx.obj.get("timeout", 20))
+    client = get_client(SUPPORTED_APIS[1], timeout=ctx.obj.get("timeout", DEFAULT_TIMEOUT))
     try:
         result = client.get_package_version(registry, package, version)
-        _print_output(result, ctx.obj.get("format", "table"))
+        _print_output(result, ctx.obj.get("format", DEFAULT_OUTPUT_FORMAT))
     except Exception as e:
         _print_error(str(e))
 
@@ -226,10 +241,10 @@ def get_repo_summary(ctx, url: str):
     Example:
         ecosystems summary repo https://github.com/facebook/react
     """
-    client = get_client("summary", timeout=ctx.obj.get("timeout", 20))
+    client = get_client(SUPPORTED_APIS[2], timeout=ctx.obj.get("timeout", DEFAULT_TIMEOUT))
     try:
         result = client.get_repo_summary(url)
-        _print_output(result, ctx.obj.get("format", "table"))
+        _print_output(result, ctx.obj.get("format", DEFAULT_OUTPUT_FORMAT))
     except Exception as e:
         _print_error(str(e))
 
@@ -243,10 +258,10 @@ def get_package_summary(ctx, url: str):
     Example:
         ecosystems summary package https://www.npmjs.com/package/express
     """
-    client = get_client("summary", timeout=ctx.obj.get("timeout", 20))
+    client = get_client(SUPPORTED_APIS[2], timeout=ctx.obj.get("timeout", DEFAULT_TIMEOUT))
     try:
         result = client.get_package_summary(url)
-        _print_output(result, ctx.obj.get("format", "table"))
+        _print_output(result, ctx.obj.get("format", DEFAULT_OUTPUT_FORMAT))
     except Exception as e:
         _print_error(str(e))
 
@@ -263,7 +278,7 @@ def call_packages_operation(ctx, operation: str, path_params: str, query_params:
     Example:
         ecosystems packages call getRegistry --path-params '{"name": "npm"}'
     """
-    _call_operation("packages", operation, path_params, query_params, body, ctx)
+    _call_operation(SUPPORTED_APIS[1], operation, path_params, query_params, body, ctx)
 
 
 @summary.command("call")
@@ -278,7 +293,7 @@ def call_summary_operation(ctx, operation: str, path_params: str, query_params: 
     Example:
         ecosystems summary call getRepositorySummary --query-params '{"url": "https://github.com/facebook/react"}'
     """
-    _call_operation("summary", operation, path_params, query_params, body, ctx)
+    _call_operation(SUPPORTED_APIS[2], operation, path_params, query_params, body, ctx)
 
 
 @awesome.command("projects")
@@ -289,7 +304,7 @@ def get_projects(ctx):
     Example:
         ecosystems awesome projects
     """
-    client = get_client("awesome", timeout=ctx.obj.get("timeout", 20))
+    client = get_client(SUPPORTED_APIS[3], timeout=ctx.obj.get("timeout", DEFAULT_TIMEOUT))
     result = client.call("getProjects")
     _print_output(result, ctx.obj.get("format", "table"))
 
@@ -303,10 +318,10 @@ def get_project(ctx, id: str):
     Example:
         ecosystems awesome project 123
     """
-    client = get_client("awesome", timeout=ctx.obj.get("timeout", 20))
+    client = get_client(SUPPORTED_APIS[3], timeout=ctx.obj.get("timeout", DEFAULT_TIMEOUT))
     try:
         result = client.call("getProject", path_params={"id": id})
-        _print_output(result, ctx.obj.get("format", "table"))
+        _print_output(result, ctx.obj.get("format", DEFAULT_OUTPUT_FORMAT))
     except Exception as e:
         _print_error(str(e))
 
@@ -323,7 +338,7 @@ def call_awesome_operation(ctx, operation: str, path_params: str, query_params: 
     Example:
         ecosystems awesome call getProject --path-params '{"id": "123"}'
     """
-    _call_operation("awesome", operation, path_params, query_params, body, ctx)
+    _call_operation(SUPPORTED_APIS[3], operation, path_params, query_params, body, ctx)
 
 
 @awesome.command("lists")
@@ -334,7 +349,7 @@ def get_lists(ctx):
     Example:
         ecosystems awesome lists
     """
-    client = get_client("awesome", timeout=ctx.obj.get("timeout", 20))
+    client = get_client(SUPPORTED_APIS[3], timeout=ctx.obj.get("timeout", DEFAULT_TIMEOUT))
     result = client.call("getLists")
     _print_output(result, ctx.obj.get("format", "table"))
 
@@ -348,10 +363,10 @@ def get_list(ctx, id: str):
     Example:
         ecosystems awesome list 123
     """
-    client = get_client("awesome", timeout=ctx.obj.get("timeout", 20))
+    client = get_client(SUPPORTED_APIS[3], timeout=ctx.obj.get("timeout", DEFAULT_TIMEOUT))
     try:
         result = client.call("getList", path_params={"id": id})
-        _print_output(result, ctx.obj.get("format", "table"))
+        _print_output(result, ctx.obj.get("format", DEFAULT_OUTPUT_FORMAT))
     except Exception as e:
         _print_error(str(e))
 
@@ -365,10 +380,10 @@ def get_list_projects(ctx, id: str):
     Example:
         ecosystems awesome list-projects 123
     """
-    client = get_client("awesome", timeout=ctx.obj.get("timeout", 20))
+    client = get_client(SUPPORTED_APIS[3], timeout=ctx.obj.get("timeout", DEFAULT_TIMEOUT))
     try:
         result = client.call("getListProjects", path_params={"id": id})
-        _print_output(result, ctx.obj.get("format", "table"))
+        _print_output(result, ctx.obj.get("format", DEFAULT_OUTPUT_FORMAT))
     except Exception as e:
         _print_error(str(e))
 
@@ -381,7 +396,7 @@ def get_awesome_topics(ctx):
     Example:
         ecosystems awesome topics
     """
-    client = get_client("awesome", timeout=ctx.obj.get("timeout", 20))
+    client = get_client(SUPPORTED_APIS[3], timeout=ctx.obj.get("timeout", DEFAULT_TIMEOUT))
     result = client.call("getTopics")
     _print_output(result, ctx.obj.get("format", "table"))
 
@@ -395,10 +410,10 @@ def get_awesome_topic(ctx, slug: str):
     Example:
         ecosystems awesome topic javascript
     """
-    client = get_client("awesome", timeout=ctx.obj.get("timeout", 20))
+    client = get_client(SUPPORTED_APIS[3], timeout=ctx.obj.get("timeout", DEFAULT_TIMEOUT))
     try:
         result = client.call("getTopic", path_params={"slug": slug})
-        _print_output(result, ctx.obj.get("format", "table"))
+        _print_output(result, ctx.obj.get("format", DEFAULT_OUTPUT_FORMAT))
     except Exception as e:
         _print_error(str(e))
 
@@ -411,7 +426,7 @@ def list_awesome_operations(ctx):
     Example:
         ecosystems awesome operations
     """
-    client = get_client("awesome", timeout=ctx.obj.get("timeout", 20))
+    client = get_client(SUPPORTED_APIS[3], timeout=ctx.obj.get("timeout", DEFAULT_TIMEOUT))
     _print_operations(client.list_operations())
 
 
@@ -429,11 +444,11 @@ def _call_operation(api: str, operation: str, path_params: str, query_params: st
     """Call an operation on the specified API."""
     # Get timeout and format from context if available
     if context and hasattr(context, "obj"):
-        timeout = context.obj.get("timeout", 20)
-        format_type = context.obj.get("format", "table")
+        timeout = context.obj.get("timeout", DEFAULT_TIMEOUT)
+        format_type = context.obj.get("format", DEFAULT_OUTPUT_FORMAT)
     else:
-        timeout = 20
-        format_type = "table"
+        timeout = DEFAULT_TIMEOUT
+        format_type = DEFAULT_OUTPUT_FORMAT
     client = get_client(api, timeout=timeout)
 
     # Parse parameters
@@ -479,7 +494,7 @@ def create_dynamic_command(api_name: str, operation_id: str, client):
         try:
             result = client.call(operation_id=operation_id, path_params=path_params, query_params=query_params)
             # Default to table format
-            _print_output(result, "table")
+            _print_output(result, DEFAULT_OUTPUT_FORMAT)
         except Exception as e:
             _print_error(str(e))
 
@@ -512,7 +527,7 @@ def _print_json(data: Any):
 
 def _print_error(error_msg: str):
     """Print error message in a nicely formatted way."""
-    console.print(Panel(f"[bold red]Error:[/bold red] {error_msg}", border_style="red"))
+    console.print(Panel(f"{ERROR_PREFIX} {error_msg}", border_style=ERROR_PANEL_STYLE))
 
 
 def _print_operations(operations: List[Dict]):
@@ -523,7 +538,7 @@ def _print_operations(operations: List[Dict]):
 @click.pass_context
 def list_repos_operations(ctx):
     """List available operations for repos API."""
-    client = get_client("repos", timeout=ctx.obj.get("timeout", 20))
+    client = get_client(SUPPORTED_APIS[0], timeout=ctx.obj.get("timeout", DEFAULT_TIMEOUT))
     _print_operations(client.list_operations())
 
 
@@ -531,5 +546,5 @@ def list_repos_operations(ctx):
 @click.pass_context
 def list_packages_operations(ctx):
     """List available operations for packages API."""
-    client = get_client("packages", timeout=ctx.obj.get("timeout", 20))
+    client = get_client(SUPPORTED_APIS[1], timeout=ctx.obj.get("timeout", DEFAULT_TIMEOUT))
     _print_operations(client.list_operations())

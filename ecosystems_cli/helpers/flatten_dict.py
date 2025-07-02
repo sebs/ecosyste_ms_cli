@@ -1,4 +1,7 @@
-def flatten_dict(d, parent_key="", sep="_"):
+from ecosystems_cli.constants import DEFAULT_SEPARATOR
+
+
+def flatten_dict(d, parent_key="", sep=DEFAULT_SEPARATOR):
     """Flatten a nested dictionary for TSV output."""
     items = []
     for k, v in d.items():

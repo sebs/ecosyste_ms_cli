@@ -4,6 +4,13 @@ from typing import Any, Dict, List, Optional
 
 import requests
 
+from ecosystems_cli.constants import (
+    API_BASE_URL_TEMPLATE,
+    DEFAULT_CONTENT_TYPE,
+    DEFAULT_TIMEOUT,
+    ERROR_API_ONLY,
+    ERROR_OPERATION_NOT_FOUND,
+)
 from ecosystems_cli.helpers.build_url import build_url
 from ecosystems_cli.helpers.load_api_spec import load_api_spec
 from ecosystems_cli.helpers.parse_endpoints import parse_endpoints
@@ -13,13 +20,13 @@ from ecosystems_cli.helpers.parse_parameters import parse_parameters
 class APIClient:
     """Client for interacting with ecosyste.ms APIs."""
 
-    def __init__(self, api_name: str, base_url: Optional[str] = None, timeout: int = 20):
+    def __init__(self, api_name: str, base_url: Optional[str] = None, timeout: int = DEFAULT_TIMEOUT):
         """Initialize API client.
 
         Args:
             api_name: Name of the API (packages, repos, summary)
             base_url: Base URL for the API. If not provided, uses default.
-            timeout: Timeout in seconds for HTTP requests. Default is 20 seconds.
+            timeout: Timeout in seconds for HTTP requests. Default is DEFAULT_TIMEOUT seconds.
         """
         self.api_name = api_name
         self.spec = load_api_spec(api_name)
@@ -32,7 +39,7 @@ class APIClient:
         servers = self.spec.get("servers", [])
         if servers and "url" in servers[0]:
             return servers[0]["url"]
-        return f"https://{self.api_name}.ecosyste.ms/api/v1"
+        return API_BASE_URL_TEMPLATE.format(api_name=self.api_name)
 
     def _get_required_params(self, details: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
         """Get required parameters from endpoint details (delegated to helper)."""
@@ -64,7 +71,7 @@ class APIClient:
 
         # Set default headers
         if "Content-Type" not in headers:
-            headers["Content-Type"] = "application/json"
+            headers["Content-Type"] = DEFAULT_CONTENT_TYPE
 
         response = requests.request(
             method=method, url=url, params=query_params, json=body, headers=headers, timeout=self.timeout
@@ -89,7 +96,7 @@ class APIClient:
     ) -> Dict[str, Any]:
         """Call API endpoint by operation ID."""
         if operation_id not in self.endpoints:
-            raise ValueError(f"Operation '{operation_id}' not found in {self.api_name} API")
+            raise ValueError(ERROR_OPERATION_NOT_FOUND.format(operation_id=operation_id, api_name=self.api_name))
 
         endpoint = self.endpoints[operation_id]
 
@@ -118,25 +125,25 @@ class APIClient:
     def get_topics(self) -> Dict[str, Any]:
         """Get all topics (repos API)."""
         if self.api_name != "repos":
-            raise ValueError("This method is only available for the repos API")
+            raise ValueError(ERROR_API_ONLY.format(api_name="repos"))
         return self.call("topics")
 
     def get_topic(self, topic_name: str) -> Dict[str, Any]:
         """Get a specific topic (repos API)."""
         if self.api_name != "repos":
-            raise ValueError("This method is only available for the repos API")
+            raise ValueError(ERROR_API_ONLY.format(api_name="repos"))
         return self.call("topic", path_params={"topic": topic_name})
 
     def get_registries(self) -> Dict[str, Any]:
         """Get all registries (packages API)."""
         if self.api_name != "packages":
-            raise ValueError("This method is only available for the packages API")
+            raise ValueError(ERROR_API_ONLY.format(api_name="packages"))
         return self.call("getRegistries")
 
     def get_registry(self, registry_name: str) -> Dict[str, Any]:
         """Get a specific registry (packages API)."""
         if self.api_name != "packages":
-            raise ValueError("This method is only available for the packages API")
+            raise ValueError(ERROR_API_ONLY.format(api_name="packages"))
         return self.call("getRegistry", path_params={"registryName": registry_name})
 
     # Additional convenience methods for packages API
@@ -144,13 +151,13 @@ class APIClient:
     def get_package(self, registry_name: str, package_name: str) -> Dict[str, Any]:
         """Get a specific package from a registry (packages API)."""
         if self.api_name != "packages":
-            raise ValueError("This method is only available for the packages API")
+            raise ValueError(ERROR_API_ONLY.format(api_name="packages"))
         return self.call("getPackage", path_params={"registryName": registry_name, "packageName": package_name})
 
     def get_package_version(self, registry_name: str, package_name: str, version: str) -> Dict[str, Any]:
         """Get a specific package version (packages API)."""
         if self.api_name != "packages":
-            raise ValueError("This method is only available for the packages API")
+            raise ValueError(ERROR_API_ONLY.format(api_name="packages"))
         return self.call(
             "getPackageVersion", path_params={"registryName": registry_name, "packageName": package_name, "version": version}
         )
@@ -160,19 +167,19 @@ class APIClient:
     def get_hosts(self) -> Dict[str, Any]:
         """Get all repository hosts (repos API)."""
         if self.api_name != "repos":
-            raise ValueError("This method is only available for the repos API")
+            raise ValueError(ERROR_API_ONLY.format(api_name="repos"))
         return self.call("getRegistries")
 
     def get_host(self, host_name: str) -> Dict[str, Any]:
         """Get a specific repository host (repos API)."""
         if self.api_name != "repos":
-            raise ValueError("This method is only available for the repos API")
+            raise ValueError(ERROR_API_ONLY.format(api_name="repos"))
         return self.call("getHost", path_params={"hostName": host_name})
 
     def get_repository(self, host_name: str, owner: str, repo: str) -> Dict[str, Any]:
         """Get a specific repository (repos API)."""
         if self.api_name != "repos":
-            raise ValueError("This method is only available for the repos API")
+            raise ValueError(ERROR_API_ONLY.format(api_name="repos"))
         return self.call("getHostRepository", path_params={"hostName": host_name, "repositoryName": f"{owner}/{repo}"})
 
     # Additional convenience methods for summary API
@@ -180,17 +187,17 @@ class APIClient:
     def get_repo_summary(self, url: str) -> Dict[str, Any]:
         """Get summary for a repository by URL (summary API)."""
         if self.api_name != "summary":
-            raise ValueError("This method is only available for the summary API")
+            raise ValueError(ERROR_API_ONLY.format(api_name="summary"))
         return self.call("repo", query_params={"url": url})
 
     def get_package_summary(self, url: str) -> Dict[str, Any]:
         """Get summary for a package by URL (summary API)."""
         if self.api_name != "summary":
-            raise ValueError("This method is only available for the summary API")
+            raise ValueError(ERROR_API_ONLY.format(api_name="summary"))
         return self.call("package", query_params={"url": url})
 
 
-def get_client(api_name: str, base_url: Optional[str] = None, timeout: int = 20) -> APIClient:
+def get_client(api_name: str, base_url: Optional[str] = None, timeout: int = DEFAULT_TIMEOUT) -> APIClient:
     """Get API client for specified API.
 
     Args:
