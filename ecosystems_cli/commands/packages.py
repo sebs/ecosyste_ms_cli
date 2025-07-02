@@ -1,87 +1,60 @@
+"""Commands for the packages API."""
+
 import click
-from rich.console import Console
 
-from ecosystems_cli.api_client import get_client
-from ecosystems_cli.helpers.print_error import print_error
-from ecosystems_cli.helpers.print_operations import print_operations
-from ecosystems_cli.helpers.print_output import print_output
-
-console = Console()
+from ecosystems_cli.commands.base import BaseCommand
 
 
-@click.group()
-def packages():
+class PackagesCommands(BaseCommand):
     """Commands for the packages API."""
-    pass
+
+    def __init__(self):
+        super().__init__("packages", "Commands for the packages API.")
+        self._register_commands()
+
+    def _register_commands(self):
+        """Register all commands for the packages API."""
+        # Register list operations command
+        self.list_operations()
+
+        # Register simple commands
+        self.create_simple_command("registries", "get_registries", "Get all package registries.")
+
+        # Register commands with error handling
+        @self.create_command_with_error_handling(
+            "registry", "get_registry", "Get a specific registry by name.", click.argument("name")
+        )
+        def get_registry(name: str):
+            pass
+
+        @self.create_command_with_error_handling(
+            "package",
+            "get_package",
+            "Get a specific package from a registry.",
+            click.argument("registry"),
+            click.argument("package"),
+        )
+        def get_package(registry: str, package: str):
+            pass
+
+        @self.create_command_with_error_handling(
+            "version",
+            "get_package_version",
+            "Get a specific package version.",
+            click.argument("registry"),
+            click.argument("package"),
+            click.argument("version"),
+        )
+        def get_package_version(registry: str, package: str, version: str):
+            pass
+
+        # Register call operation command
+        self.call_operation()
 
 
-@packages.command("list")
-@click.pass_context
-def list_packages_operations(ctx):
-    """List available operations for packages API."""
-    client = get_client("packages", timeout=ctx.obj.get("timeout", 20))
-    print_operations(client.list_operations(), console=console)
+# Create the command group
+packages_base = PackagesCommands()
 
-
-@packages.command("registries")
-@click.pass_context
-def get_registries(ctx):
-    """Get all package registries."""
-    client = get_client("packages", timeout=ctx.obj.get("timeout", 20))
-    result = client.get_registries()
-    print_output(result, ctx.obj.get("format", "table"), console=console)
-
-
-@packages.command("registry")
-@click.argument("name")
-@click.pass_context
-def get_registry(ctx, name: str):
-    """Get a specific registry by name."""
-    client = get_client("packages", timeout=ctx.obj.get("timeout", 20))
-    try:
-        result = client.get_registry(name)
-        print_output(result, ctx.obj.get("format", "table"), console=console)
-    except Exception as e:
-        print_error(str(e), console=console)
-
-
-@packages.command("package")
-@click.argument("registry")
-@click.argument("package")
-@click.pass_context
-def get_package(ctx, registry: str, package: str):
-    """Get a specific package from a registry."""
-    client = get_client("packages", timeout=ctx.obj.get("timeout", 20))
-    try:
-        result = client.get_package(registry, package)
-        print_output(result, ctx.obj.get("format", "table"), console=console)
-    except Exception as e:
-        print_error(str(e), console=console)
-
-
-@packages.command("version")
-@click.argument("registry")
-@click.argument("package")
-@click.argument("version")
-@click.pass_context
-def get_package_version(ctx, registry: str, package: str, version: str):
-    """Get a specific package version."""
-    client = get_client("packages", timeout=ctx.obj.get("timeout", 20))
-    try:
-        result = client.get_package_version(registry, package, version)
-        print_output(result, ctx.obj.get("format", "table"), console=console)
-    except Exception as e:
-        print_error(str(e), console=console)
-
-
-@packages.command("call")
-@click.argument("operation")
-@click.option("--path-params", help="Path parameters as JSON")
-@click.option("--query-params", help="Query parameters as JSON")
-@click.option("--body", help="Request body as JSON")
-@click.pass_context
-def call_packages_operation(ctx, operation: str, path_params: str, query_params: str, body: str):
-    """Call an operation on the packages API."""
-    from ecosystems_cli.cli import _call_operation
-
-    _call_operation("packages", operation, path_params, query_params, body, ctx)
+# Export the properly named group
+packages = packages_base.group
+packages.name = "packages"

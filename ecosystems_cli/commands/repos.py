@@ -1,95 +1,55 @@
+"""Commands for the repos API."""
+
 import click
-from rich.console import Console
 
-from ecosystems_cli.api_client import get_client
-from ecosystems_cli.helpers.print_error import print_error
-from ecosystems_cli.helpers.print_operations import print_operations
-from ecosystems_cli.helpers.print_output import print_output
-
-console = Console()
+from ecosystems_cli.commands.base import BaseCommand
 
 
-@click.group()
-def repos():
+class ReposCommands(BaseCommand):
     """Commands for the repos API."""
-    pass
+
+    def __init__(self):
+        super().__init__("repos", "Commands for the repos API.")
+        self._register_commands()
+
+    def _register_commands(self):
+        """Register all commands for the repos API."""
+        # Register list operations command
+        self.list_operations()
+
+        # Register simple commands
+        self.create_simple_command("topics", "get_topics", "Get all topics.")
+        self.create_simple_command("hosts", "get_hosts", "Get all repository hosts.")
+
+        # Register commands with error handling
+        @self.create_command_with_error_handling("topic", "get_topic", "Get a specific topic by name.", click.argument("name"))
+        def get_topic(name: str):
+            pass
+
+        @self.create_command_with_error_handling(
+            "host", "get_host", "Get a specific repository host by name.", click.argument("name")
+        )
+        def get_host(name: str):
+            pass
+
+        @self.create_command_with_error_handling(
+            "repository",
+            "get_repository",
+            "Get a specific repository.",
+            click.argument("host"),
+            click.argument("owner"),
+            click.argument("repo"),
+        )
+        def get_repository(host: str, owner: str, repo: str):
+            pass
+
+        # Register call operation command
+        self.call_operation()
 
 
-@repos.command("list")
-@click.pass_context
-def list_repos_operations(ctx):
-    """List available operations for repos API."""
-    client = get_client("repos", timeout=ctx.obj.get("timeout", 20))
-    print_operations(client.list_operations(), console)
+# Create the command group
+repos_base = ReposCommands()
 
-
-@repos.command("topics")
-@click.pass_context
-def get_topics(ctx):
-    """Get all topics."""
-    client = get_client("repos", timeout=ctx.obj.get("timeout", 20))
-    result = client.get_topics()
-    print_output(result, ctx.obj.get("format", "table"), console=console)
-
-
-@repos.command("topic")
-@click.argument("name")
-@click.pass_context
-def get_topic(ctx, name: str):
-    """Get a specific topic by name."""
-    client = get_client("repos", timeout=ctx.obj.get("timeout", 20))
-    try:
-        result = client.get_topic(name)
-        print_output(result, ctx.obj.get("format", "table"), console=console)
-    except Exception as e:
-        print_error(str(e), console=console)
-
-
-@repos.command("hosts")
-@click.pass_context
-def get_hosts(ctx):
-    """Get all repository hosts."""
-    client = get_client("repos", timeout=ctx.obj.get("timeout", 20))
-    result = client.get_hosts()
-    print_output(result, ctx.obj.get("format", "table"), console=console)
-
-
-@repos.command("host")
-@click.argument("name")
-@click.pass_context
-def get_host(ctx, name: str):
-    """Get a specific repository host by name."""
-    client = get_client("repos", timeout=ctx.obj.get("timeout", 20))
-    try:
-        result = client.get_host(name)
-        print_output(result, ctx.obj.get("format", "table"), console=console)
-    except Exception as e:
-        print_error(str(e), console=console)
-
-
-@repos.command("repository")
-@click.argument("host")
-@click.argument("owner")
-@click.argument("repo")
-@click.pass_context
-def get_repository(ctx, host: str, owner: str, repo: str):
-    """Get a specific repository."""
-    client = get_client("repos", timeout=ctx.obj.get("timeout", 20))
-    try:
-        result = client.get_repository(host, owner, repo)
-        print_output(result, ctx.obj.get("format", "table"), console=console)
-    except Exception as e:
-        print_error(str(e), console=console)
-
-
-@repos.command("call")
-@click.argument("operation")
-@click.option("--path-params", help="Path parameters as JSON")
-@click.option("--query-params", help="Query parameters as JSON")
-@click.option("--body", help="Request body as JSON")
-@click.pass_context
-def call_repos_operation(ctx, operation: str, path_params: str, query_params: str, body: str):
-    """Call an operation on the repos API."""
-    from ecosystems_cli.cli import _call_operation
-
-    _call_operation("repos", operation, path_params, query_params, body, ctx)
+# Export the properly named group
+repos = repos_base.group
+repos.name = "repos"
