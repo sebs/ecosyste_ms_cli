@@ -1,5 +1,6 @@
 from typing import Any, Dict
 
+from ecosystems_cli.constants import DEFAULT_SEPARATOR, HTTP_METHODS
 from ecosystems_cli.helpers.parse_parameters import parse_parameters
 
 
@@ -10,7 +11,7 @@ def parse_endpoints(spec: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
 
     for path, methods in paths.items():
         for method, details in methods.items():
-            if method in ["get", "post", "put", "delete", "patch"]:
+            if method in HTTP_METHODS:
                 operation_id = details.get("operationId")
                 if operation_id:
                     endpoints[operation_id] = {
@@ -24,7 +25,7 @@ def parse_endpoints(spec: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
     return endpoints
 
 
-def flatten_dict(d, parent_key="", sep="_"):
+def flatten_dict(d, parent_key="", sep=DEFAULT_SEPARATOR):
     from ecosystems_cli.helpers.flatten_dict import flatten_dict
 
     return flatten_dict(d, parent_key, sep)
