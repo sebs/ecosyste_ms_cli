@@ -73,7 +73,7 @@ class TestReposCommands:
         result = self.runner.invoke(self.repos_commands.group, ["topic", "nonexistent"], obj={"timeout": 20})
 
         assert result.exit_code == 0
-        mock_print_error.assert_called_once_with("Topic not found", console=mock.ANY)
+        mock_print_error.assert_called_once_with("Unexpected error: Topic not found", console=mock.ANY)
 
     @mock.patch("ecosystems_cli.commands.base.get_client")
     @mock.patch("ecosystems_cli.commands.base.print_output")

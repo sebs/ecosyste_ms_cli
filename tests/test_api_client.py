@@ -171,7 +171,9 @@ class TestAPIClient:
         client = APIClient("test")
 
         # Act & Assert
-        with pytest.raises(ValueError, match="Operation 'invalidOp' not found in test API"):
+        from ecosystems_cli.exceptions import InvalidOperationError
+
+        with pytest.raises(InvalidOperationError, match="Invalid operation: invalidOp"):
             client.call("invalidOp")
 
     def test_get_required_params(self, monkeypatch, mock_spec):

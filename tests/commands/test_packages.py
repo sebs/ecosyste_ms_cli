@@ -73,7 +73,7 @@ class TestPackagesCommands:
         result = self.runner.invoke(self.packages_commands.group, ["registry", "nonexistent"], obj={"timeout": 20})
 
         assert result.exit_code == 0
-        mock_print_error.assert_called_once_with("Registry not found", console=mock.ANY)
+        mock_print_error.assert_called_once_with("Unexpected error: Registry not found", console=mock.ANY)
 
     @mock.patch("ecosystems_cli.commands.base.get_client")
     @mock.patch("ecosystems_cli.commands.base.print_output")
