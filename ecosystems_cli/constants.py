@@ -6,7 +6,7 @@ DEFAULT_TIMEOUT = 20
 DEFAULT_CONTENT_TYPE = "application/json"
 
 # Supported APIs
-SUPPORTED_APIS = ["repos", "packages", "summary", "awesome"]
+SUPPORTED_APIS = ["repos", "packages", "summary", "awesome", "papers"]
 
 # Output Formats
 OUTPUT_FORMATS = ["table", "json", "tsv", "jsonl"]
@@ -38,6 +38,7 @@ PRIORITY_FIELDS = {
     "packages": ["name", "platform", "description", "downloads", "language"],
     "summary": ["name", "type", "count", "total", "description"],
     "awesome": ["name", "title", "url", "description", "category"],
+    "papers": ["doi", "title", "publication_date", "mentions_count", "openalex_id"],
 }
 
 # Operations Display

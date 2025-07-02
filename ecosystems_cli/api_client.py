@@ -215,12 +215,52 @@ class APIClient:
             raise InvalidAPIError(f"Method get_repository is only available for 'repos' API, not '{self.api_name}'")
         return self.call("getHostRepository", path_params={"hostName": host_name, "repositoryName": f"{owner}/{repo}"})
 
+    # Additional convenience methods for papers API
+
+    def list_papers(
+        self,
+        page: Optional[int] = None,
+        per_page: Optional[int] = None,
+        sort: Optional[str] = None,
+        order: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """List all papers (papers API)."""
+        if self.api_name != "papers":
+            raise InvalidAPIError(f"Method list_papers is only available for 'papers' API, not '{self.api_name}'")
+        query_params = {}
+        if page is not None:
+            query_params["page"] = page
+        if per_page is not None:
+            query_params["per_page"] = per_page
+        if sort is not None:
+            query_params["sort"] = sort
+        if order is not None:
+            query_params["order"] = order
+        return self.call("listPapers", query_params=query_params if query_params else None)
+
+    def get_paper(self, doi: str) -> Dict[str, Any]:
+        """Get a specific paper by DOI (papers API)."""
+        if self.api_name != "papers":
+            raise InvalidAPIError(f"Method get_paper is only available for 'papers' API, not '{self.api_name}'")
+        return self.call("getPaper", path_params={"doi": doi})
+
+    def get_paper_mentions(self, doi: str, page: Optional[int] = None, per_page: Optional[int] = None) -> Dict[str, Any]:
+        """List all mentions for a paper (papers API)."""
+        if self.api_name != "papers":
+            raise InvalidAPIError(f"Method get_paper_mentions is only available for 'papers' API, not '{self.api_name}'")
+        query_params = {}
+        if page is not None:
+            query_params["page"] = page
+        if per_page is not None:
+            query_params["per_page"] = per_page
+        return self.call("listPaperMentions", path_params={"doi": doi}, query_params=query_params if query_params else None)
+
 
 def get_client(api_name: str, base_url: Optional[str] = None, timeout: int = DEFAULT_TIMEOUT) -> APIClient:
     """Get API client for specified API.
 
     Args:
-        api_name: Name of the API (packages, repos, summary)
+        api_name: Name of the API (packages, repos, summary, awesome, papers)
         base_url: Base URL for the API. If not provided, uses default.
         timeout: Timeout in seconds for HTTP requests. Default is 20 seconds.
     """
