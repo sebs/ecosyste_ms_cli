@@ -10,6 +10,7 @@ from rich.panel import Panel
 from ecosystems_cli.api_client import get_client
 from ecosystems_cli.commands.advisories import advisories
 from ecosystems_cli.commands.awesome import awesome
+from ecosystems_cli.commands.licenses import licenses
 from ecosystems_cli.commands.ost import ost
 from ecosystems_cli.commands.packages import packages
 from ecosystems_cli.commands.papers import papers
@@ -65,6 +66,7 @@ main.add_command(ost)
 main.add_command(parser)
 main.add_command(get_resolver_group())
 main.add_command(sbom)
+main.add_command(licenses)
 
 
 @main.group()

@@ -6,7 +6,19 @@ DEFAULT_TIMEOUT = 20
 DEFAULT_CONTENT_TYPE = "application/json"
 
 # Supported APIs
-SUPPORTED_APIS = ["advisories", "repos", "packages", "summary", "awesome", "papers", "ost", "parser", "resolver", "sbom"]
+SUPPORTED_APIS = [
+    "advisories",
+    "repos",
+    "packages",
+    "summary",
+    "awesome",
+    "papers",
+    "ost",
+    "parser",
+    "resolver",
+    "sbom",
+    "licenses",
+]
 
 # Output Formats
 OUTPUT_FORMATS = ["table", "json", "tsv", "jsonl"]
@@ -44,6 +56,7 @@ PRIORITY_FIELDS = {
     "parser": ["id", "url", "status", "created_at", "sha256"],
     "resolver": ["id", "package_name", "registry", "status", "created_at"],
     "sbom": ["id", "url", "status", "created_at", "sha256"],
+    "licenses": ["id", "url", "status", "created_at", "sha256"],
 }
 
 # Operations Display
