@@ -26,9 +26,9 @@ class TestAPIConfiguration:
 
     def test_supported_apis(self):
         """Test supported APIs list."""
-        assert constants.SUPPORTED_APIS == ["repos", "packages", "summary", "awesome", "papers", "ost"]
+        assert constants.SUPPORTED_APIS == ["advisories", "repos", "packages", "summary", "awesome", "papers", "ost"]
         assert isinstance(constants.SUPPORTED_APIS, list)
-        assert len(constants.SUPPORTED_APIS) == 6
+        assert len(constants.SUPPORTED_APIS) == 7
         assert all(isinstance(api, str) for api in constants.SUPPORTED_APIS)
 
 
@@ -84,10 +84,11 @@ class TestDisplayConfiguration:
     def test_priority_fields(self):
         """Test priority fields dictionary."""
         assert isinstance(constants.PRIORITY_FIELDS, dict)
-        expected_keys = {"repos", "packages", "summary", "awesome", "papers", "ost"}
+        expected_keys = {"advisories", "repos", "packages", "summary", "awesome", "papers", "ost"}
         assert set(constants.PRIORITY_FIELDS.keys()) == expected_keys
 
         # Check each API has appropriate priority fields
+        assert constants.PRIORITY_FIELDS["advisories"] == ["uuid", "title", "severity", "published_at", "cvss_score"]
         assert constants.PRIORITY_FIELDS["repos"] == ["full_name", "name", "description", "stars", "language"]
         assert constants.PRIORITY_FIELDS["packages"] == ["name", "platform", "description", "downloads", "language"]
         assert constants.PRIORITY_FIELDS["summary"] == ["name", "type", "count", "total", "description"]
