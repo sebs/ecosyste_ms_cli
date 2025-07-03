@@ -16,6 +16,7 @@ from ecosystems_cli.commands.papers import papers
 from ecosystems_cli.commands.parser import parser
 from ecosystems_cli.commands.repos import repos
 from ecosystems_cli.commands.resolver import get_resolver_group
+from ecosystems_cli.commands.sbom import sbom
 from ecosystems_cli.commands.summary import summary
 from ecosystems_cli.constants import (
     DEFAULT_OUTPUT_FORMAT,
@@ -63,6 +64,7 @@ main.add_command(papers)
 main.add_command(ost)
 main.add_command(parser)
 main.add_command(get_resolver_group())
+main.add_command(sbom)
 
 
 @main.group()
