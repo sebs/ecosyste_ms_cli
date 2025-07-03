@@ -13,6 +13,7 @@ from ecosystems_cli.commands.archives import archives
 from ecosystems_cli.commands.awesome import awesome
 from ecosystems_cli.commands.commits import commits
 from ecosystems_cli.commands.diff import diff
+from ecosystems_cli.commands.docker import docker
 from ecosystems_cli.commands.issues import issues
 from ecosystems_cli.commands.licenses import licenses
 from ecosystems_cli.commands.ost import ost
@@ -65,6 +66,7 @@ def main(ctx, timeout, format):
 main.add_command(advisories)
 main.add_command(archives)
 main.add_command(commits)
+main.add_command(docker)
 main.add_command(repos)
 main.add_command(packages)
 main.add_command(summary)
