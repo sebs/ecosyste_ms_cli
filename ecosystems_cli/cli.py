@@ -22,6 +22,7 @@ from ecosystems_cli.commands.parser import parser
 from ecosystems_cli.commands.repos import repos
 from ecosystems_cli.commands.resolver import get_resolver_group
 from ecosystems_cli.commands.sbom import sbom
+from ecosystems_cli.commands.sponsors import sponsors
 from ecosystems_cli.commands.summary import summary
 from ecosystems_cli.commands.timeline import timeline
 from ecosystems_cli.constants import (
@@ -77,6 +78,7 @@ main.add_command(licenses)
 main.add_command(diff)
 main.add_command(timeline)
 main.add_command(issues)
+main.add_command(sponsors)
 
 
 @main.group()

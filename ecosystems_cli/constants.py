@@ -22,6 +22,7 @@ SUPPORTED_APIS = [
     "licenses",
     "timeline",
     "issues",
+    "sponsors",
 ]
 
 # Output Formats
@@ -65,6 +66,7 @@ PRIORITY_FIELDS = {
     "licenses": ["id", "url", "status", "created_at", "sha256"],
     "timeline": ["actor", "event_type", "repository", "owner", "payload"],
     "issues": ["number", "title", "state", "user", "created_at"],
+    "sponsors": ["login", "has_sponsors_listing", "sponsors_count", "sponsorships_count", "minimum_sponsorship_amount"],
 }
 
 # Operations Display
