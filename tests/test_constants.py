@@ -42,10 +42,11 @@ class TestAPIConfiguration:
             "licenses",
             "timeline",
             "issues",
+            "sponsors",
         ]
         assert constants.SUPPORTED_APIS == expected_apis
         assert isinstance(constants.SUPPORTED_APIS, list)
-        assert len(constants.SUPPORTED_APIS) == 15
+        assert len(constants.SUPPORTED_APIS) == 16
         assert all(isinstance(api, str) for api in constants.SUPPORTED_APIS)
 
 
@@ -117,6 +118,7 @@ class TestDisplayConfiguration:
             "licenses",
             "timeline",
             "issues",
+            "sponsors",
         }
         assert set(constants.PRIORITY_FIELDS.keys()) == expected_keys
 
@@ -136,6 +138,13 @@ class TestDisplayConfiguration:
         assert constants.PRIORITY_FIELDS["timeline"] == ["actor", "event_type", "repository", "owner", "payload"]
         assert constants.PRIORITY_FIELDS["sbom"] == ["id", "url", "status", "created_at", "sha256"]
         assert constants.PRIORITY_FIELDS["issues"] == ["number", "title", "state", "user", "created_at"]
+        assert constants.PRIORITY_FIELDS["sponsors"] == [
+            "login",
+            "has_sponsors_listing",
+            "sponsors_count",
+            "sponsorships_count",
+            "minimum_sponsorship_amount",
+        ]
 
 
 class TestOperationsDisplay:
