@@ -6,7 +6,7 @@ DEFAULT_TIMEOUT = 20
 DEFAULT_CONTENT_TYPE = "application/json"
 
 # Supported APIs
-SUPPORTED_APIS = ["repos", "packages", "summary", "awesome", "papers", "ost"]
+SUPPORTED_APIS = ["advisories", "repos", "packages", "summary", "awesome", "papers", "ost"]
 
 # Output Formats
 OUTPUT_FORMATS = ["table", "json", "tsv", "jsonl"]
@@ -34,6 +34,7 @@ STYLE_BLUE = "blue"
 
 # Table Display Priority Fields
 PRIORITY_FIELDS = {
+    "advisories": ["uuid", "title", "severity", "published_at", "cvss_score"],
     "repos": ["full_name", "name", "description", "stars", "language"],
     "packages": ["name", "platform", "description", "downloads", "language"],
     "summary": ["name", "type", "count", "total", "description"],
