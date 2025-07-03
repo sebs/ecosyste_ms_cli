@@ -41,10 +41,11 @@ class TestAPIConfiguration:
             "sbom",
             "licenses",
             "timeline",
+            "issues",
         ]
         assert constants.SUPPORTED_APIS == expected_apis
         assert isinstance(constants.SUPPORTED_APIS, list)
-        assert len(constants.SUPPORTED_APIS) == 14
+        assert len(constants.SUPPORTED_APIS) == 15
         assert all(isinstance(api, str) for api in constants.SUPPORTED_APIS)
 
 
@@ -115,6 +116,7 @@ class TestDisplayConfiguration:
             "sbom",
             "licenses",
             "timeline",
+            "issues",
         }
         assert set(constants.PRIORITY_FIELDS.keys()) == expected_keys
 
@@ -133,6 +135,7 @@ class TestDisplayConfiguration:
         assert constants.PRIORITY_FIELDS["licenses"] == ["id", "url", "status", "created_at", "sha256"]
         assert constants.PRIORITY_FIELDS["timeline"] == ["actor", "event_type", "repository", "owner", "payload"]
         assert constants.PRIORITY_FIELDS["sbom"] == ["id", "url", "status", "created_at", "sha256"]
+        assert constants.PRIORITY_FIELDS["issues"] == ["number", "title", "state", "user", "created_at"]
 
 
 class TestOperationsDisplay:

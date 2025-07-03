@@ -13,6 +13,7 @@ from ecosystems_cli.commands.archives import archives
 from ecosystems_cli.commands.awesome import awesome
 from ecosystems_cli.commands.commits import commits
 from ecosystems_cli.commands.diff import diff
+from ecosystems_cli.commands.issues import issues
 from ecosystems_cli.commands.licenses import licenses
 from ecosystems_cli.commands.ost import ost
 from ecosystems_cli.commands.packages import packages
@@ -75,6 +76,7 @@ main.add_command(sbom)
 main.add_command(licenses)
 main.add_command(diff)
 main.add_command(timeline)
+main.add_command(issues)
 
 
 @main.group()
