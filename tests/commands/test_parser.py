@@ -49,59 +49,62 @@ class TestParserCommands:
         mock_client.call.assert_called_once_with("jobFormats")
         mock_print_output.assert_called_once()
 
-    @mock.patch("ecosystems_cli.commands.parser.APIClient")
-    def test_submit_command(self, mock_api_client):
+    @mock.patch("ecosystems_cli.commands.base.get_client")
+    @mock.patch("ecosystems_cli.commands.base.print_output")
+    def test_submit_command(self, mock_print_output, mock_get_client):
         """Test submitting a parsing job."""
-        mock_client_instance = mock.MagicMock()
-        mock_api_client.return_value = mock_client_instance
-        mock_client_instance.call.return_value = {"id": "job123", "status": "pending"}
+        mock_client = mock.MagicMock()
+        mock_client.call.return_value = {"id": "job123", "status": "pending"}
+        mock_get_client.return_value = mock_client
 
-        # Create a context object to pass
-        context = mock.MagicMock()
-        context.obj = {"timeout": 20, "format": "table"}
-
-        # Note: The command might not be invoked directly in this test setup
-        # since it's registered through decorators
-        self.runner.invoke(
+        result = self.runner.invoke(
             self.parser_commands.group,
             ["submit", "https://example.com/package.json"],
             obj={"timeout": 20, "format": "table"},
         )
 
-    @mock.patch("ecosystems_cli.commands.parser.APIClient")
-    def test_status_command(self, mock_api_client):
+        assert result.exit_code == 0
+        mock_get_client.assert_called_once_with("parser", timeout=20)
+        mock_client.call.assert_called_once_with(
+            "createJob", path_params={}, query_params={"url": "https://example.com/package.json"}
+        )
+        mock_print_output.assert_called_once()
+
+    @mock.patch("ecosystems_cli.commands.base.get_client")
+    @mock.patch("ecosystems_cli.commands.base.print_output")
+    def test_status_command(self, mock_print_output, mock_get_client):
         """Test getting job status."""
-        mock_client_instance = mock.MagicMock()
-        mock_api_client.return_value = mock_client_instance
-        mock_client_instance.call.return_value = {
+        mock_client = mock.MagicMock()
+        mock_client.call.return_value = {
             "id": "job123",
             "status": "completed",
             "results": {"dependencies": []},
         }
+        mock_get_client.return_value = mock_client
 
-        # Note: The command might not be invoked directly in this test setup
-        # since it's registered through decorators
-        self.runner.invoke(
+        result = self.runner.invoke(
             self.parser_commands.group,
             ["status", "job123"],
             obj={"timeout": 20, "format": "table"},
         )
 
-    @mock.patch("ecosystems_cli.commands.base.get_client")
-    @mock.patch("ecosystems_cli.commands.base.print_output")
-    def test_call_command(self, mock_print_output, mock_get_client):
-        """Test generic call command."""
-        mock_client = mock.MagicMock()
-        mock_client.call.return_value = {"result": "success"}
-        mock_get_client.return_value = mock_client
+        assert result.exit_code == 0
+        mock_get_client.assert_called_once_with("parser", timeout=20)
+        mock_client.call.assert_called_once_with("getJob", path_params={"jobID": "job123"}, query_params={})
+        mock_print_output.assert_called_once()
 
+    @mock.patch("ecosystems_cli.cli._call_operation")
+    def test_call_command(self, mock_call_operation):
+        """Test generic call command."""
         result = self.runner.invoke(
             self.parser_commands.group,
             ["call", "createJob", "--query-params", '{"url": "https://example.com/package.json"}'],
             obj={"timeout": 20, "format": "table"},
         )
 
-        if result.exit_code != 0:
-            print(f"Output: {result.output}")
-            print(f"Exception: {result.exception}")
         assert result.exit_code == 0
+        mock_call_operation.assert_called_once()
+        args = mock_call_operation.call_args[0]
+        assert args[0] == "parser"
+        assert args[1] == "createJob"
+        assert args[3] == '{"url": "https://example.com/package.json"}'

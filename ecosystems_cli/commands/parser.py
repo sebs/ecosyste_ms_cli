@@ -1,6 +1,5 @@
 import click
 
-from ecosystems_cli.api_client import APIClient
 from ecosystems_cli.commands.base import BaseCommand
 
 
@@ -19,25 +18,23 @@ class ParserCommands(BaseCommand):
             operation_id="jobFormats",
         )
 
-        @self.create_command_with_error_handling(
+        @self.create_command_with_operation(
             "submit",
-            "submit",
+            "createJob",
             "Submit a dependency parsing job",
             click.argument("url"),
         )
         def submit_job(url: str):
-            client = APIClient("parser")
-            return client.call("createJob", {"url": url})
+            return {"url": url}
 
-        @self.create_command_with_error_handling(
+        @self.create_command_with_operation(
             "status",
-            "status",
+            "getJob",
             "Get status of a parsing job",
             click.argument("job_id"),
         )
         def get_job_status(job_id: str):
-            client = APIClient("parser")
-            return client.call("getJob", {"jobID": job_id})
+            return {"jobID": job_id}
 
         self.call_operation()
 
