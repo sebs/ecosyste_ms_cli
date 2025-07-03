@@ -19,6 +19,7 @@ SUPPORTED_APIS = [
     "resolver",
     "sbom",
     "licenses",
+    "timeline",
 ]
 
 # Output Formats
@@ -59,6 +60,7 @@ PRIORITY_FIELDS = {
     "resolver": ["id", "package_name", "registry", "status", "created_at"],
     "sbom": ["id", "url", "status", "created_at", "sha256"],
     "licenses": ["id", "url", "status", "created_at", "sha256"],
+    "timeline": ["actor", "event_type", "repository", "owner", "payload"],
 }
 
 # Operations Display
