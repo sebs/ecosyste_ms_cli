@@ -137,6 +137,10 @@ class BaseCommand:
                             path_params = {"slug": all_args[0]}
                         elif operation_id == "lookupProject" and len(all_args) == 1:
                             query_params = {"url": all_args[0]}
+                        elif operation_id == "createJob" and len(all_args) == 1:
+                            query_params = {"url": all_args[0]}
+                        elif operation_id == "getJob" and len(all_args) == 1:
+                            path_params = {"jobID": all_args[0]}
 
                     result = client.call(operation_id, path_params=path_params, query_params=query_params)
                     print_output(result, ctx.obj.get("format", "table"), console=self.console)
