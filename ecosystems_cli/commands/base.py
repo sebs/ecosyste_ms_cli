@@ -136,6 +136,24 @@ class BaseCommand:
                                 query_params["version"] = kwargs["version"]
                         elif operation_id == "getJob" and len(args) == 1:
                             path_params = {"jobID": args[0]}
+                    elif self.api_name == "archives":
+                        # Handle archives API operations
+                        # Click passes named arguments as keyword args, so check both
+                        if operation_id == "list":
+                            if len(args) == 1:
+                                query_params = {"url": args[0]}
+                            elif "url" in kwargs:
+                                query_params = {"url": kwargs["url"]}
+                        elif operation_id == "contents":
+                            if len(args) == 2:
+                                query_params = {"url": args[0], "path": args[1]}
+                            elif "url" in kwargs and "path" in kwargs:
+                                query_params = {"url": kwargs["url"], "path": kwargs["path"]}
+                        elif operation_id in ["readme", "changelog", "repopack"]:
+                            if len(args) == 1:
+                                query_params = {"url": args[0]}
+                            elif "url" in kwargs:
+                                query_params = {"url": kwargs["url"]}
                     else:
                         # Check both args and kwargs for parameters
                         all_args = list(args) + list(kwargs.values())

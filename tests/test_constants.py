@@ -28,6 +28,7 @@ class TestAPIConfiguration:
         """Test supported APIs list."""
         expected_apis = [
             "advisories",
+            "archives",
             "repos",
             "packages",
             "summary",
@@ -41,7 +42,7 @@ class TestAPIConfiguration:
         ]
         assert constants.SUPPORTED_APIS == expected_apis
         assert isinstance(constants.SUPPORTED_APIS, list)
-        assert len(constants.SUPPORTED_APIS) == 11
+        assert len(constants.SUPPORTED_APIS) == 12
         assert all(isinstance(api, str) for api in constants.SUPPORTED_APIS)
 
 
@@ -99,6 +100,7 @@ class TestDisplayConfiguration:
         assert isinstance(constants.PRIORITY_FIELDS, dict)
         expected_keys = {
             "advisories",
+            "archives",
             "repos",
             "packages",
             "summary",
@@ -114,6 +116,7 @@ class TestDisplayConfiguration:
 
         # Check each API has appropriate priority fields
         assert constants.PRIORITY_FIELDS["advisories"] == ["uuid", "title", "severity", "published_at", "cvss_score"]
+        assert constants.PRIORITY_FIELDS["archives"] == ["name", "directory", "contents"]
         assert constants.PRIORITY_FIELDS["repos"] == ["full_name", "name", "description", "stars", "language"]
         assert constants.PRIORITY_FIELDS["packages"] == ["name", "platform", "description", "downloads", "language"]
         assert constants.PRIORITY_FIELDS["summary"] == ["name", "type", "count", "total", "description"]

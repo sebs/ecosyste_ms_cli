@@ -8,6 +8,7 @@ DEFAULT_CONTENT_TYPE = "application/json"
 # Supported APIs
 SUPPORTED_APIS = [
     "advisories",
+    "archives",
     "repos",
     "packages",
     "summary",
@@ -47,6 +48,7 @@ STYLE_BLUE = "blue"
 # Table Display Priority Fields
 PRIORITY_FIELDS = {
     "advisories": ["uuid", "title", "severity", "published_at", "cvss_score"],
+    "archives": ["name", "directory", "contents"],
     "repos": ["full_name", "name", "description", "stars", "language"],
     "packages": ["name", "platform", "description", "downloads", "language"],
     "summary": ["name", "type", "count", "total", "description"],
