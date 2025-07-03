@@ -9,6 +9,7 @@ from rich.panel import Panel
 
 from ecosystems_cli.api_client import get_client
 from ecosystems_cli.commands.awesome import awesome
+from ecosystems_cli.commands.ost import ost
 from ecosystems_cli.commands.packages import packages
 from ecosystems_cli.commands.papers import papers
 from ecosystems_cli.commands.repos import repos
@@ -55,6 +56,7 @@ main.add_command(packages)
 main.add_command(summary)
 main.add_command(awesome)
 main.add_command(papers)
+main.add_command(ost)
 
 
 @main.group()
