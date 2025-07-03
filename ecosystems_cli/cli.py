@@ -13,6 +13,7 @@ from ecosystems_cli.commands.awesome import awesome
 from ecosystems_cli.commands.ost import ost
 from ecosystems_cli.commands.packages import packages
 from ecosystems_cli.commands.papers import papers
+from ecosystems_cli.commands.parser import parser
 from ecosystems_cli.commands.repos import repos
 from ecosystems_cli.commands.summary import summary
 from ecosystems_cli.constants import (
@@ -59,6 +60,7 @@ main.add_command(summary)
 main.add_command(awesome)
 main.add_command(papers)
 main.add_command(ost)
+main.add_command(parser)
 
 
 @main.group()

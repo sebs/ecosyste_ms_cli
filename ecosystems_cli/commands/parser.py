@@ -1,0 +1,51 @@
+import click
+
+from ecosystems_cli.api_client import APIClient
+from ecosystems_cli.commands.base import BaseCommand
+
+
+class ParserCommands(BaseCommand):
+    def __init__(self):
+        super().__init__("parser", "Parse dependency metadata from manifest files")
+        self._register_commands()
+
+    def _register_commands(self):
+        self.list_operations()
+
+        self.create_simple_command(
+            "formats",
+            "call",
+            "List supported file formats and ecosystems",
+            operation_id="jobFormats",
+        )
+
+        @self.create_command_with_error_handling(
+            "submit",
+            "submit",
+            "Submit a dependency parsing job",
+            click.argument("url"),
+        )
+        def submit_job(url: str):
+            client = APIClient("parser")
+            return client.call("createJob", {"url": url})
+
+        @self.create_command_with_error_handling(
+            "status",
+            "status",
+            "Get status of a parsing job",
+            click.argument("job_id"),
+        )
+        def get_job_status(job_id: str):
+            client = APIClient("parser")
+            return client.call("getJob", {"jobID": job_id})
+
+        self.call_operation()
+
+
+# Create the command group
+parser_base = ParserCommands()
+
+# Export the properly named group
+parser_commands = parser_base
+parser = parser_base.group
+parser.name = "parser"
