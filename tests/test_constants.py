@@ -30,6 +30,8 @@ class TestAPIConfiguration:
             "advisories",
             "archives",
             "commits",
+            "docker",
+            "diff",
             "repos",
             "packages",
             "summary",
@@ -43,10 +45,11 @@ class TestAPIConfiguration:
             "timeline",
             "issues",
             "sponsors",
+            "opencollective",
         ]
         assert constants.SUPPORTED_APIS == expected_apis
         assert isinstance(constants.SUPPORTED_APIS, list)
-        assert len(constants.SUPPORTED_APIS) == 16
+        assert len(constants.SUPPORTED_APIS) == 19
         assert all(isinstance(api, str) for api in constants.SUPPORTED_APIS)
 
 
@@ -119,6 +122,9 @@ class TestDisplayConfiguration:
             "timeline",
             "issues",
             "sponsors",
+            "opencollective",
+            "docker",
+            "diff",
         }
         assert set(constants.PRIORITY_FIELDS.keys()) == expected_keys
 
