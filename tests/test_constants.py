@@ -26,9 +26,10 @@ class TestAPIConfiguration:
 
     def test_supported_apis(self):
         """Test supported APIs list."""
-        assert constants.SUPPORTED_APIS == ["advisories", "repos", "packages", "summary", "awesome", "papers", "ost", "parser"]
+        expected_apis = ["advisories", "repos", "packages", "summary", "awesome", "papers", "ost", "parser", "resolver"]
+        assert constants.SUPPORTED_APIS == expected_apis
         assert isinstance(constants.SUPPORTED_APIS, list)
-        assert len(constants.SUPPORTED_APIS) == 8
+        assert len(constants.SUPPORTED_APIS) == 9
         assert all(isinstance(api, str) for api in constants.SUPPORTED_APIS)
 
 
@@ -84,7 +85,7 @@ class TestDisplayConfiguration:
     def test_priority_fields(self):
         """Test priority fields dictionary."""
         assert isinstance(constants.PRIORITY_FIELDS, dict)
-        expected_keys = {"advisories", "repos", "packages", "summary", "awesome", "papers", "ost", "parser"}
+        expected_keys = {"advisories", "repos", "packages", "summary", "awesome", "papers", "ost", "parser", "resolver"}
         assert set(constants.PRIORITY_FIELDS.keys()) == expected_keys
 
         # Check each API has appropriate priority fields
@@ -96,6 +97,7 @@ class TestDisplayConfiguration:
         assert constants.PRIORITY_FIELDS["ost"] == ["id", "url", "category", "language", "score"]
         assert constants.PRIORITY_FIELDS["papers"] == ["doi", "title", "publication_date", "mentions_count", "openalex_id"]
         assert constants.PRIORITY_FIELDS["parser"] == ["id", "url", "status", "created_at", "sha256"]
+        assert constants.PRIORITY_FIELDS["resolver"] == ["id", "package_name", "registry", "status", "created_at"]
 
 
 class TestOperationsDisplay:

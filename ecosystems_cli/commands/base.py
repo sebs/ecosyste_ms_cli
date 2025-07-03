@@ -123,24 +123,39 @@ class BaseCommand:
                     # Build params based on operation requirements
                     path_params = {}
                     query_params = {}
-                    # Check both args and kwargs for parameters
-                    all_args = list(args) + list(kwargs.values())
-                    if len(all_args) > 0:
-                        # Map arguments to params based on operation ID
-                        if (
-                            operation_id
-                            in ["getProject", "getList", "getListProjects", "getCollection", "getCollectionProjects"]
-                            and len(all_args) == 1
-                        ):
-                            path_params = {"id": all_args[0]}
-                        elif operation_id == "getTopic" and len(all_args) == 1:
-                            path_params = {"slug": all_args[0]}
-                        elif operation_id == "lookupProject" and len(all_args) == 1:
-                            query_params = {"url": all_args[0]}
-                        elif operation_id == "createJob" and len(all_args) == 1:
-                            query_params = {"url": all_args[0]}
-                        elif operation_id == "getJob" and len(all_args) == 1:
-                            path_params = {"jobID": all_args[0]}
+
+                    # Special handling for resolver API
+                    if self.api_name == "resolver":
+                        if operation_id == "createJob" and len(args) >= 2:
+                            # For resolver API createJob operation
+                            query_params = {"package_name": args[0], "registry": args[1]}
+                            # Handle optional parameters from kwargs
+                            if "before" in kwargs and kwargs["before"]:
+                                query_params["before"] = kwargs["before"]
+                            if "version" in kwargs and kwargs["version"]:
+                                query_params["version"] = kwargs["version"]
+                        elif operation_id == "getJob" and len(args) == 1:
+                            path_params = {"jobID": args[0]}
+                    else:
+                        # Check both args and kwargs for parameters
+                        all_args = list(args) + list(kwargs.values())
+                        if len(all_args) > 0:
+                            # Map arguments to params based on operation ID
+                            if (
+                                operation_id
+                                in ["getProject", "getList", "getListProjects", "getCollection", "getCollectionProjects"]
+                                and len(all_args) == 1
+                            ):
+                                path_params = {"id": all_args[0]}
+                            elif operation_id == "getTopic" and len(all_args) == 1:
+                                path_params = {"slug": all_args[0]}
+                            elif operation_id == "lookupProject" and len(all_args) == 1:
+                                query_params = {"url": all_args[0]}
+                            elif operation_id == "createJob" and len(all_args) == 1:
+                                # For other APIs' createJob operation
+                                query_params = {"url": all_args[0]}
+                            elif operation_id == "getJob" and len(all_args) == 1:
+                                path_params = {"jobID": all_args[0]}
 
                     result = client.call(operation_id, path_params=path_params, query_params=query_params)
                     print_output(result, ctx.obj.get("format", "table"), console=self.console)
