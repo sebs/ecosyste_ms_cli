@@ -21,6 +21,7 @@ from ecosystems_cli.commands.repos import repos
 from ecosystems_cli.commands.resolver import get_resolver_group
 from ecosystems_cli.commands.sbom import sbom
 from ecosystems_cli.commands.summary import summary
+from ecosystems_cli.commands.timeline import timeline
 from ecosystems_cli.constants import (
     DEFAULT_OUTPUT_FORMAT,
     DEFAULT_TIMEOUT,
@@ -71,6 +72,7 @@ main.add_command(get_resolver_group())
 main.add_command(sbom)
 main.add_command(licenses)
 main.add_command(diff)
+main.add_command(timeline)
 
 
 @main.group()
