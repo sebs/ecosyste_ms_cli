@@ -16,6 +16,7 @@ from ecosystems_cli.commands.diff import diff
 from ecosystems_cli.commands.docker import docker
 from ecosystems_cli.commands.issues import issues
 from ecosystems_cli.commands.licenses import licenses
+from ecosystems_cli.commands.opencollective import opencollective
 from ecosystems_cli.commands.ost import ost
 from ecosystems_cli.commands.packages import packages
 from ecosystems_cli.commands.papers import papers
@@ -81,6 +82,7 @@ main.add_command(diff)
 main.add_command(timeline)
 main.add_command(issues)
 main.add_command(sponsors)
+main.add_command(opencollective)
 
 
 @main.group()

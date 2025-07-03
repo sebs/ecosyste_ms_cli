@@ -10,6 +10,8 @@ SUPPORTED_APIS = [
     "advisories",
     "archives",
     "commits",
+    "docker",
+    "diff",
     "repos",
     "packages",
     "summary",
@@ -23,6 +25,7 @@ SUPPORTED_APIS = [
     "timeline",
     "issues",
     "sponsors",
+    "opencollective",
 ]
 
 # Output Formats
@@ -67,6 +70,9 @@ PRIORITY_FIELDS = {
     "timeline": ["actor", "event_type", "repository", "owner", "payload"],
     "issues": ["number", "title", "state", "user", "created_at"],
     "sponsors": ["login", "has_sponsors_listing", "sponsors_count", "sponsorships_count", "minimum_sponsorship_amount"],
+    "opencollective": ["id", "url", "name", "description", "created_at"],
+    "docker": ["id", "url", "name", "description", "created_at"],
+    "diff": ["id", "url", "name", "description", "created_at"],
 }
 
 # Operations Display

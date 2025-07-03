@@ -167,6 +167,10 @@ class BaseCommand:
                                 path_params = {"id": all_args[0]}
                             elif operation_id == "getTopic" and len(all_args) == 1:
                                 path_params = {"slug": all_args[0]}
+                            elif operation_id == "getCollective" and len(all_args) == 1:
+                                path_params = {"id": all_args[0]}
+                            elif operation_id == "getCollectiveProjects" and len(all_args) == 1:
+                                path_params = {"slug": all_args[0]}
                             elif operation_id == "lookupProject" and len(all_args) == 1:
                                 query_params = {"url": all_args[0]}
                             elif operation_id == "createJob" and len(all_args) == 1:
