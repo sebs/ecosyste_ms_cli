@@ -46,10 +46,11 @@ class TestAPIConfiguration:
             "issues",
             "sponsors",
             "opencollective",
+            "ruby",
         ]
         assert constants.SUPPORTED_APIS == expected_apis
         assert isinstance(constants.SUPPORTED_APIS, list)
-        assert len(constants.SUPPORTED_APIS) == 19
+        assert len(constants.SUPPORTED_APIS) == 20
         assert all(isinstance(api, str) for api in constants.SUPPORTED_APIS)
 
 
@@ -125,6 +126,7 @@ class TestDisplayConfiguration:
             "opencollective",
             "docker",
             "diff",
+            "ruby",
         }
         assert set(constants.PRIORITY_FIELDS.keys()) == expected_keys
 
@@ -151,6 +153,7 @@ class TestDisplayConfiguration:
             "sponsorships_count",
             "minimum_sponsorship_amount",
         ]
+        assert constants.PRIORITY_FIELDS["ruby"] == ["id", "url", "language", "score", "monthly_downloads"]
 
 
 class TestOperationsDisplay:

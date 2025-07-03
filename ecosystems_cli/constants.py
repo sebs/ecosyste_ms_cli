@@ -26,6 +26,7 @@ SUPPORTED_APIS = [
     "issues",
     "sponsors",
     "opencollective",
+    "ruby",
 ]
 
 # Output Formats
@@ -73,6 +74,7 @@ PRIORITY_FIELDS = {
     "opencollective": ["id", "url", "name", "description", "created_at"],
     "docker": ["id", "url", "name", "description", "created_at"],
     "diff": ["id", "url", "name", "description", "created_at"],
+    "ruby": ["id", "url", "language", "score", "monthly_downloads"],
 }
 
 # Operations Display

@@ -23,6 +23,7 @@ from ecosystems_cli.commands.papers import papers
 from ecosystems_cli.commands.parser import parser
 from ecosystems_cli.commands.repos import repos
 from ecosystems_cli.commands.resolver import get_resolver_group
+from ecosystems_cli.commands.ruby import ruby
 from ecosystems_cli.commands.sbom import sbom
 from ecosystems_cli.commands.sponsors import sponsors
 from ecosystems_cli.commands.summary import summary
@@ -83,6 +84,7 @@ main.add_command(timeline)
 main.add_command(issues)
 main.add_command(sponsors)
 main.add_command(opencollective)
+main.add_command(ruby)
 
 
 @main.group()
