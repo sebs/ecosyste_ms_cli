@@ -29,6 +29,7 @@ class TestAPIConfiguration:
         expected_apis = [
             "advisories",
             "archives",
+            "commits",
             "repos",
             "packages",
             "summary",
@@ -43,7 +44,7 @@ class TestAPIConfiguration:
         ]
         assert constants.SUPPORTED_APIS == expected_apis
         assert isinstance(constants.SUPPORTED_APIS, list)
-        assert len(constants.SUPPORTED_APIS) == 13
+        assert len(constants.SUPPORTED_APIS) == 14
         assert all(isinstance(api, str) for api in constants.SUPPORTED_APIS)
 
 
@@ -102,6 +103,7 @@ class TestDisplayConfiguration:
         expected_keys = {
             "advisories",
             "archives",
+            "commits",
             "repos",
             "packages",
             "summary",

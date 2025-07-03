@@ -9,6 +9,7 @@ DEFAULT_CONTENT_TYPE = "application/json"
 SUPPORTED_APIS = [
     "advisories",
     "archives",
+    "commits",
     "repos",
     "packages",
     "summary",
@@ -50,6 +51,7 @@ STYLE_BLUE = "blue"
 PRIORITY_FIELDS = {
     "advisories": ["uuid", "title", "severity", "published_at", "cvss_score"],
     "archives": ["name", "directory", "contents"],
+    "commits": ["sha", "author", "message", "timestamp", "merge"],
     "repos": ["full_name", "name", "description", "stars", "language"],
     "packages": ["name", "platform", "description", "downloads", "language"],
     "summary": ["name", "type", "count", "total", "description"],
