@@ -7,6 +7,12 @@ import pytest
 import yaml
 
 from ecosystems_cli.api_client import APIClient, get_client
+from ecosystems_cli.exceptions import (
+    APIAuthenticationError,
+    APIHTTPError,
+    APINotFoundError,
+    APIServerError,
+)
 
 
 @pytest.fixture
@@ -203,6 +209,117 @@ class TestAPIClient:
         ]
         required_params2 = client._get_required_params(details)
         assert "optional_param" not in required_params2
+
+    @mock.patch("requests.request")
+    def test_server_error_with_message(self, mock_request, monkeypatch, mock_spec):
+        """Test that server errors include the error message from response."""
+        # Arrange
+        mock_open = mock.mock_open(read_data=yaml.dump(mock_spec))
+        monkeypatch.setattr("builtins.open", mock_open)
+        monkeypatch.setattr(Path, "exists", lambda self: True)
+        client = APIClient("test")
+
+        mock_response = mock.Mock()
+        mock_response.raise_for_status.side_effect = pytest.importorskip("requests").exceptions.HTTPError()
+        mock_response.status_code = 500
+        mock_response.json.return_value = {"error": "internal server error"}
+        mock_request.return_value = mock_response
+
+        # Act & Assert
+        with pytest.raises(APIServerError) as exc_info:
+            client._make_request("get", "/test")
+
+        assert "Server error at" in str(exc_info.value)
+        assert "internal server error" in str(exc_info.value)
+        assert exc_info.value.status_code == 500
+
+    @mock.patch("requests.request")
+    def test_server_error_without_message(self, mock_request, monkeypatch, mock_spec):
+        """Test that server errors work even without error message in response."""
+        # Arrange
+        mock_open = mock.mock_open(read_data=yaml.dump(mock_spec))
+        monkeypatch.setattr("builtins.open", mock_open)
+        monkeypatch.setattr(Path, "exists", lambda self: True)
+        client = APIClient("test")
+
+        mock_response = mock.Mock()
+        mock_response.raise_for_status.side_effect = pytest.importorskip("requests").exceptions.HTTPError()
+        mock_response.status_code = 503
+        mock_response.json.side_effect = ValueError("Invalid JSON")
+        mock_request.return_value = mock_response
+
+        # Act & Assert
+        with pytest.raises(APIServerError) as exc_info:
+            client._make_request("get", "/test")
+
+        assert "Server error at" in str(exc_info.value)
+        assert exc_info.value.status_code == 503
+
+    @mock.patch("requests.request")
+    def test_authentication_error(self, mock_request, monkeypatch, mock_spec):
+        """Test that 401 errors are handled properly."""
+        # Arrange
+        mock_open = mock.mock_open(read_data=yaml.dump(mock_spec))
+        monkeypatch.setattr("builtins.open", mock_open)
+        monkeypatch.setattr(Path, "exists", lambda self: True)
+        client = APIClient("test")
+
+        mock_response = mock.Mock()
+        mock_response.raise_for_status.side_effect = pytest.importorskip("requests").exceptions.HTTPError()
+        mock_response.status_code = 401
+        mock_response.json.return_value = {"error": "Invalid API key"}
+        mock_request.return_value = mock_response
+
+        # Act & Assert
+        with pytest.raises(APIAuthenticationError) as exc_info:
+            client._make_request("get", "/test")
+
+        assert "Invalid API key" in str(exc_info.value)
+        assert exc_info.value.status_code == 401
+
+    @mock.patch("requests.request")
+    def test_not_found_error(self, mock_request, monkeypatch, mock_spec):
+        """Test that 404 errors are handled properly."""
+        # Arrange
+        mock_open = mock.mock_open(read_data=yaml.dump(mock_spec))
+        monkeypatch.setattr("builtins.open", mock_open)
+        monkeypatch.setattr(Path, "exists", lambda self: True)
+        client = APIClient("test")
+
+        mock_response = mock.Mock()
+        mock_response.raise_for_status.side_effect = pytest.importorskip("requests").exceptions.HTTPError()
+        mock_response.status_code = 404
+        mock_response.json.return_value = {"message": "Resource not found"}
+        mock_request.return_value = mock_response
+
+        # Act & Assert
+        with pytest.raises(APINotFoundError) as exc_info:
+            client._make_request("get", "/test")
+
+        assert "Resource not found" in str(exc_info.value)
+        assert exc_info.value.status_code == 404
+
+    @mock.patch("requests.request")
+    def test_other_http_error(self, mock_request, monkeypatch, mock_spec):
+        """Test that other HTTP errors are handled properly."""
+        # Arrange
+        mock_open = mock.mock_open(read_data=yaml.dump(mock_spec))
+        monkeypatch.setattr("builtins.open", mock_open)
+        monkeypatch.setattr(Path, "exists", lambda self: True)
+        client = APIClient("test")
+
+        mock_response = mock.Mock()
+        mock_response.raise_for_status.side_effect = pytest.importorskip("requests").exceptions.HTTPError()
+        mock_response.status_code = 400
+        mock_response.json.return_value = {"error": "Bad request"}
+        mock_request.return_value = mock_response
+
+        # Act & Assert
+        with pytest.raises(APIHTTPError) as exc_info:
+            client._make_request("get", "/test")
+
+        assert "Bad request" in str(exc_info.value)
+        assert exc_info.value.status_code == 400
 
 
 def test_get_client():

@@ -51,7 +51,7 @@ class APIServerError(APIHTTPError):
     """Raised when the server encounters an error (5xx)."""
 
     def __init__(self, status_code: int = 500, message: str = None):
-        super().__init__(status_code, message or "Server error")
+        super().__init__(status_code, message or f"Server error (HTTP {status_code})")
 
 
 class ConfigurationError(EcosystemsCLIError):

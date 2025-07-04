@@ -42,7 +42,7 @@ def mock_api_client():
         client_instance.call.side_effect = None
         client_instance.call.return_value = {"result": "success"}
 
-        def get_topic(name):
+        def get_topic(topic_name):
             return {"name": "test_topic", "repositories": []}
 
         client_instance.get_topic.side_effect = get_topic
