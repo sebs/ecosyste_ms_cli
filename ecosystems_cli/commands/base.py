@@ -8,10 +8,31 @@ from rich.console import Console
 
 from ecosystems_cli.api_client import get_client
 from ecosystems_cli.commands.handlers import OperationHandlerFactory
+from ecosystems_cli.constants import (
+    DEFAULT_OUTPUT_FORMAT,
+    DEFAULT_TIMEOUT,
+    OUTPUT_FORMATS,
+)
 from ecosystems_cli.exceptions import EcosystemsCLIError
 from ecosystems_cli.helpers.print_error import print_error
 from ecosystems_cli.helpers.print_operations import print_operations
 from ecosystems_cli.helpers.print_output import print_output
+
+
+def common_options(f):
+    """Decorator to add common options to commands."""
+    f = click.option(
+        "--format",
+        default=DEFAULT_OUTPUT_FORMAT,
+        type=click.Choice(OUTPUT_FORMATS),
+        help=f"Output format. Default is {DEFAULT_OUTPUT_FORMAT}.",
+    )(f)
+    f = click.option(
+        "--timeout",
+        default=DEFAULT_TIMEOUT,
+        help=f"Timeout in seconds for API requests. Default is {DEFAULT_TIMEOUT} seconds.",
+    )(f)
+    return f
 
 
 class BaseCommand:
@@ -29,11 +50,35 @@ class BaseCommand:
         self.console = Console()
 
         # Create the group with proper decorator
-        @click.group()
-        def group():
-            pass
+        @click.group(help=description)
+        @common_options
+        @click.pass_context
+        def group(ctx, timeout, format):
+            # Ensure context object exists
+            ctx.ensure_object(dict)
 
-        group.__doc__ = description
+            # Check if values were already set in context (e.g., by tests)
+            # Only preserve them if the provided values are defaults
+            if timeout == DEFAULT_TIMEOUT and "timeout" in ctx.obj:
+                timeout = ctx.obj["timeout"]
+            elif ctx.parent and ctx.parent.obj and timeout == DEFAULT_TIMEOUT:
+                # Use parent value if current value is default
+                parent_timeout = ctx.parent.obj.get("timeout", DEFAULT_TIMEOUT)
+                if parent_timeout != DEFAULT_TIMEOUT:
+                    timeout = parent_timeout
+
+            if format == DEFAULT_OUTPUT_FORMAT and "format" in ctx.obj:
+                format = ctx.obj["format"]
+            elif ctx.parent and ctx.parent.obj and format == DEFAULT_OUTPUT_FORMAT:
+                # Use parent value if current value is default
+                parent_format = ctx.parent.obj.get("format", DEFAULT_OUTPUT_FORMAT)
+                if parent_format != DEFAULT_OUTPUT_FORMAT:
+                    format = parent_format
+
+            # Set the final values
+            ctx.obj["timeout"] = timeout
+            ctx.obj["format"] = format
+
         self.group = group
 
     def list_operations(self) -> Callable:
