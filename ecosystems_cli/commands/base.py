@@ -7,6 +7,7 @@ import click
 from rich.console import Console
 
 from ecosystems_cli.api_client import get_client
+from ecosystems_cli.commands.handlers import OperationHandlerFactory
 from ecosystems_cli.exceptions import EcosystemsCLIError
 from ecosystems_cli.helpers.print_error import print_error
 from ecosystems_cli.helpers.print_operations import print_operations
@@ -120,64 +121,9 @@ class BaseCommand:
             def wrapper(ctx, *args, **kwargs):
                 client = get_client(self.api_name, timeout=ctx.obj.get("timeout", 20))
                 try:
-                    # Build params based on operation requirements
-                    path_params = {}
-                    query_params = {}
-
-                    # Special handling for resolver API
-                    if self.api_name == "resolver":
-                        if operation_id == "createJob" and len(args) >= 2:
-                            # For resolver API createJob operation
-                            query_params = {"package_name": args[0], "registry": args[1]}
-                            # Handle optional parameters from kwargs
-                            if "before" in kwargs and kwargs["before"]:
-                                query_params["before"] = kwargs["before"]
-                            if "version" in kwargs and kwargs["version"]:
-                                query_params["version"] = kwargs["version"]
-                        elif operation_id == "getJob" and len(args) == 1:
-                            path_params = {"jobID": args[0]}
-                    elif self.api_name == "archives":
-                        # Handle archives API operations
-                        # Click passes named arguments as keyword args, so check both
-                        if operation_id == "list":
-                            if len(args) == 1:
-                                query_params = {"url": args[0]}
-                            elif "url" in kwargs:
-                                query_params = {"url": kwargs["url"]}
-                        elif operation_id == "contents":
-                            if len(args) == 2:
-                                query_params = {"url": args[0], "path": args[1]}
-                            elif "url" in kwargs and "path" in kwargs:
-                                query_params = {"url": kwargs["url"], "path": kwargs["path"]}
-                        elif operation_id in ["readme", "changelog", "repopack"]:
-                            if len(args) == 1:
-                                query_params = {"url": args[0]}
-                            elif "url" in kwargs:
-                                query_params = {"url": kwargs["url"]}
-                    else:
-                        # Check both args and kwargs for parameters
-                        all_args = list(args) + list(kwargs.values())
-                        if len(all_args) > 0:
-                            # Map arguments to params based on operation ID
-                            if (
-                                operation_id
-                                in ["getProject", "getList", "getListProjects", "getCollection", "getCollectionProjects"]
-                                and len(all_args) == 1
-                            ):
-                                path_params = {"id": all_args[0]}
-                            elif operation_id == "getTopic" and len(all_args) == 1:
-                                path_params = {"slug": all_args[0]}
-                            elif operation_id == "getCollective" and len(all_args) == 1:
-                                path_params = {"id": all_args[0]}
-                            elif operation_id == "getCollectiveProjects" and len(all_args) == 1:
-                                path_params = {"slug": all_args[0]}
-                            elif operation_id == "lookupProject" and len(all_args) == 1:
-                                query_params = {"url": all_args[0]}
-                            elif operation_id == "createJob" and len(all_args) == 1:
-                                # For other APIs' createJob operation
-                                query_params = {"url": all_args[0]}
-                            elif operation_id == "getJob" and len(all_args) == 1:
-                                path_params = {"jobID": all_args[0]}
+                    # Use operation handler to build parameters
+                    handler = OperationHandlerFactory.get_handler(self.api_name)
+                    path_params, query_params = handler.build_params(operation_id, args, kwargs)
 
                     result = client.call(operation_id, path_params=path_params, query_params=query_params)
                     print_output(result, ctx.obj.get("format", "table"), console=self.console)
