@@ -1,3 +1,5 @@
+from typing import Any
+
 from ecosystems_cli.constants import (
     DICT_TRUNCATE_FORMAT,
     EMPTY_DICT_DISPLAY,
@@ -7,7 +9,7 @@ from ecosystems_cli.constants import (
 )
 
 
-def format_value(value):
+def format_value(value: Any) -> str:
     """Format a value for display in a table or TSV."""
     if isinstance(value, (dict, list)):
         # For complex objects, show a simplified representation

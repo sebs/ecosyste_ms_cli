@@ -1,4 +1,7 @@
-def parse_parameters(details: dict) -> dict:
+from typing import Any, Dict, List
+
+
+def parse_parameters(details: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
     """
     Parse parameters from endpoint details.
 
@@ -8,8 +11,9 @@ def parse_parameters(details: dict) -> dict:
     Returns:
         dict: A dictionary mapping parameter names to their metadata, including location, requirement, schema, and description.
     """
-    params = {}
-    for param in details.get("parameters", []):
+    params: Dict[str, Dict[str, Any]] = {}
+    parameters: List[Dict[str, Any]] = details.get("parameters", [])
+    for param in parameters:
         param_name = param.get("name")
         if param_name:
             params[param_name] = {

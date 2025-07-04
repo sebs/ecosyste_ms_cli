@@ -1,14 +1,16 @@
+from typing import Dict
+
 import click
 
 from ecosystems_cli.commands.base import BaseCommand
 
 
 class ParserCommands(BaseCommand):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__("parser", "Parse dependency metadata from manifest files")
         self._register_commands()
 
-    def _register_commands(self):
+    def _register_commands(self) -> None:
         self.list_operations()
 
         self.create_simple_command(
@@ -24,7 +26,7 @@ class ParserCommands(BaseCommand):
             "Submit a dependency parsing job",
             click.argument("url"),
         )
-        def submit_job(url: str):
+        def submit_job(url: str) -> Dict[str, str]:
             return {"url": url}
 
         @self.create_command_with_operation(
@@ -33,7 +35,7 @@ class ParserCommands(BaseCommand):
             "Get status of a parsing job",
             click.argument("job_id"),
         )
-        def get_job_status(job_id: str):
+        def get_job_status(job_id: str) -> Dict[str, str]:
             return {"jobID": job_id}
 
         self.call_operation()
