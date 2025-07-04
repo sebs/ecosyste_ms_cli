@@ -1,5 +1,48 @@
 # Changelog
 
+## [v1.0.0] - 2025-07-04
+
+### Changes since v0.3.6
+
+- chore(release): bump version 0.3.6 → 1.0.0
+- refactor: add type hints
+- refactor: simplify print_output
+- refactor: cleaned up the base class containing unwanted code
+- feat: ruby api added
+- feat: add opencollective
+- feat: add docker api
+- feat: added sponsors api
+- feat: issues api
+- feat: commits api
+- feat: timeline api
+- feat: added diff api
+- feat: added archives
+- feat: licenses
+- feat: sbom
+- feat: dependency resolver
+- fix: mock did some http requests
+- feat: added dependency parser
+- feat: advisories added
+- feat: ost api
+- feat: papers command added
+- refactor: output less complex now
+- docs: added specs for papers
+- fix: make it executable again
+- refactor: explicit error handling
+- refactor: introrcued base class to reduce code duplication
+- refactor: extract commad tests
+- refactor: constants extracted
+- fix: missing parameter at error log
+- chore: up gitignore
+- refactor: clean up the commands a bit more
+- refactor: start to pull commands out
+- refactor: extract commands
+- refactor: extracted the print output method
+- refactor: extract formatvalue method
+- refactor: extract more helper methods
+- docs: update CHANGELOG for v0.3.6
+
+
 ## [v0.3.6] - 2025-06-07
 
 ### Changes since v0.3.5
