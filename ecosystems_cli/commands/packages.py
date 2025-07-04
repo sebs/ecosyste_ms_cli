@@ -8,11 +8,11 @@ from ecosystems_cli.commands.base import BaseCommand
 class PackagesCommands(BaseCommand):
     """Commands for the packages API."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__("packages", "Commands for the packages API.")
         self._register_commands()
 
-    def _register_commands(self):
+    def _register_commands(self) -> None:
         """Register all commands for the packages API."""
         # Register list operations command
         self.list_operations()
@@ -24,7 +24,7 @@ class PackagesCommands(BaseCommand):
         @self.create_command_with_error_handling(
             "registry", "get_registry", "Get a specific registry by name.", click.argument("name")
         )
-        def get_registry(name: str):
+        def get_registry(name: str) -> None:
             pass
 
         @self.create_command_with_error_handling(
@@ -34,7 +34,7 @@ class PackagesCommands(BaseCommand):
             click.argument("registry"),
             click.argument("package"),
         )
-        def get_package(registry: str, package: str):
+        def get_package(registry: str, package: str) -> None:
             pass
 
         @self.create_command_with_error_handling(
@@ -45,7 +45,7 @@ class PackagesCommands(BaseCommand):
             click.argument("package"),
             click.argument("version"),
         )
-        def get_package_version(registry: str, package: str, version: str):
+        def get_package_version(registry: str, package: str, version: str) -> None:
             pass
 
         # Register call operation command

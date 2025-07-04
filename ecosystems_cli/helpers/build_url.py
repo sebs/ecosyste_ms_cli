@@ -1,4 +1,7 @@
-def build_url(base_url: str, path: str, path_params: dict) -> str:
+from typing import Dict, Optional
+
+
+def build_url(base_url: str, path: str, path_params: Optional[Dict[str, str]] = None) -> str:
     """
     Construct a URL by combining a base URL and a path, replacing placeholders in the path with values from path_params.
 
