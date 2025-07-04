@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, List
 
 from rich.console import Console
 from rich.syntax import Syntax
@@ -14,6 +14,70 @@ from ecosystems_cli.constants import (
 )
 from ecosystems_cli.helpers.format_value import format_value
 from ecosystems_cli.helpers.parse_endpoints import flatten_dict
+
+
+class TableFieldSelector:
+    """Selects appropriate fields for table display based on API type and priorities."""
+
+    def __init__(self, priority_fields: dict, max_selected_fields: int = 2):
+        self.priority_fields = priority_fields.copy()
+        self.priority_fields["common"] = ["id", "name", "title"]
+        self.max_selected_fields = max_selected_fields
+
+    def select_fields(self, headers: List[str]) -> List[str]:
+        """Select which fields to display in the table."""
+        api_type = self._detect_api_type(headers)
+        selected_fields = []
+
+        # Apply selection strategies in order
+        strategies = [
+            lambda: self._select_from_priority(headers, selected_fields, api_type),
+            lambda: self._select_from_common(headers, selected_fields),
+            lambda: self._select_remaining(headers, selected_fields),
+            lambda: self._ensure_minimum(headers, selected_fields),
+        ]
+
+        for strategy in strategies:
+            strategy()
+            if len(selected_fields) >= self.max_selected_fields:
+                break
+
+        return selected_fields
+
+    def _detect_api_type(self, headers: List[str]) -> str:
+        """Detect the API type based on available headers."""
+        for api_name, fields in self.priority_fields.items():
+            if api_name != "common" and any(field in headers for field in fields):
+                return api_name
+        return "common"
+
+    def _select_from_priority(self, headers: List[str], selected: List[str], api_type: str) -> None:
+        """Select fields from API-specific priority list."""
+        self._add_fields(headers, selected, self.priority_fields[api_type])
+
+    def _select_from_common(self, headers: List[str], selected: List[str]) -> None:
+        """Select fields from common priority list if needed."""
+        if len(selected) < 2:
+            self._add_fields(headers, selected, self.priority_fields["common"])
+
+    def _select_remaining(self, headers: List[str], selected: List[str]) -> None:
+        """Select any remaining headers if still needed."""
+        if len(selected) < 2:
+            self._add_fields(headers, selected, headers)
+
+    def _add_fields(self, headers: List[str], selected: List[str], candidates: List[str]) -> None:
+        """Add fields from candidates to selected list."""
+        for field in candidates:
+            if field in headers and field not in selected and len(selected) < self.max_selected_fields:
+                selected.append(field)
+
+    def _ensure_minimum(self, headers: List[str], selected: List[str]) -> None:
+        """Ensure we have at least 2 fields if possible."""
+        if len(selected) == 1 and headers:
+            for field in headers:
+                if field not in selected:
+                    selected.append(field)
+                    break
 
 
 def _format_json(data: Any, console: Console) -> None:
@@ -51,46 +115,8 @@ def _format_jsonl(data: Any, console: Console) -> None:
 
 def _select_table_fields(headers: list[str]) -> list[str]:
     """Select which fields to display in the table based on priority."""
-    from typing import List
-
-    priority_fields = PRIORITY_FIELDS.copy()
-    priority_fields["common"] = ["id", "name", "title"]
-
-    # Determine API type based on available headers
-    api_type = "common"
-    for api_name, fields in priority_fields.items():
-        if api_name != "common" and any(field in headers for field in fields):
-            api_type = api_name
-            break
-
-    # Select fields based on priority
-    selected_fields: List[str] = []
-
-    # First, add priority fields for the detected API type
-    for field in priority_fields[api_type]:
-        if field in headers and len(selected_fields) < MAX_SELECTED_FIELDS:
-            selected_fields.append(field)
-
-    # If we have less than 2 fields, add common fields
-    if len(selected_fields) < 2:
-        for field in priority_fields["common"]:
-            if field in headers and field not in selected_fields and len(selected_fields) < MAX_SELECTED_FIELDS:
-                selected_fields.append(field)
-
-    # If still less than 2 fields, add any remaining headers
-    if len(selected_fields) < 2:
-        for field in headers:
-            if field not in selected_fields and len(selected_fields) < MAX_SELECTED_FIELDS:
-                selected_fields.append(field)
-
-    # Ensure we have at least 2 fields if possible
-    if len(selected_fields) == 1 and len(headers) > 0:
-        for field in headers:
-            if field not in selected_fields:
-                selected_fields.append(field)
-                break
-
-    return selected_fields
+    selector = TableFieldSelector(PRIORITY_FIELDS, MAX_SELECTED_FIELDS)
+    return selector.select_fields(headers)
 
 
 def _format_table(data: Any, console: Console) -> None:

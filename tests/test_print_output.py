@@ -1,6 +1,7 @@
 from rich.console import Console
 
 from ecosystems_cli.helpers.print_output import (
+    TableFieldSelector,
     _format_json,
     _format_jsonl,
     _format_table,
@@ -93,3 +94,117 @@ def test_print_output_table(capsys):
     data = [{"id": 1, "name": "foo"}, {"id": 2, "name": "bar"}]
     console = Console(file=None, force_terminal=True, color_system=None, width=80)
     print_output(data, format_type="table", console=console)
+
+
+class TestTableFieldSelector:
+    """Test the TableFieldSelector class."""
+
+    def test_init(self):
+        """Test TableFieldSelector initialization."""
+        priority_fields = {"repos": ["full_name", "name"]}
+        selector = TableFieldSelector(priority_fields, max_selected_fields=3)
+
+        assert selector.max_selected_fields == 3
+        assert "repos" in selector.priority_fields
+        assert "common" in selector.priority_fields
+        assert selector.priority_fields["common"] == ["id", "name", "title"]
+
+    def test_detect_api_type_with_matching_fields(self):
+        """Test API type detection when fields match."""
+        priority_fields = {"repos": ["full_name", "stars"], "packages": ["platform", "downloads"]}
+        selector = TableFieldSelector(priority_fields)
+
+        # Test repos detection
+        headers = ["full_name", "description", "language"]
+        assert selector._detect_api_type(headers) == "repos"
+
+        # Test packages detection
+        headers = ["name", "platform", "version"]
+        assert selector._detect_api_type(headers) == "packages"
+
+    def test_detect_api_type_defaults_to_common(self):
+        """Test API type detection defaults to common."""
+        priority_fields = {"repos": ["full_name", "stars"]}
+        selector = TableFieldSelector(priority_fields)
+
+        headers = ["id", "name", "description"]
+        assert selector._detect_api_type(headers) == "common"
+
+    def test_select_fields_api_specific(self):
+        """Test field selection for API-specific fields."""
+        priority_fields = {
+            "repos": ["full_name", "stars", "language"],
+        }
+        selector = TableFieldSelector(priority_fields, max_selected_fields=2)
+
+        headers = ["full_name", "stars", "language", "description"]
+        selected = selector.select_fields(headers)
+
+        assert len(selected) == 2
+        assert "full_name" in selected
+        assert "stars" in selected
+
+    def test_select_fields_falls_back_to_common(self):
+        """Test field selection falls back to common fields."""
+        priority_fields = {"repos": ["not_present", "also_not_present"]}
+        selector = TableFieldSelector(priority_fields, max_selected_fields=2)
+
+        headers = ["id", "name", "description"]
+        selected = selector.select_fields(headers)
+
+        assert len(selected) == 2
+        assert "id" in selected
+        assert "name" in selected
+
+    def test_select_fields_uses_remaining_headers(self):
+        """Test field selection uses remaining headers when needed."""
+        priority_fields = {}
+        selector = TableFieldSelector(priority_fields, max_selected_fields=2)
+
+        headers = ["custom1", "custom2", "custom3"]
+        selected = selector.select_fields(headers)
+
+        assert len(selected) == 2
+        assert "custom1" in selected
+        assert "custom2" in selected
+
+    def test_ensure_minimum_fields(self):
+        """Test ensuring minimum of 2 fields."""
+        priority_fields = {"repos": ["full_name"]}
+        selector = TableFieldSelector(priority_fields, max_selected_fields=2)
+
+        headers = ["full_name", "other_field"]
+        selected = selector.select_fields(headers)
+
+        assert len(selected) == 2
+        assert "full_name" in selected
+        assert "other_field" in selected
+
+    def test_no_duplicate_fields(self):
+        """Test that fields are not duplicated."""
+        priority_fields = {"repos": ["name"], "common": ["name", "id"]}
+        selector = TableFieldSelector(priority_fields, max_selected_fields=3)
+
+        headers = ["name", "id", "description"]
+        selected = selector.select_fields(headers)
+
+        assert len(selected) == len(set(selected))  # No duplicates
+        assert "name" in selected
+        assert "id" in selected
+
+    def test_empty_headers(self):
+        """Test behavior with empty headers."""
+        priority_fields = {"repos": ["full_name"]}
+        selector = TableFieldSelector(priority_fields)
+
+        selected = selector.select_fields([])
+        assert selected == []
+
+    def test_select_table_fields_uses_selector(self):
+        """Test that _select_table_fields uses TableFieldSelector."""
+        headers = ["full_name", "stars", "language", "description"]
+        selected = _select_table_fields(headers)
+
+        assert isinstance(selected, list)
+        assert len(selected) >= 1
+        assert len(selected) <= 2
