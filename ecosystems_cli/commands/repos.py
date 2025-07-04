@@ -22,25 +22,27 @@ class ReposCommands(BaseCommand):
         self.create_simple_command("hosts", "get_hosts", "Get all repository hosts.")
 
         # Register commands with error handling
-        @self.create_command_with_error_handling("topic", "get_topic", "Get a specific topic by name.", click.argument("name"))
-        def get_topic(name: str):
+        @self.create_command_with_error_handling(
+            "topic", "get_topic", "Get a specific topic by name.", click.argument("topic_name")
+        )
+        def get_topic(topic_name: str):
             pass
 
         @self.create_command_with_error_handling(
-            "host", "get_host", "Get a specific repository host by name.", click.argument("name")
+            "host", "get_host", "Get a specific repository host by name.", click.argument("host_name")
         )
-        def get_host(name: str):
+        def get_host(host_name: str):
             pass
 
         @self.create_command_with_error_handling(
             "repository",
             "get_repository",
             "Get a specific repository.",
-            click.argument("host"),
+            click.argument("host_name"),
             click.argument("owner"),
             click.argument("repo"),
         )
-        def get_repository(host: str, owner: str, repo: str):
+        def get_repository(host_name: str, owner: str, repo: str):
             pass
 
         # Register call operation command

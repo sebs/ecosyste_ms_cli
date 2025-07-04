@@ -148,7 +148,7 @@ class TestBaseCommand:
         # Test that it's a Click command
         assert isinstance(call_cmd, click.Command)
         assert call_cmd.name == "call"
-        assert len(call_cmd.params) == 4  # operation + 3 options
+        assert len(call_cmd.params) == 6  # operation + 3 options + timeout + format
 
         # Test command execution using invoke
         from click.testing import CliRunner

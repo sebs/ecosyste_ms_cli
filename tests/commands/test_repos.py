@@ -59,7 +59,7 @@ class TestReposCommands:
 
         assert result.exit_code == 0
         mock_get_client.assert_called_once_with("repos", timeout=20)
-        mock_client.get_topic.assert_called_once_with(name="python")
+        mock_client.get_topic.assert_called_once_with(topic_name="python")
         mock_print_output.assert_called_once()
 
     @mock.patch("ecosystems_cli.commands.base.get_client")
@@ -99,7 +99,7 @@ class TestReposCommands:
         result = self.runner.invoke(self.repos_commands.group, ["host", "github.com"], obj={"timeout": 20})
 
         assert result.exit_code == 0
-        mock_client.get_host.assert_called_once_with(name="github.com")
+        mock_client.get_host.assert_called_once_with(host_name="github.com")
 
     @mock.patch("ecosystems_cli.commands.base.get_client")
     @mock.patch("ecosystems_cli.commands.base.print_output")
@@ -114,7 +114,7 @@ class TestReposCommands:
         )
 
         assert result.exit_code == 0
-        mock_client.get_repository.assert_called_once_with(host="github.com", owner="owner", repo="repo")
+        mock_client.get_repository.assert_called_once_with(host_name="github.com", owner="owner", repo="repo")
 
     @mock.patch("ecosystems_cli.cli._call_operation")
     def test_call_repos_operation(self, mock_call_operation):

@@ -100,14 +100,27 @@ class APIClient:
         try:
             response.raise_for_status()
         except requests.exceptions.HTTPError:
+            # Try to extract error message from response
+            error_msg = None
+            try:
+                error_data = response.json()
+                error_msg = error_data.get("error") or error_data.get("message")
+            except (ValueError, TypeError, AttributeError):
+                # If response is not JSON or malformed, error_msg remains None
+                pass
+
             if response.status_code == 401:
-                raise APIAuthenticationError()
+                raise APIAuthenticationError(error_msg)
             elif response.status_code == 404:
-                raise APINotFoundError()
+                raise APINotFoundError(error_msg)
             elif response.status_code >= 500:
-                raise APIServerError(response.status_code)
+                # Include URL in server error for better debugging
+                msg = f"Server error at {url}"
+                if error_msg:
+                    msg += f": {error_msg}"
+                raise APIServerError(response.status_code, msg)
             else:
-                raise APIHTTPError(response.status_code)
+                raise APIHTTPError(response.status_code, error_msg)
 
         # Return JSON response if available, otherwise return response text
         try:

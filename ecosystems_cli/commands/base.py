@@ -84,10 +84,18 @@ class BaseCommand:
     def list_operations(self) -> Callable:
         """Create a command to list available operations."""
 
+        @common_options
         @click.pass_context
-        def list_operations_impl(ctx):
+        def list_operations_impl(ctx, timeout, format):
             """List available operations for the API."""
-            client = get_client(self.api_name, timeout=ctx.obj.get("timeout", 20))
+            # Update context with command-level options
+            ctx.ensure_object(dict)
+            if timeout != DEFAULT_TIMEOUT:
+                ctx.obj["timeout"] = timeout
+            if format != DEFAULT_OUTPUT_FORMAT:
+                ctx.obj["format"] = format
+
+            client = get_client(self.api_name, timeout=ctx.obj.get("timeout", DEFAULT_TIMEOUT))
             print_operations(client.list_operations(), console=self.console)
 
         # Set the function name and docstring dynamically
@@ -106,14 +114,27 @@ class BaseCommand:
             operation_id: Optional operation ID for 'call' method
         """
 
+        @common_options
         @click.pass_context
-        def command_impl(ctx):
-            client = get_client(self.api_name, timeout=ctx.obj.get("timeout", 20))
-            if operation_id and method_name == "call":
-                result = client.call(operation_id)
-            else:
-                result = getattr(client, method_name)()
-            print_output(result, ctx.obj.get("format", "table"), console=self.console)
+        def command_impl(ctx, timeout, format):
+            # Update context with command-level options
+            ctx.ensure_object(dict)
+            if timeout != DEFAULT_TIMEOUT:
+                ctx.obj["timeout"] = timeout
+            if format != DEFAULT_OUTPUT_FORMAT:
+                ctx.obj["format"] = format
+
+            client = get_client(self.api_name, timeout=ctx.obj.get("timeout", DEFAULT_TIMEOUT))
+            try:
+                if operation_id and method_name == "call":
+                    result = client.call(operation_id)
+                else:
+                    result = getattr(client, method_name)()
+                print_output(result, ctx.obj.get("format", DEFAULT_OUTPUT_FORMAT), console=self.console)
+            except EcosystemsCLIError as e:
+                print_error(str(e), console=self.console)
+            except Exception as e:
+                print_error(f"Unexpected error: {str(e)}", console=self.console)
 
         command_impl.__doc__ = description
         return self.group.command(name)(command_impl)
@@ -129,13 +150,21 @@ class BaseCommand:
         """
 
         def decorator(func):
+            @common_options
             @click.pass_context
             @wraps(func)
-            def wrapper(ctx, *args, **kwargs):
-                client = get_client(self.api_name, timeout=ctx.obj.get("timeout", 20))
+            def wrapper(ctx, timeout, format, **kwargs):
+                # Update context with command-level options
+                ctx.ensure_object(dict)
+                if timeout != DEFAULT_TIMEOUT:
+                    ctx.obj["timeout"] = timeout
+                if format != DEFAULT_OUTPUT_FORMAT:
+                    ctx.obj["format"] = format
+
+                client = get_client(self.api_name, timeout=ctx.obj.get("timeout", DEFAULT_TIMEOUT))
                 try:
-                    result = getattr(client, method_name)(*args, **kwargs)
-                    print_output(result, ctx.obj.get("format", "table"), console=self.console)
+                    result = getattr(client, method_name)(**kwargs)
+                    print_output(result, ctx.obj.get("format", DEFAULT_OUTPUT_FORMAT), console=self.console)
                 except EcosystemsCLIError as e:
                     print_error(str(e), console=self.console)
                 except Exception as e:
@@ -161,17 +190,25 @@ class BaseCommand:
         """
 
         def decorator(func):
+            @common_options
             @click.pass_context
             @wraps(func)
-            def wrapper(ctx, *args, **kwargs):
-                client = get_client(self.api_name, timeout=ctx.obj.get("timeout", 20))
+            def wrapper(ctx, timeout, format, *args, **kwargs):
+                # Update context with command-level options
+                ctx.ensure_object(dict)
+                if timeout != DEFAULT_TIMEOUT:
+                    ctx.obj["timeout"] = timeout
+                if format != DEFAULT_OUTPUT_FORMAT:
+                    ctx.obj["format"] = format
+
+                client = get_client(self.api_name, timeout=ctx.obj.get("timeout", DEFAULT_TIMEOUT))
                 try:
                     # Use operation handler to build parameters
                     handler = OperationHandlerFactory.get_handler(self.api_name)
                     path_params, query_params = handler.build_params(operation_id, args, kwargs)
 
                     result = client.call(operation_id, path_params=path_params, query_params=query_params)
-                    print_output(result, ctx.obj.get("format", "table"), console=self.console)
+                    print_output(result, ctx.obj.get("format", DEFAULT_OUTPUT_FORMAT), console=self.console)
                 except EcosystemsCLIError as e:
                     print_error(str(e), console=self.console)
                 except Exception as e:
@@ -193,9 +230,17 @@ class BaseCommand:
         @click.option("--path-params", help="Path parameters as JSON")
         @click.option("--query-params", help="Query parameters as JSON")
         @click.option("--body", help="Request body as JSON")
+        @common_options
         @click.pass_context
-        def call_operation_impl(ctx, operation: str, path_params: str, query_params: str, body: str):
+        def call_operation_impl(ctx, operation: str, path_params: str, query_params: str, body: str, timeout, format):
             """Call an operation on the API."""
+            # Update context with command-level options
+            ctx.ensure_object(dict)
+            if timeout != DEFAULT_TIMEOUT:
+                ctx.obj["timeout"] = timeout
+            if format != DEFAULT_OUTPUT_FORMAT:
+                ctx.obj["format"] = format
+
             from ecosystems_cli.cli import _call_operation
 
             _call_operation(self.api_name, operation, path_params, query_params, body, ctx)
