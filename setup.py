@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 
 setup(
     name="ecosystems-cli",
-    version="0.3.6",
+    version="1.0.0",
     description="CLI for ecosyste.ms API",
     author="Sebastian Schürmann",
     author_email="sebastian.schurmann@gmail.com",
