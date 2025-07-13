@@ -30,7 +30,7 @@ class TestCommitsCommands:
         result = self.runner.invoke(self.commits_commands.group, ["list"], obj={"timeout": 30})
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("commits", timeout=30)
+        mock_get_client.assert_called_once_with("commits", base_url=None, timeout=30)
         mock_client.list_operations.assert_called_once()
         mock_print_operations.assert_called_once()
 
@@ -45,7 +45,7 @@ class TestCommitsCommands:
         result = self.runner.invoke(self.commits_commands.group, ["hosts"], obj={"timeout": 20, "format": "table"})
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("commits", timeout=20)
+        mock_get_client.assert_called_once_with("commits", base_url=None, timeout=20)
         mock_client.getRegistries.assert_called_once()
         mock_print_output.assert_called_once_with({"hosts": ["github.com", "gitlab.com"]}, "table", console=mock.ANY)
 
@@ -62,7 +62,7 @@ class TestCommitsCommands:
         )
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("commits", timeout=20)
+        mock_get_client.assert_called_once_with("commits", base_url=None, timeout=20)
         mock_client.repositoriesLookup.assert_called_once_with(url="https://github.com/owner/repo")
         mock_print_output.assert_called_once()
 

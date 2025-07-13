@@ -28,7 +28,7 @@ class TestArchivesCommands:
         result = self.runner.invoke(self.archives_commands.group, ["list"], obj={"timeout": 30})
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("archives", timeout=30)
+        mock_get_client.assert_called_once_with("archives", base_url=None, timeout=30)
         mock_client.list_operations.assert_called_once()
         mock_print_operations.assert_called_once()
 
@@ -46,7 +46,7 @@ class TestArchivesCommands:
         )
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("archives", timeout=20)
+        mock_get_client.assert_called_once_with("archives", base_url=None, timeout=20)
         mock_client.call.assert_called_once_with("list", path_params={}, query_params={"url": test_url})
         mock_print_output.assert_called_once()
 
@@ -69,7 +69,7 @@ class TestArchivesCommands:
         )
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("archives", timeout=20)
+        mock_get_client.assert_called_once_with("archives", base_url=None, timeout=20)
         mock_client.call.assert_called_once_with("contents", path_params={}, query_params={"url": test_url, "path": test_path})
         mock_print_output.assert_called_once()
 
@@ -90,7 +90,7 @@ class TestArchivesCommands:
         result = self.runner.invoke(self.archives_commands.group, ["readme", test_url], obj={"timeout": 20})
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("archives", timeout=20)
+        mock_get_client.assert_called_once_with("archives", base_url=None, timeout=20)
         mock_client.call.assert_called_once_with("readme", path_params={}, query_params={"url": test_url})
 
     @mock.patch("ecosystems_cli.commands.base.get_client")
@@ -110,7 +110,7 @@ class TestArchivesCommands:
         result = self.runner.invoke(self.archives_commands.group, ["changelog", test_url], obj={"timeout": 20})
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("archives", timeout=20)
+        mock_get_client.assert_called_once_with("archives", base_url=None, timeout=20)
         mock_client.call.assert_called_once_with("changelog", path_params={}, query_params={"url": test_url})
 
     @mock.patch("ecosystems_cli.commands.base.get_client")
@@ -125,7 +125,7 @@ class TestArchivesCommands:
         result = self.runner.invoke(self.archives_commands.group, ["repopack", test_url], obj={"timeout": 20})
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("archives", timeout=20)
+        mock_get_client.assert_called_once_with("archives", base_url=None, timeout=20)
         mock_client.call.assert_called_once_with("repopack", path_params={}, query_params={"url": test_url})
 
     @mock.patch("ecosystems_cli.commands.base.get_client")

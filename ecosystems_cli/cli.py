@@ -38,6 +38,7 @@ from ecosystems_cli.constants import (
 )
 from ecosystems_cli.exceptions import EcosystemsCLIError, JSONParseError
 from ecosystems_cli.helpers.format_value import format_value
+from ecosystems_cli.helpers.get_domain import build_base_url, get_domain_with_precedence
 from ecosystems_cli.helpers.print_operations import print_operations
 from ecosystems_cli.helpers.print_output import print_output
 
@@ -56,12 +57,18 @@ console = Console()
     type=click.Choice(OUTPUT_FORMATS),
     help=f"Output format. Default is {DEFAULT_OUTPUT_FORMAT}.",
 )
+@click.option(
+    "--domain",
+    default=None,
+    help="Override the API domain. Example: api.example.com",
+)
 @click.pass_context
-def main(ctx, timeout, format):
+def main(ctx, timeout, format, domain):
     """Ecosystems CLI for interacting with ecosyste.ms APIs."""
     ctx.ensure_object(dict)
     ctx.obj["timeout"] = timeout
     ctx.obj["format"] = format
+    ctx.obj["domain"] = domain
 
 
 # Add command groups to main
@@ -108,16 +115,22 @@ def _parse_json_param(param: Optional[str]) -> Optional[Dict]:
 
 def _call_operation(api: str, operation: str, path_params: str, query_params: str, body: str, context=None):
     """Call an operation on the specified API."""
-    # Get timeout and format from context if available
+    # Get timeout, format, and domain from context if available
     if context and hasattr(context, "obj"):
         timeout = context.obj.get("timeout", DEFAULT_TIMEOUT)
         format_type = context.obj.get("format", DEFAULT_OUTPUT_FORMAT)
+        domain = context.obj.get("domain")
     else:
         timeout = DEFAULT_TIMEOUT
         format_type = DEFAULT_OUTPUT_FORMAT
+        domain = None
+
+    # Get domain with proper precedence
+    final_domain = get_domain_with_precedence(api, domain)
+    base_url = build_base_url(final_domain, api)
 
     try:
-        client = get_client(api, timeout=timeout)
+        client = get_client(api, base_url=base_url, timeout=timeout)
 
         # Parse parameters
         path_params_dict = _parse_json_param(path_params)

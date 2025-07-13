@@ -28,7 +28,7 @@ class TestOSTCommands:
         result = self.runner.invoke(self.ost_commands.group, ["list"], obj={"timeout": 30})
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("ost", timeout=30)
+        mock_get_client.assert_called_once_with("ost", base_url=None, timeout=30)
         mock_client.list_operations.assert_called_once()
         mock_print_operations.assert_called_once()
 
@@ -43,7 +43,7 @@ class TestOSTCommands:
         result = self.runner.invoke(self.ost_commands.group, ["projects"], obj={"timeout": 20, "format": "table"})
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("ost", timeout=20)
+        mock_get_client.assert_called_once_with("ost", base_url=None, timeout=20)
         mock_client.get_projects.assert_called_once()
         mock_print_output.assert_called_once_with(
             [{"id": 1, "url": "https://github.com/example/project"}], "table", console=mock.ANY
@@ -60,7 +60,7 @@ class TestOSTCommands:
         result = self.runner.invoke(self.ost_commands.group, ["project", "1"], obj={"timeout": 20, "format": "json"})
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("ost", timeout=20)
+        mock_get_client.assert_called_once_with("ost", base_url=None, timeout=20)
         mock_client.get_project.assert_called_once_with(id=1)
         mock_print_output.assert_called_once()
 
@@ -90,7 +90,7 @@ class TestOSTCommands:
         )
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("ost", timeout=20)
+        mock_get_client.assert_called_once_with("ost", base_url=None, timeout=20)
         mock_client.lookup_project.assert_called_once_with(url="https://github.com/example/project")
 
     @mock.patch("ecosystems_cli.commands.base.get_client")
@@ -104,7 +104,7 @@ class TestOSTCommands:
         result = self.runner.invoke(self.ost_commands.group, ["issues"], obj={"timeout": 20, "format": "jsonl"})
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("ost", timeout=20)
+        mock_get_client.assert_called_once_with("ost", base_url=None, timeout=20)
         mock_client.get_issues.assert_called_once()
 
     @mock.patch("ecosystems_cli.commands.base.get_client")
@@ -118,7 +118,7 @@ class TestOSTCommands:
         result = self.runner.invoke(self.ost_commands.group, ["openclimateaction-issues"], obj={"timeout": 20})
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("ost", timeout=20)
+        mock_get_client.assert_called_once_with("ost", base_url=None, timeout=20)
         mock_client.get_open_climate_action_issues.assert_called_once()
 
     @mock.patch("ecosystems_cli.cli._call_operation")

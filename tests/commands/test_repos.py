@@ -28,7 +28,7 @@ class TestReposCommands:
         result = self.runner.invoke(self.repos_commands.group, ["list"], obj={"timeout": 30})
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("repos", timeout=30)
+        mock_get_client.assert_called_once_with("repos", base_url=None, timeout=30)
         mock_client.list_operations.assert_called_once()
         mock_print_operations.assert_called_once()
 
@@ -43,7 +43,7 @@ class TestReposCommands:
         result = self.runner.invoke(self.repos_commands.group, ["topics"], obj={"timeout": 20, "format": "table"})
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("repos", timeout=20)
+        mock_get_client.assert_called_once_with("repos", base_url=None, timeout=20)
         mock_client.get_topics.assert_called_once()
         mock_print_output.assert_called_once_with({"topics": ["python", "javascript"]}, "table", console=mock.ANY)
 
@@ -58,7 +58,7 @@ class TestReposCommands:
         result = self.runner.invoke(self.repos_commands.group, ["topic", "python"], obj={"timeout": 20, "format": "json"})
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("repos", timeout=20)
+        mock_get_client.assert_called_once_with("repos", base_url=None, timeout=20)
         mock_client.get_topic.assert_called_once_with(topic_name="python")
         mock_print_output.assert_called_once()
 

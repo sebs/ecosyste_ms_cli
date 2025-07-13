@@ -28,7 +28,7 @@ class TestOpenCollectiveCommands:
         result = self.runner.invoke(self.opencollective_commands.group, ["list"], obj={"timeout": 30})
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("opencollective", timeout=30)
+        mock_get_client.assert_called_once_with("opencollective", base_url=None, timeout=30)
         mock_client.list_operations.assert_called_once()
         mock_print_operations.assert_called_once()
 
@@ -43,7 +43,7 @@ class TestOpenCollectiveCommands:
         result = self.runner.invoke(self.opencollective_commands.group, ["projects"], obj={"timeout": 20, "format": "table"})
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("opencollective", timeout=20)
+        mock_get_client.assert_called_once_with("opencollective", base_url=None, timeout=20)
         mock_client.call.assert_called_once_with("getProjects")
         mock_print_output.assert_called_once()
 
@@ -60,7 +60,7 @@ class TestOpenCollectiveCommands:
         )
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("opencollective", timeout=20)
+        mock_get_client.assert_called_once_with("opencollective", base_url=None, timeout=20)
         mock_client.call.assert_called_once_with("getProject", path_params={"id": 123}, query_params={})
         mock_print_output.assert_called_once()
 

@@ -30,7 +30,7 @@ class TestSponsorsCommands:
         result = self.runner.invoke(self.sponsors_commands.group, ["list"], obj={"timeout": 30})
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("sponsors", timeout=30)
+        mock_get_client.assert_called_once_with("sponsors", base_url=None, timeout=30)
         mock_client.list_operations.assert_called_once()
         mock_print_operations.assert_called_once()
 
@@ -48,7 +48,7 @@ class TestSponsorsCommands:
         result = self.runner.invoke(self.sponsors_commands.group, ["accounts"], obj={"timeout": 20, "format": "table"})
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("sponsors", timeout=20)
+        mock_get_client.assert_called_once_with("sponsors", base_url=None, timeout=20)
         mock_client.list_accounts.assert_called_once()
         mock_print_output.assert_called_once()
 
@@ -66,7 +66,7 @@ class TestSponsorsCommands:
         result = self.runner.invoke(self.sponsors_commands.group, ["sponsors"], obj={"timeout": 20, "format": "json"})
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("sponsors", timeout=20)
+        mock_get_client.assert_called_once_with("sponsors", base_url=None, timeout=20)
         mock_client.list_sponsors.assert_called_once()
         mock_print_output.assert_called_once()
 
@@ -88,7 +88,7 @@ class TestSponsorsCommands:
         )
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("sponsors", timeout=20)
+        mock_get_client.assert_called_once_with("sponsors", base_url=None, timeout=20)
         mock_client.get_account.assert_called_once_with(login="testuser")
         mock_print_output.assert_called_once()
 
