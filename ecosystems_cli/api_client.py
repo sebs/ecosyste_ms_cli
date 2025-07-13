@@ -4,6 +4,7 @@ from typing import Any, Dict, List, Optional
 
 import requests
 
+from ecosystems_cli import __version__
 from ecosystems_cli.constants import (
     API_BASE_URL_TEMPLATE,
     DEFAULT_CONTENT_TYPE,
@@ -84,6 +85,9 @@ class APIClient:
         # Set default headers
         if "Content-Type" not in headers:
             headers["Content-Type"] = DEFAULT_CONTENT_TYPE
+
+        # Set user-agent header
+        headers["User-Agent"] = f"ecosyste_ms_cli ({__version__})"
 
         try:
             response = requests.request(
