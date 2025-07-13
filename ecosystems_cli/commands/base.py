@@ -14,6 +14,7 @@ from ecosystems_cli.constants import (
     OUTPUT_FORMATS,
 )
 from ecosystems_cli.exceptions import EcosystemsCLIError
+from ecosystems_cli.helpers.get_domain import build_base_url, get_domain_with_precedence
 from ecosystems_cli.helpers.print_error import print_error
 from ecosystems_cli.helpers.print_operations import print_operations
 from ecosystems_cli.helpers.print_output import print_output
@@ -31,6 +32,11 @@ def common_options(f):
         "--timeout",
         default=DEFAULT_TIMEOUT,
         help=f"Timeout in seconds for API requests. Default is {DEFAULT_TIMEOUT} seconds.",
+    )(f)
+    f = click.option(
+        "--domain",
+        default=None,
+        help="Override the API domain. Example: api.example.com",
     )(f)
     return f
 
@@ -53,7 +59,7 @@ class BaseCommand:
         @click.group(help=description)
         @common_options
         @click.pass_context
-        def group(ctx, timeout, format):
+        def group(ctx, timeout, format, domain):
             # Ensure context object exists
             ctx.ensure_object(dict)
 
@@ -75,9 +81,18 @@ class BaseCommand:
                 if parent_format != DEFAULT_OUTPUT_FORMAT:
                     format = parent_format
 
+            if domain is None and "domain" in ctx.obj:
+                domain = ctx.obj["domain"]
+            elif ctx.parent and ctx.parent.obj and domain is None:
+                # Use parent value if current value is None
+                parent_domain = ctx.parent.obj.get("domain")
+                if parent_domain is not None:
+                    domain = parent_domain
+
             # Set the final values
             ctx.obj["timeout"] = timeout
             ctx.obj["format"] = format
+            ctx.obj["domain"] = domain
 
         self.group = group
 
@@ -86,7 +101,7 @@ class BaseCommand:
 
         @common_options
         @click.pass_context
-        def list_operations_impl(ctx, timeout, format):
+        def list_operations_impl(ctx, timeout, format, domain):
             """List available operations for the API."""
             # Update context with command-level options
             ctx.ensure_object(dict)
@@ -94,8 +109,14 @@ class BaseCommand:
                 ctx.obj["timeout"] = timeout
             if format != DEFAULT_OUTPUT_FORMAT:
                 ctx.obj["format"] = format
+            if domain is not None:
+                ctx.obj["domain"] = domain
 
-            client = get_client(self.api_name, timeout=ctx.obj.get("timeout", DEFAULT_TIMEOUT))
+            # Get domain with proper precedence
+            domain = get_domain_with_precedence(self.api_name, ctx.obj.get("domain"))
+            base_url = build_base_url(domain, self.api_name)
+
+            client = get_client(self.api_name, base_url=base_url, timeout=ctx.obj.get("timeout", DEFAULT_TIMEOUT))
             print_operations(client.list_operations(), console=self.console)
 
         # Set the function name and docstring dynamically
@@ -116,15 +137,21 @@ class BaseCommand:
 
         @common_options
         @click.pass_context
-        def command_impl(ctx, timeout, format):
+        def command_impl(ctx, timeout, format, domain):
             # Update context with command-level options
             ctx.ensure_object(dict)
             if timeout != DEFAULT_TIMEOUT:
                 ctx.obj["timeout"] = timeout
             if format != DEFAULT_OUTPUT_FORMAT:
                 ctx.obj["format"] = format
+            if domain is not None:
+                ctx.obj["domain"] = domain
 
-            client = get_client(self.api_name, timeout=ctx.obj.get("timeout", DEFAULT_TIMEOUT))
+            # Get domain with proper precedence
+            domain = get_domain_with_precedence(self.api_name, ctx.obj.get("domain"))
+            base_url = build_base_url(domain, self.api_name)
+
+            client = get_client(self.api_name, base_url=base_url, timeout=ctx.obj.get("timeout", DEFAULT_TIMEOUT))
             try:
                 if operation_id and method_name == "call":
                     result = client.call(operation_id)
@@ -153,15 +180,21 @@ class BaseCommand:
             @common_options
             @click.pass_context
             @wraps(func)
-            def wrapper(ctx, timeout, format, **kwargs):
+            def wrapper(ctx, timeout, format, domain, **kwargs):
                 # Update context with command-level options
                 ctx.ensure_object(dict)
                 if timeout != DEFAULT_TIMEOUT:
                     ctx.obj["timeout"] = timeout
                 if format != DEFAULT_OUTPUT_FORMAT:
                     ctx.obj["format"] = format
+                if domain is not None:
+                    ctx.obj["domain"] = domain
 
-                client = get_client(self.api_name, timeout=ctx.obj.get("timeout", DEFAULT_TIMEOUT))
+                # Get domain with proper precedence
+                domain = get_domain_with_precedence(self.api_name, ctx.obj.get("domain"))
+                base_url = build_base_url(domain, self.api_name)
+
+                client = get_client(self.api_name, base_url=base_url, timeout=ctx.obj.get("timeout", DEFAULT_TIMEOUT))
                 try:
                     result = getattr(client, method_name)(**kwargs)
                     print_output(result, ctx.obj.get("format", DEFAULT_OUTPUT_FORMAT), console=self.console)
@@ -193,15 +226,21 @@ class BaseCommand:
             @common_options
             @click.pass_context
             @wraps(func)
-            def wrapper(ctx, timeout, format, *args, **kwargs):
+            def wrapper(ctx, timeout, format, domain, *args, **kwargs):
                 # Update context with command-level options
                 ctx.ensure_object(dict)
                 if timeout != DEFAULT_TIMEOUT:
                     ctx.obj["timeout"] = timeout
                 if format != DEFAULT_OUTPUT_FORMAT:
                     ctx.obj["format"] = format
+                if domain is not None:
+                    ctx.obj["domain"] = domain
 
-                client = get_client(self.api_name, timeout=ctx.obj.get("timeout", DEFAULT_TIMEOUT))
+                # Get domain with proper precedence
+                domain = get_domain_with_precedence(self.api_name, ctx.obj.get("domain"))
+                base_url = build_base_url(domain, self.api_name)
+
+                client = get_client(self.api_name, base_url=base_url, timeout=ctx.obj.get("timeout", DEFAULT_TIMEOUT))
                 try:
                     # Use operation handler to build parameters
                     handler = OperationHandlerFactory.get_handler(self.api_name)
@@ -232,7 +271,7 @@ class BaseCommand:
         @click.option("--body", help="Request body as JSON")
         @common_options
         @click.pass_context
-        def call_operation_impl(ctx, operation: str, path_params: str, query_params: str, body: str, timeout, format):
+        def call_operation_impl(ctx, operation: str, path_params: str, query_params: str, body: str, timeout, format, domain):
             """Call an operation on the API."""
             # Update context with command-level options
             ctx.ensure_object(dict)
@@ -240,6 +279,8 @@ class BaseCommand:
                 ctx.obj["timeout"] = timeout
             if format != DEFAULT_OUTPUT_FORMAT:
                 ctx.obj["format"] = format
+            if domain is not None:
+                ctx.obj["domain"] = domain
 
             from ecosystems_cli.cli import _call_operation
 

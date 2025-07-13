@@ -30,7 +30,7 @@ class TestResolverCommands:
         result = self.runner.invoke(self.resolver_commands.group, ["list"], obj={"timeout": 30})
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("resolver", timeout=30)
+        mock_get_client.assert_called_once_with("resolver", base_url=None, timeout=30)
         mock_client.list_operations.assert_called_once()
         mock_print_operations.assert_called_once()
 

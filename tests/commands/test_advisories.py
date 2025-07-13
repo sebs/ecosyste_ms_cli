@@ -30,7 +30,7 @@ class TestAdvisoriesCommands:
         result = self.runner.invoke(self.advisories_commands.group, ["list"], obj={"timeout": 30})
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("advisories", timeout=30)
+        mock_get_client.assert_called_once_with("advisories", base_url=None, timeout=30)
         mock_client.list_operations.assert_called_once()
         mock_print_operations.assert_called_once()
 
@@ -48,7 +48,7 @@ class TestAdvisoriesCommands:
         result = self.runner.invoke(self.advisories_commands.group, ["packages"], obj={"timeout": 20, "format": "table"})
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("advisories", timeout=20)
+        mock_get_client.assert_called_once_with("advisories", base_url=None, timeout=20)
         mock_client.get_advisories_packages.assert_called_once()
         mock_print_output.assert_called_once()
 
@@ -67,7 +67,7 @@ class TestAdvisoriesCommands:
         )
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("advisories", timeout=20)
+        mock_get_client.assert_called_once_with("advisories", base_url=None, timeout=20)
         mock_client.get_advisories.assert_called_once_with(
             ecosystem="npm",
             severity="high",
@@ -100,7 +100,7 @@ class TestAdvisoriesCommands:
         )
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("advisories", timeout=20)
+        mock_get_client.assert_called_once_with("advisories", base_url=None, timeout=20)
         mock_client.get_advisory.assert_called_once_with(advisory_uuid="test-uuid-123")
         mock_print_output.assert_called_once()
 

@@ -28,7 +28,7 @@ class TestTimelineCommands:
         result = self.runner.invoke(self.timeline_commands.group, ["list"], obj={"timeout": 30})
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("timeline", timeout=30)
+        mock_get_client.assert_called_once_with("timeline", base_url=None, timeout=30)
         mock_client.list_operations.assert_called_once()
         mock_print_operations.assert_called_once()
 
@@ -46,7 +46,7 @@ class TestTimelineCommands:
         result = self.runner.invoke(self.timeline_commands.group, ["events"], obj={"timeout": 20, "format": "table"})
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("timeline", timeout=20)
+        mock_get_client.assert_called_once_with("timeline", base_url=None, timeout=20)
         mock_client.get_events.assert_called_once()
         mock_print_output.assert_called_once_with(
             [
@@ -70,7 +70,7 @@ class TestTimelineCommands:
         )
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("timeline", timeout=20)
+        mock_get_client.assert_called_once_with("timeline", base_url=None, timeout=20)
         mock_client.get_event.assert_called_once_with(repo_name="owner/repo")
         mock_print_output.assert_called_once()
 

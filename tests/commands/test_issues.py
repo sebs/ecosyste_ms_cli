@@ -28,7 +28,7 @@ class TestIssuesCommands:
         result = self.runner.invoke(self.issues_commands.group, ["list"], obj={"timeout": 30})
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("issues", timeout=30)
+        mock_get_client.assert_called_once_with("issues", base_url=None, timeout=30)
         mock_client.list_operations.assert_called_once()
         mock_print_operations.assert_called_once()
 
@@ -43,7 +43,7 @@ class TestIssuesCommands:
         result = self.runner.invoke(self.issues_commands.group, ["hosts"], obj={"timeout": 20, "format": "table"})
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("issues", timeout=20)
+        mock_get_client.assert_called_once_with("issues", base_url=None, timeout=20)
         mock_client.getRegistries.assert_called_once()
         mock_print_output.assert_called_once_with(
             [{"name": "github.com", "repositories_count": 1000}], "table", console=mock.ANY
@@ -60,7 +60,7 @@ class TestIssuesCommands:
         result = self.runner.invoke(self.issues_commands.group, ["host", "github.com"], obj={"timeout": 20, "format": "json"})
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("issues", timeout=20)
+        mock_get_client.assert_called_once_with("issues", base_url=None, timeout=20)
         mock_client.getHost.assert_called_once_with(host_name="github.com")
         mock_print_output.assert_called_once()
 

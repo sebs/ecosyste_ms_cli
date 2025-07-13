@@ -31,7 +31,7 @@ class TestDiffCommands:
         result = self.runner.invoke(self.diff_commands.group, ["list"], obj={"timeout": 30})
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("diff", timeout=30)
+        mock_get_client.assert_called_once_with("diff", base_url=None, timeout=30)
         mock_client.list_operations.assert_called_once()
         mock_print_operations.assert_called_once()
 
@@ -52,7 +52,7 @@ class TestDiffCommands:
         result = self.runner.invoke(self.diff_commands.group, ["create-job", url1, url2], obj={"timeout": 20, "format": "json"})
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("diff", timeout=20)
+        mock_get_client.assert_called_once_with("diff", base_url=None, timeout=20)
         mock_client.createJob.assert_called_once_with(url_1=url1, url_2=url2)
         mock_print_output.assert_called_once()
 
@@ -86,7 +86,7 @@ class TestDiffCommands:
         result = self.runner.invoke(self.diff_commands.group, ["get-job", "123"], obj={"timeout": 20, "format": "table"})
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("diff", timeout=20)
+        mock_get_client.assert_called_once_with("diff", base_url=None, timeout=20)
         mock_client.getJob.assert_called_once_with(job_id="123")
         mock_print_output.assert_called_once()
 

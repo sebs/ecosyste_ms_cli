@@ -41,7 +41,7 @@ def test_subcommand_shows_inherited_options(mock_print_output, mock_get_client):
     result = runner.invoke(cli, ["repos", "--timeout", "30", "--format", "json", "topics"])
     assert result.exit_code == 0
     # Check that the client was called with the correct timeout
-    mock_get_client.assert_called_with("repos", timeout=30)
+    mock_get_client.assert_called_with("repos", base_url=None, timeout=30)
 
     # Reset mocks
     mock_get_client.reset_mock()
@@ -50,4 +50,4 @@ def test_subcommand_shows_inherited_options(mock_print_output, mock_get_client):
     result = runner.invoke(cli, ["--timeout", "40", "--format", "json", "repos", "topics"])
     assert result.exit_code == 0
     # Check that the client was called with the correct timeout from main level
-    mock_get_client.assert_called_with("repos", timeout=40)
+    mock_get_client.assert_called_with("repos", base_url=None, timeout=40)

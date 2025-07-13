@@ -27,7 +27,7 @@ class TestLicensesCommands:
         result = self.runner.invoke(self.licenses_commands.group, ["list"], obj={"timeout": 30})
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("licenses", timeout=30)
+        mock_get_client.assert_called_once_with("licenses", base_url=None, timeout=30)
         mock_client.list_operations.assert_called_once()
         mock_print_operations.assert_called_once()
 
@@ -46,7 +46,7 @@ class TestLicensesCommands:
         )
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("licenses", timeout=20)
+        mock_get_client.assert_called_once_with("licenses", base_url=None, timeout=20)
         mock_client.call.assert_called_once_with(
             "createJob", path_params={}, query_params={"url": "https://example.com/LICENSE"}
         )
@@ -71,7 +71,7 @@ class TestLicensesCommands:
         )
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("licenses", timeout=20)
+        mock_get_client.assert_called_once_with("licenses", base_url=None, timeout=20)
         mock_client.call.assert_called_once_with("getJob", path_params={"jobID": "job123"}, query_params={})
         mock_print_output.assert_called_once()
 

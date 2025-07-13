@@ -27,7 +27,7 @@ class TestParserCommands:
         result = self.runner.invoke(self.parser_commands.group, ["list"], obj={"timeout": 30})
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("parser", timeout=30)
+        mock_get_client.assert_called_once_with("parser", base_url=None, timeout=30)
         mock_client.list_operations.assert_called_once()
         mock_print_operations.assert_called_once()
 
@@ -45,7 +45,7 @@ class TestParserCommands:
         result = self.runner.invoke(self.parser_commands.group, ["formats"], obj={"timeout": 20, "format": "table"})
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("parser", timeout=20)
+        mock_get_client.assert_called_once_with("parser", base_url=None, timeout=20)
         mock_client.call.assert_called_once_with("jobFormats")
         mock_print_output.assert_called_once()
 
@@ -64,7 +64,7 @@ class TestParserCommands:
         )
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("parser", timeout=20)
+        mock_get_client.assert_called_once_with("parser", base_url=None, timeout=20)
         mock_client.call.assert_called_once_with(
             "createJob", path_params={}, query_params={"url": "https://example.com/package.json"}
         )
@@ -89,7 +89,7 @@ class TestParserCommands:
         )
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("parser", timeout=20)
+        mock_get_client.assert_called_once_with("parser", base_url=None, timeout=20)
         mock_client.call.assert_called_once_with("getJob", path_params={"jobID": "job123"}, query_params={})
         mock_print_output.assert_called_once()
 

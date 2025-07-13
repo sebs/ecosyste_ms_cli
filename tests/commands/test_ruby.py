@@ -28,7 +28,7 @@ class TestRubyCommands:
         result = self.runner.invoke(self.ruby_commands.group, ["list"], obj={"timeout": 30})
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("ruby", timeout=30)
+        mock_get_client.assert_called_once_with("ruby", base_url=None, timeout=30)
         mock_client.list_operations.assert_called_once()
         mock_print_operations.assert_called_once()
 
@@ -43,7 +43,7 @@ class TestRubyCommands:
         result = self.runner.invoke(self.ruby_commands.group, ["projects"], obj={"timeout": 20, "format": "table"})
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("ruby", timeout=20)
+        mock_get_client.assert_called_once_with("ruby", base_url=None, timeout=20)
         mock_client.getProjects.assert_called_once()
         mock_print_output.assert_called_once_with(
             [{"id": 1, "url": "https://github.com/rails/rails"}], "table", console=mock.ANY
@@ -60,7 +60,7 @@ class TestRubyCommands:
         result = self.runner.invoke(self.ruby_commands.group, ["project", "1"], obj={"timeout": 20, "format": "json"})
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("ruby", timeout=20)
+        mock_get_client.assert_called_once_with("ruby", base_url=None, timeout=20)
         mock_client.getProject.assert_called_once_with(project_id=1)
         mock_print_output.assert_called_once()
 

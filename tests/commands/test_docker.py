@@ -30,7 +30,7 @@ class TestDockerCommands:
         result = self.runner.invoke(self.docker_commands.group, ["list"], obj={"timeout": 30})
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("docker", timeout=30)
+        mock_get_client.assert_called_once_with("docker", base_url=None, timeout=30)
         mock_client.list_operations.assert_called_once()
         mock_print_operations.assert_called_once()
 
@@ -45,7 +45,7 @@ class TestDockerCommands:
         result = self.runner.invoke(self.docker_commands.group, ["packages"], obj={"timeout": 20, "format": "table"})
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("docker", timeout=20)
+        mock_get_client.assert_called_once_with("docker", base_url=None, timeout=20)
         mock_client.get_packages.assert_called_once()
         mock_print_output.assert_called_once_with([{"name": "nginx", "versions_count": 100}], "table", console=mock.ANY)
 
@@ -60,7 +60,7 @@ class TestDockerCommands:
         result = self.runner.invoke(self.docker_commands.group, ["package", "nginx"], obj={"timeout": 20, "format": "json"})
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("docker", timeout=20)
+        mock_get_client.assert_called_once_with("docker", base_url=None, timeout=20)
         mock_client.get_package.assert_called_once_with(package_name="nginx")
         mock_print_output.assert_called_once()
 
@@ -88,7 +88,7 @@ class TestDockerCommands:
         result = self.runner.invoke(self.docker_commands.group, ["versions", "nginx"], obj={"timeout": 20})
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("docker", timeout=20)
+        mock_get_client.assert_called_once_with("docker", base_url=None, timeout=20)
         mock_client.get_package_versions.assert_called_once_with(package_name="nginx")
 
     @mock.patch("ecosystems_cli.commands.base.get_client")
@@ -104,7 +104,7 @@ class TestDockerCommands:
         )
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("docker", timeout=20)
+        mock_get_client.assert_called_once_with("docker", base_url=None, timeout=20)
         mock_client.get_package_version.assert_called_once_with(package_name="nginx", version_number="1.21.0")
 
     @mock.patch("ecosystems_cli.commands.base.get_client")
@@ -118,7 +118,7 @@ class TestDockerCommands:
         result = self.runner.invoke(self.docker_commands.group, ["usage"], obj={"timeout": 20})
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("docker", timeout=20)
+        mock_get_client.assert_called_once_with("docker", base_url=None, timeout=20)
         mock_client.usage.assert_called_once()
 
     @mock.patch("ecosystems_cli.commands.base.get_client")
@@ -132,7 +132,7 @@ class TestDockerCommands:
         result = self.runner.invoke(self.docker_commands.group, ["usage-ecosystem", "npm"], obj={"timeout": 20})
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("docker", timeout=20)
+        mock_get_client.assert_called_once_with("docker", base_url=None, timeout=20)
         mock_client.usage_ecosystem.assert_called_once_with(ecosystem="npm")
 
     @mock.patch("ecosystems_cli.commands.base.get_client")
@@ -146,7 +146,7 @@ class TestDockerCommands:
         result = self.runner.invoke(self.docker_commands.group, ["usage-package", "npm", "express"], obj={"timeout": 20})
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("docker", timeout=20)
+        mock_get_client.assert_called_once_with("docker", base_url=None, timeout=20)
         mock_client.usage_package.assert_called_once_with(ecosystem="npm", package="express")
 
     @mock.patch("ecosystems_cli.cli._call_operation")

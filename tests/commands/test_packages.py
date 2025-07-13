@@ -28,7 +28,7 @@ class TestPackagesCommands:
         result = self.runner.invoke(self.packages_commands.group, ["list"], obj={"timeout": 30})
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("packages", timeout=30)
+        mock_get_client.assert_called_once_with("packages", base_url=None, timeout=30)
         mock_client.list_operations.assert_called_once()
         mock_print_operations.assert_called_once()
 
@@ -43,7 +43,7 @@ class TestPackagesCommands:
         result = self.runner.invoke(self.packages_commands.group, ["registries"], obj={"timeout": 20, "format": "table"})
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("packages", timeout=20)
+        mock_get_client.assert_called_once_with("packages", base_url=None, timeout=20)
         mock_client.get_registries.assert_called_once()
         mock_print_output.assert_called_once_with({"registries": ["npm", "pypi"]}, "table", console=mock.ANY)
 
@@ -58,7 +58,7 @@ class TestPackagesCommands:
         result = self.runner.invoke(self.packages_commands.group, ["registry", "npm"], obj={"timeout": 20, "format": "json"})
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("packages", timeout=20)
+        mock_get_client.assert_called_once_with("packages", base_url=None, timeout=20)
         mock_client.get_registry.assert_called_once_with(name="npm")
         mock_print_output.assert_called_once()
 
@@ -86,7 +86,7 @@ class TestPackagesCommands:
         result = self.runner.invoke(self.packages_commands.group, ["package", "npm", "react"], obj={"timeout": 20})
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("packages", timeout=20)
+        mock_get_client.assert_called_once_with("packages", base_url=None, timeout=20)
         mock_client.get_package.assert_called_once_with(registry="npm", package="react")
 
     @mock.patch("ecosystems_cli.commands.base.get_client")
@@ -102,7 +102,7 @@ class TestPackagesCommands:
         )
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("packages", timeout=20)
+        mock_get_client.assert_called_once_with("packages", base_url=None, timeout=20)
         mock_client.get_package_version.assert_called_once_with(registry="npm", package="react", version="18.0.0")
 
     @mock.patch("ecosystems_cli.cli._call_operation")

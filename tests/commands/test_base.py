@@ -48,7 +48,7 @@ class TestBaseCommand:
             runner.invoke(list_cmd, obj={"timeout": 30})
 
         # Verify calls
-        mock_get_client.assert_called_once_with("test_api", timeout=30)
+        mock_get_client.assert_called_once_with("test_api", base_url=None, timeout=30)
         mock_client.list_operations.assert_called_once()
         mock_print_operations.assert_called_once_with(["op1", "op2"], console=self.base_command.console)
 
@@ -77,7 +77,7 @@ class TestBaseCommand:
         runner.invoke(simple_cmd, obj={"timeout": 20, "format": "json"})
 
         # Verify calls
-        mock_get_client.assert_called_once_with("test_api", timeout=20)
+        mock_get_client.assert_called_once_with("test_api", base_url=None, timeout=20)
         mock_client.test_method.assert_called_once()
         mock_print_output.assert_called_once_with({"result": "test"}, "json", console=self.base_command.console)
 
@@ -110,7 +110,7 @@ class TestBaseCommand:
         runner.invoke(test_func, ["value1", "value2"], obj={"timeout": 20, "format": "table"})
 
         # Verify calls
-        mock_get_client.assert_called_once_with("test_api", timeout=20)
+        mock_get_client.assert_called_once_with("test_api", base_url=None, timeout=20)
         mock_client.test_method.assert_called_once_with(arg1="value1", arg2="value2")
         mock_print_output.assert_called_once()
         mock_print_error.assert_not_called()
@@ -148,7 +148,7 @@ class TestBaseCommand:
         # Test that it's a Click command
         assert isinstance(call_cmd, click.Command)
         assert call_cmd.name == "call"
-        assert len(call_cmd.params) == 6  # operation + 3 options + timeout + format
+        assert len(call_cmd.params) == 7  # operation + 3 options + timeout + format + domain
 
         # Test command execution using invoke
         from click.testing import CliRunner
