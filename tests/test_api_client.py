@@ -137,7 +137,7 @@ class TestAPIClient:
             url="https://test.example.com/api/v1/test",
             params={"id": "123"},
             json=None,
-            headers={"Content-Type": "application/json"},
+            headers={"Content-Type": "application/json", "User-Agent": "ecosyste_ms_cli (1.0.0)"},
             timeout=20,
         )
 
@@ -164,7 +164,7 @@ class TestAPIClient:
             url="https://test.example.com/api/v1/items/123",
             params={},
             json=None,
-            headers={"Content-Type": "application/json"},
+            headers={"Content-Type": "application/json", "User-Agent": "ecosyste_ms_cli (1.0.0)"},
             timeout=20,
         )
 
