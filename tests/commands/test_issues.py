@@ -1,6 +1,5 @@
 """Tests for the issues commands."""
 
-import json
 from unittest import mock
 
 from click.testing import CliRunner
@@ -149,27 +148,3 @@ class TestIssuesCommands:
 
         assert result.exit_code == 0
         mock_print_error.assert_called_once_with("Unexpected error: Host not found", console=mock.ANY)
-
-    @mock.patch("ecosystems_cli.cli._call_operation")
-    def test_call_issues_operation(self, mock_call_operation):
-        """Test calling a generic operation on issues API."""
-        result = self.runner.invoke(
-            self.issues_commands.group,
-            [
-                "call",
-                "getHost",
-                "--path-params",
-                json.dumps({"hostName": "github.com"}),
-                "--query-params",
-                json.dumps({"page": 1}),
-            ],
-            obj={"timeout": 20},
-        )
-
-        assert result.exit_code == 0
-        mock_call_operation.assert_called_once()
-        args = mock_call_operation.call_args[0]
-        assert args[0] == "issues"
-        assert args[1] == "getHost"
-        assert args[2] == json.dumps({"hostName": "github.com"})
-        assert args[3] == json.dumps({"page": 1})

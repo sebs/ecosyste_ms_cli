@@ -130,16 +130,3 @@ class TestCLIDomainConfiguration:
         mock_request.assert_called_once()
         call_args = mock_request.call_args
         assert call_args[1]["url"] == "https://repos.ecosyste.ms/api/v1/topics"
-
-    @patch("ecosystems_cli.api_client.requests.request")
-    def test_domain_with_call_operation(self, mock_request):
-        """Test domain configuration with generic call operation."""
-        mock_request.return_value.status_code = 200
-        mock_request.return_value.json.return_value = {"result": "test"}
-
-        self.runner.invoke(main, ["--domain", "call.api.com", "repos", "call", "topics", "--query-params", '{"page": 1}'])
-
-        # Check that the custom domain was used
-        mock_request.assert_called_once()
-        call_args = mock_request.call_args
-        assert call_args[1]["url"] == "https://call.api.com/api/v1/topics"

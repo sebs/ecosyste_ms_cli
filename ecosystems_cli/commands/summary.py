@@ -43,13 +43,9 @@ class SummaryCommands(BaseCommand):
             "collection-projects", "getCollectionProjects", "Get projects in a collection.", click.argument("id")
         )
         def get_collection_projects(id: str):
-            pass
-
-        # Register call operation command
-        self.call_operation()
+            pass  # Create the command group
 
 
-# Create the command group
 summary_base = SummaryCommands()
 
 # Export the properly named group

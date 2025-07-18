@@ -67,9 +67,6 @@ class ResolverCommands(BaseCommand):
             except Exception as e:
                 print_error(f"Unexpected error: {str(e)}", console=self.console)
 
-        # Generic call command
-        self.call_operation()
-
 
 def get_resolver_group():
     """Get the resolver command group."""

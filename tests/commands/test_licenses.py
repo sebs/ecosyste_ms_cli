@@ -74,19 +74,3 @@ class TestLicensesCommands:
         mock_get_client.assert_called_once_with("licenses", base_url=None, timeout=20)
         mock_client.call.assert_called_once_with("getJob", path_params={"jobID": "job123"}, query_params={})
         mock_print_output.assert_called_once()
-
-    @mock.patch("ecosystems_cli.cli._call_operation")
-    def test_call_command(self, mock_call_operation):
-        """Test generic call command."""
-        result = self.runner.invoke(
-            self.licenses_commands.group,
-            ["call", "createJob", "--query-params", '{"url": "https://example.com/LICENSE"}'],
-            obj={"timeout": 20, "format": "table"},
-        )
-
-        assert result.exit_code == 0
-        mock_call_operation.assert_called_once()
-        args = mock_call_operation.call_args[0]
-        assert args[0] == "licenses"
-        assert args[1] == "createJob"
-        assert args[3] == '{"url": "https://example.com/LICENSE"}'

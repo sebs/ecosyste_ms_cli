@@ -39,13 +39,9 @@ class SponsorsCommands(BaseCommand):
             click.argument("login"),
         )
         def list_account_sponsorships(login: str):
-            pass
-
-        # Register call operation command
-        self.call_operation()
+            pass  # Create the command group
 
 
-# Create the command group
 sponsors_base = SponsorsCommands()
 
 # Export the properly named group

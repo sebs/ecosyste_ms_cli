@@ -1,6 +1,5 @@
 """Tests for the opencollective commands."""
 
-import json
 from unittest import mock
 
 from click.testing import CliRunner
@@ -147,27 +146,3 @@ class TestOpenCollectiveCommands:
 
         assert result.exit_code == 0
         mock_print_error.assert_called_once_with("Unexpected error: Project not found", console=mock.ANY)
-
-    @mock.patch("ecosystems_cli.cli._call_operation")
-    def test_call_opencollective_operation(self, mock_call_operation):
-        """Test calling a generic operation on opencollective API."""
-        result = self.runner.invoke(
-            self.opencollective_commands.group,
-            [
-                "call",
-                "getProject",
-                "--path-params",
-                json.dumps({"id": 123}),
-                "--query-params",
-                json.dumps({"include": "meta"}),
-            ],
-            obj={"timeout": 20},
-        )
-
-        assert result.exit_code == 0
-        mock_call_operation.assert_called_once()
-        args = mock_call_operation.call_args[0]
-        assert args[0] == "opencollective"
-        assert args[1] == "getProject"
-        assert args[2] == json.dumps({"id": 123})
-        assert args[3] == json.dumps({"include": "meta"})

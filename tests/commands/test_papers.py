@@ -149,21 +149,3 @@ class TestPapersCommands:
 
         assert result.exit_code == 0
         mock_client.get_paper_mentions.assert_called_once_with(doi="10.1234/test", page=3, per_page=25)
-
-    @patch("ecosystems_cli.cli._call_operation")
-    def test_call_operation(self, mock_call_operation):
-        """Test calling an arbitrary operation."""
-        result = self.runner.invoke(
-            self.papers_commands.group,
-            ["call", "getPaper", "--path-params", '{"doi": "10.1234/test"}'],
-            obj={"timeout": 20, "format": "table"},
-        )
-
-        assert result.exit_code == 0
-        mock_call_operation.assert_called_once()
-        args = mock_call_operation.call_args[0]
-        assert args[0] == "papers"
-        assert args[1] == "getPaper"
-        assert args[2] == '{"doi": "10.1234/test"}'
-        assert args[3] is None  # query_params
-        assert args[4] is None  # body

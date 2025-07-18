@@ -1,6 +1,5 @@
 """Tests for the SBOM commands."""
 
-import json
 from unittest import mock
 
 from click.testing import CliRunner
@@ -83,24 +82,3 @@ class TestSbomCommands:
 
         assert result.exit_code == 0
         mock_print_error.assert_called_once_with("Unexpected error: Job not found", console=mock.ANY)
-
-    @mock.patch("ecosystems_cli.cli._call_operation")
-    def test_call_sbom_operation(self, mock_call_operation):
-        """Test calling a generic operation on SBOM API."""
-        result = self.runner.invoke(
-            self.sbom_commands.group,
-            [
-                "call",
-                "createJob",
-                "--query-params",
-                json.dumps({"url": "https://example.com/package.json"}),
-            ],
-            obj={"timeout": 20},
-        )
-
-        assert result.exit_code == 0
-        mock_call_operation.assert_called_once()
-        args = mock_call_operation.call_args[0]
-        assert args[0] == "sbom"
-        assert args[1] == "createJob"
-        assert args[3] == json.dumps({"url": "https://example.com/package.json"})

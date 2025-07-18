@@ -44,13 +44,9 @@ class PapersCommands(BaseCommand):
             click.option("--per-page", type=int, help="Number of records to return"),
         )
         def paper_mentions(doi: str, page: int = None, per_page: int = None):
-            pass
-
-        # Register call operation command
-        self.call_operation()
+            pass  # Create the command group
 
 
-# Create the command group
 papers_base = PapersCommands()
 
 # Export the properly named group

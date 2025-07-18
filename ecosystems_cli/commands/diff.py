@@ -30,13 +30,9 @@ class DiffCommands(BaseCommand):
 
         @self.create_command_with_error_handling("get-job", "getJob", "Fetch a diff job by ID.", click.argument("job_id"))
         def get_job(job_id: str):
-            pass
-
-        # Register call operation command
-        self.call_operation()
+            pass  # Create the command group
 
 
-# Create the command group
 diff_base = DiffCommands()
 
 # Export the properly named group

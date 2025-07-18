@@ -1,6 +1,5 @@
 """Tests for the diff commands."""
 
-import json
 from unittest import mock
 
 from click.testing import CliRunner
@@ -89,24 +88,3 @@ class TestDiffCommands:
         mock_get_client.assert_called_once_with("diff", base_url=None, timeout=20)
         mock_client.getJob.assert_called_once_with(job_id="123")
         mock_print_output.assert_called_once()
-
-    @mock.patch("ecosystems_cli.cli._call_operation")
-    def test_call_diff_operation(self, mock_call_operation):
-        """Test calling a generic operation on diff API."""
-        result = self.runner.invoke(
-            self.diff_commands.group,
-            [
-                "call",
-                "getJob",
-                "--path-params",
-                json.dumps({"jobID": "123"}),
-            ],
-            obj={"timeout": 20},
-        )
-
-        assert result.exit_code == 0
-        mock_call_operation.assert_called_once()
-        args = mock_call_operation.call_args[0]
-        assert args[0] == "diff"
-        assert args[1] == "getJob"
-        assert args[2] == json.dumps({"jobID": "123"})

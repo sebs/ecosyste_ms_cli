@@ -1,6 +1,5 @@
 """Tests for the commits commands."""
 
-import json
 from unittest import mock
 
 from click.testing import CliRunner
@@ -165,48 +164,3 @@ class TestCommitsCommands:
 
         assert result.exit_code == 0
         mock_print_error.assert_called_once_with("Unexpected error: Repository not found", console=mock.ANY)
-
-    @mock.patch("ecosystems_cli.cli._call_operation")
-    def test_call_commits_operation(self, mock_call_operation):
-        """Test calling a generic operation on commits API."""
-        result = self.runner.invoke(
-            self.commits_commands.group,
-            [
-                "call",
-                "repositoriesLookup",
-                "--query-params",
-                json.dumps({"url": "https://github.com/owner/repo"}),
-            ],
-            obj={"timeout": 20},
-        )
-
-        assert result.exit_code == 0
-        mock_call_operation.assert_called_once()
-        args = mock_call_operation.call_args[0]
-        assert args[0] == "commits"
-        assert args[1] == "repositoriesLookup"
-        assert args[3] == json.dumps({"url": "https://github.com/owner/repo"})
-
-    @mock.patch("ecosystems_cli.cli._call_operation")
-    def test_call_commits_operation_with_path_params(self, mock_call_operation):
-        """Test calling a generic operation with path parameters."""
-        result = self.runner.invoke(
-            self.commits_commands.group,
-            [
-                "call",
-                "getHostRepository",
-                "--path-params",
-                json.dumps({"host": "github.com", "name": "owner/repo"}),
-                "--query-params",
-                json.dumps({"include": "commits"}),
-            ],
-            obj={"timeout": 20},
-        )
-
-        assert result.exit_code == 0
-        mock_call_operation.assert_called_once()
-        args = mock_call_operation.call_args[0]
-        assert args[0] == "commits"
-        assert args[1] == "getHostRepository"
-        assert args[2] == json.dumps({"host": "github.com", "name": "owner/repo"})
-        assert args[3] == json.dumps({"include": "commits"})

@@ -55,13 +55,9 @@ class CommitsCommands(BaseCommand):
             click.argument("repo_name"),
         )
         def get_commits(host_name: str, repo_name: str):
-            pass
-
-        # Register call operation command
-        self.call_operation()
+            pass  # Create the command group
 
 
-# Create the command group
 commits_base = CommitsCommands()
 
 # Export the properly named group

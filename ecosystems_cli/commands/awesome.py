@@ -42,13 +42,9 @@ class AwesomeCommands(BaseCommand):
         # Get specific topic command
         @self.create_command_with_operation("topic", "getTopic", "Get a specific topic by slug.", click.argument("slug"))
         def get_topic(slug: str):
-            pass
-
-        # Register call operation command
-        self.call_operation()
+            pass  # Create the command group
 
 
-# Create the command group
 awesome_base = AwesomeCommands()
 
 # Export the properly named group

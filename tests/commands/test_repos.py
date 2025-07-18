@@ -1,6 +1,5 @@
 """Tests for the repos commands."""
 
-import json
 from unittest import mock
 
 from click.testing import CliRunner
@@ -115,27 +114,3 @@ class TestReposCommands:
 
         assert result.exit_code == 0
         mock_client.get_repository.assert_called_once_with(host_name="github.com", owner="owner", repo="repo")
-
-    @mock.patch("ecosystems_cli.cli._call_operation")
-    def test_call_repos_operation(self, mock_call_operation):
-        """Test calling a generic operation on repos API."""
-        result = self.runner.invoke(
-            self.repos_commands.group,
-            [
-                "call",
-                "get_repo",
-                "--path-params",
-                json.dumps({"id": 123}),
-                "--query-params",
-                json.dumps({"include": "meta"}),
-            ],
-            obj={"timeout": 20},
-        )
-
-        assert result.exit_code == 0
-        mock_call_operation.assert_called_once()
-        args = mock_call_operation.call_args[0]
-        assert args[0] == "repos"
-        assert args[1] == "get_repo"
-        assert args[2] == json.dumps({"id": 123})
-        assert args[3] == json.dumps({"include": "meta"})
