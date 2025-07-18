@@ -231,15 +231,6 @@ class TestSummaryCommands:
 class TestErrorHandling:
     """Test error handling in the CLI."""
 
-    def test_invalid_json_params(self, runner, mock_api_client):
-        """Test handling invalid JSON parameters."""
-        # Act
-        result = runner.invoke(main, ["repos", "call", "test_op", "--path-params", "{invalid json}"])
-
-        # Assert
-        assert result.exit_code == 0  # CLI continues with error message
-        assert "Invalid JSON" in result.output
-
     def test_api_error_handling(self, runner, mock_api_client):
         """Test handling API errors."""
         # Arrange

@@ -40,13 +40,9 @@ class OSTCommands(BaseCommand):
             click.argument("url"),
         )
         def lookup_project(url: str):
-            pass
-
-        # Register call operation command
-        self.call_operation()
+            pass  # Create the command group
 
 
-# Create the command group
 ost_base = OSTCommands()
 
 # Export the properly named group

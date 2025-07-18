@@ -62,13 +62,9 @@ class ArchivesCommands(BaseCommand):
             click.argument("url"),
         )
         def get_repopack(url: str):
-            pass
-
-        # Register call operation command
-        self.call_operation()
+            pass  # Create the command group
 
 
-# Create the command group
 archives_base = ArchivesCommands()
 
 # Export the properly named group

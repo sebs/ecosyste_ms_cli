@@ -1,6 +1,5 @@
 """Tests for the archives commands."""
 
-import json
 from unittest import mock
 
 from click.testing import CliRunner
@@ -140,24 +139,3 @@ class TestArchivesCommands:
 
         assert result.exit_code == 0
         mock_print_error.assert_called_once_with("Unexpected error: Archive not found", console=mock.ANY)
-
-    @mock.patch("ecosystems_cli.cli._call_operation")
-    def test_call_archives_operation(self, mock_call_operation):
-        """Test calling a generic operation on archives API."""
-        result = self.runner.invoke(
-            self.archives_commands.group,
-            [
-                "call",
-                "list",
-                "--query-params",
-                json.dumps({"url": "https://registry.npmjs.org/express/-/express-4.18.2.tgz"}),
-            ],
-            obj={"timeout": 20},
-        )
-
-        assert result.exit_code == 0
-        mock_call_operation.assert_called_once()
-        args = mock_call_operation.call_args[0]
-        assert args[0] == "archives"
-        assert args[1] == "list"
-        assert args[3] == json.dumps({"url": "https://registry.npmjs.org/express/-/express-4.18.2.tgz"})

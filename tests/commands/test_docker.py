@@ -1,6 +1,5 @@
 """Tests for the docker commands."""
 
-import json
 from unittest import mock
 
 from click.testing import CliRunner
@@ -148,27 +147,3 @@ class TestDockerCommands:
         assert result.exit_code == 0
         mock_get_client.assert_called_once_with("docker", base_url=None, timeout=20)
         mock_client.usage_package.assert_called_once_with(ecosystem="npm", package="express")
-
-    @mock.patch("ecosystems_cli.cli._call_operation")
-    def test_call_docker_operation(self, mock_call_operation):
-        """Test calling a generic operation on docker API."""
-        result = self.runner.invoke(
-            self.docker_commands.group,
-            [
-                "call",
-                "get_package",
-                "--path-params",
-                json.dumps({"packageName": "nginx"}),
-                "--query-params",
-                json.dumps({"include": "versions"}),
-            ],
-            obj={"timeout": 20},
-        )
-
-        assert result.exit_code == 0
-        mock_call_operation.assert_called_once()
-        args = mock_call_operation.call_args[0]
-        assert args[0] == "docker"
-        assert args[1] == "get_package"
-        assert args[2] == json.dumps({"packageName": "nginx"})
-        assert args[3] == json.dumps({"include": "versions"})

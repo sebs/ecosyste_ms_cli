@@ -54,13 +54,9 @@ class AdvisoriesCommands(BaseCommand):
             "get", "get_advisory", "Get an advisory by UUID.", click.argument("advisory_uuid")
         )
         def get_advisory(advisory_uuid: str):
-            pass
-
-        # Register call operation command
-        self.call_operation()
+            pass  # Create the command group
 
 
-# Create the command group
 advisories_base = AdvisoriesCommands()
 
 # Export the properly named group

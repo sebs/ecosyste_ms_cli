@@ -1,6 +1,5 @@
 """Tests for the sponsors commands."""
 
-import json
 from unittest import mock
 
 from click.testing import CliRunner
@@ -140,27 +139,3 @@ class TestSponsorsCommands:
 
         assert result.exit_code == 0
         mock_client.list_account_sponsorships.assert_called_once_with(login="testuser")
-
-    @mock.patch("ecosystems_cli.cli._call_operation")
-    def test_call_sponsors_operation(self, mock_call_operation):
-        """Test calling a generic operation on sponsors API."""
-        result = self.runner.invoke(
-            self.sponsors_commands.group,
-            [
-                "call",
-                "getAccount",
-                "--path-params",
-                json.dumps({"login": "testuser"}),
-                "--query-params",
-                json.dumps({"include": "sponsors"}),
-            ],
-            obj={"timeout": 20},
-        )
-
-        assert result.exit_code == 0
-        mock_call_operation.assert_called_once()
-        args = mock_call_operation.call_args[0]
-        assert args[0] == "sponsors"
-        assert args[1] == "getAccount"
-        assert args[2] == json.dumps({"login": "testuser"})
-        assert args[3] == json.dumps({"include": "sponsors"})

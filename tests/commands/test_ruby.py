@@ -1,6 +1,5 @@
 """Tests for the ruby commands."""
 
-import json
 from unittest import mock
 
 from click.testing import CliRunner
@@ -117,27 +116,3 @@ class TestRubyCommands:
 
         assert result.exit_code == 0
         mock_client.getIssues.assert_called_once()
-
-    @mock.patch("ecosystems_cli.cli._call_operation")
-    def test_call_ruby_operation(self, mock_call_operation):
-        """Test calling a generic operation on ruby API."""
-        result = self.runner.invoke(
-            self.ruby_commands.group,
-            [
-                "call",
-                "getProject",
-                "--path-params",
-                json.dumps({"id": 123}),
-                "--query-params",
-                json.dumps({"include": "meta"}),
-            ],
-            obj={"timeout": 20},
-        )
-
-        assert result.exit_code == 0
-        mock_call_operation.assert_called_once()
-        args = mock_call_operation.call_args[0]
-        assert args[0] == "ruby"
-        assert args[1] == "getProject"
-        assert args[2] == json.dumps({"id": 123})
-        assert args[3] == json.dumps({"include": "meta"})

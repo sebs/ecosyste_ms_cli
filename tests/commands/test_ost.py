@@ -1,6 +1,5 @@
 """Tests for the OST commands."""
 
-import json
 from unittest import mock
 
 from click.testing import CliRunner
@@ -120,27 +119,3 @@ class TestOSTCommands:
         assert result.exit_code == 0
         mock_get_client.assert_called_once_with("ost", base_url=None, timeout=20)
         mock_client.get_open_climate_action_issues.assert_called_once()
-
-    @mock.patch("ecosystems_cli.cli._call_operation")
-    def test_call_ost_operation(self, mock_call_operation):
-        """Test calling a generic operation on OST API."""
-        result = self.runner.invoke(
-            self.ost_commands.group,
-            [
-                "call",
-                "get_project",
-                "--path-params",
-                json.dumps({"id": 1}),
-                "--query-params",
-                json.dumps({"include": "details"}),
-            ],
-            obj={"timeout": 20},
-        )
-
-        assert result.exit_code == 0
-        mock_call_operation.assert_called_once()
-        args = mock_call_operation.call_args[0]
-        assert args[0] == "ost"
-        assert args[1] == "get_project"
-        assert args[2] == json.dumps({"id": 1})
-        assert args[3] == json.dumps({"include": "details"})

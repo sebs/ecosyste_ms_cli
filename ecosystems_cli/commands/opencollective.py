@@ -50,13 +50,9 @@ class OpenCollectiveCommands(BaseCommand):
             click.argument("slug"),
         )
         def get_collective_projects(slug: str):
-            pass
-
-        # Register call operation command
-        self.call_operation()
+            pass  # Create the command group
 
 
-# Create the command group
 opencollective_base = OpenCollectiveCommands()
 
 # Export the properly named group

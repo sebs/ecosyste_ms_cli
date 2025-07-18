@@ -66,13 +66,9 @@ class IssuesCommands(BaseCommand):
             "lookup", "repositoriesLookup", "Lookup repository metadata by URL.", click.argument("url")
         )
         def lookup_repository(url: str):
-            pass
-
-        # Register call operation command
-        self.call_operation()
+            pass  # Create the command group
 
 
-# Create the command group
 issues_base = IssuesCommands()
 
 # Export the properly named group

@@ -261,30 +261,3 @@ class BaseCommand:
             return self.group.command(name)(wrapper)
 
         return decorator
-
-    def call_operation(self) -> Callable:
-        """Create a generic call command for the API."""
-
-        @click.argument("operation")
-        @click.option("--path-params", help="Path parameters as JSON")
-        @click.option("--query-params", help="Query parameters as JSON")
-        @click.option("--body", help="Request body as JSON")
-        @common_options
-        @click.pass_context
-        def call_operation_impl(ctx, operation: str, path_params: str, query_params: str, body: str, timeout, format, domain):
-            """Call an operation on the API."""
-            # Update context with command-level options
-            ctx.ensure_object(dict)
-            if timeout != DEFAULT_TIMEOUT:
-                ctx.obj["timeout"] = timeout
-            if format != DEFAULT_OUTPUT_FORMAT:
-                ctx.obj["format"] = format
-            if domain is not None:
-                ctx.obj["domain"] = domain
-
-            from ecosystems_cli.cli import _call_operation
-
-            _call_operation(self.api_name, operation, path_params, query_params, body, ctx)
-
-        call_operation_impl.__doc__ = f"Call an operation on the {self.api_name} API."
-        return self.group.command("call")(call_operation_impl)

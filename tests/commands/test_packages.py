@@ -1,6 +1,5 @@
 """Tests for the packages commands."""
 
-import json
 from unittest import mock
 
 from click.testing import CliRunner
@@ -104,27 +103,3 @@ class TestPackagesCommands:
         assert result.exit_code == 0
         mock_get_client.assert_called_once_with("packages", base_url=None, timeout=20)
         mock_client.get_package_version.assert_called_once_with(registry="npm", package="react", version="18.0.0")
-
-    @mock.patch("ecosystems_cli.cli._call_operation")
-    def test_call_packages_operation(self, mock_call_operation):
-        """Test calling a generic operation on packages API."""
-        result = self.runner.invoke(
-            self.packages_commands.group,
-            [
-                "call",
-                "get_package",
-                "--path-params",
-                json.dumps({"registry": "npm", "name": "react"}),
-                "--query-params",
-                json.dumps({"include": "versions"}),
-            ],
-            obj={"timeout": 20},
-        )
-
-        assert result.exit_code == 0
-        mock_call_operation.assert_called_once()
-        args = mock_call_operation.call_args[0]
-        assert args[0] == "packages"
-        assert args[1] == "get_package"
-        assert args[2] == json.dumps({"registry": "npm", "name": "react"})
-        assert args[3] == json.dumps({"include": "versions"})

@@ -64,13 +64,9 @@ class DockerCommands(BaseCommand):
             click.argument("package"),
         )
         def usage_package(ecosystem: str, package: str):
-            pass
-
-        # Register call operation command
-        self.call_operation()
+            pass  # Create the command group
 
 
-# Create the command group
 docker_base = DockerCommands()
 
 # Export the properly named group

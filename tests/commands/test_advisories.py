@@ -1,6 +1,5 @@
 """Tests for the advisories commands."""
 
-import json
 from unittest import mock
 
 from click.testing import CliRunner
@@ -116,24 +115,3 @@ class TestAdvisoriesCommands:
 
         assert result.exit_code == 0
         mock_print_error.assert_called_once_with("Unexpected error: Advisory not found", console=mock.ANY)
-
-    @mock.patch("ecosystems_cli.cli._call_operation")
-    def test_call_advisories_operation(self, mock_call_operation):
-        """Test calling a generic operation on advisories API."""
-        result = self.runner.invoke(
-            self.advisories_commands.group,
-            [
-                "call",
-                "getAdvisory",
-                "--path-params",
-                json.dumps({"advisoryUUID": "test-uuid-123"}),
-            ],
-            obj={"timeout": 20},
-        )
-
-        assert result.exit_code == 0
-        mock_call_operation.assert_called_once()
-        args = mock_call_operation.call_args[0]
-        assert args[0] == "advisories"
-        assert args[1] == "getAdvisory"
-        assert args[2] == json.dumps({"advisoryUUID": "test-uuid-123"})

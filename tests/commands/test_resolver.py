@@ -126,22 +126,3 @@ class TestResolverCommands:
 
         assert result.exit_code == 0
         mock_print_error.assert_called_once_with("Unexpected error: Job not found", console=mock.ANY)
-
-    @mock.patch("ecosystems_cli.cli._call_operation")
-    def test_call_operation(self, mock_call_operation):
-        """Test generic call operation."""
-        result = self.runner.invoke(
-            self.resolver_commands.group,
-            ["call", "createJob", "--query-params", '{"package_name": "numpy", "registry": "pypi"}'],
-            obj={"timeout": 20, "format": "json"},
-        )
-
-        assert result.exit_code == 0
-        mock_call_operation.assert_called_once_with(
-            "resolver",
-            "createJob",
-            None,
-            '{"package_name": "numpy", "registry": "pypi"}',
-            None,
-            mock.ANY,
-        )

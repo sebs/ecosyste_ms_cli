@@ -36,12 +36,9 @@ class ParserCommands(BaseCommand):
             click.argument("job_id"),
         )
         def get_job_status(job_id: str) -> Dict[str, str]:
-            return {"jobID": job_id}
-
-        self.call_operation()
+            return {"jobID": job_id}  # Create the command group
 
 
-# Create the command group
 parser_base = ParserCommands()
 
 # Export the properly named group

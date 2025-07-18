@@ -1,6 +1,5 @@
 """Tests for the timeline commands."""
 
-import json
 from unittest import mock
 
 from click.testing import CliRunner
@@ -86,24 +85,3 @@ class TestTimelineCommands:
 
         assert result.exit_code == 0
         mock_print_error.assert_called_once_with("Unexpected error: Repository not found", console=mock.ANY)
-
-    @mock.patch("ecosystems_cli.cli._call_operation")
-    def test_call_timeline_operation(self, mock_call_operation):
-        """Test calling a generic operation on timeline API."""
-        result = self.runner.invoke(
-            self.timeline_commands.group,
-            [
-                "call",
-                "get_events",
-                "--query-params",
-                json.dumps({"page": 1, "per_page": 10}),
-            ],
-            obj={"timeout": 20},
-        )
-
-        assert result.exit_code == 0
-        mock_call_operation.assert_called_once()
-        args = mock_call_operation.call_args[0]
-        assert args[0] == "timeline"
-        assert args[1] == "get_events"
-        assert args[3] == json.dumps({"page": 1, "per_page": 10})

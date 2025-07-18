@@ -46,13 +46,9 @@ class PackagesCommands(BaseCommand):
             click.argument("version"),
         )
         def get_package_version(registry: str, package: str, version: str) -> None:
-            pass
-
-        # Register call operation command
-        self.call_operation()
+            pass  # Create the command group
 
 
-# Create the command group
 packages_base = PackagesCommands()
 
 # Export the properly named group

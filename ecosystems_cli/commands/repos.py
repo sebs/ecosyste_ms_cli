@@ -43,13 +43,9 @@ class ReposCommands(BaseCommand):
             click.argument("repo"),
         )
         def get_repository(host_name: str, owner: str, repo: str):
-            pass
-
-        # Register call operation command
-        self.call_operation()
+            pass  # Create the command group
 
 
-# Create the command group
 repos_base = ReposCommands()
 
 # Export the properly named group

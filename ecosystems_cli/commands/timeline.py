@@ -25,13 +25,9 @@ class TimelineCommands(BaseCommand):
             "event", "get_event", "Get events for a specific repository.", click.argument("repo_name")
         )
         def get_event(repo_name: str):
-            pass
-
-        # Register call operation command
-        self.call_operation()
+            pass  # Create the command group
 
 
-# Create the command group
 timeline_base = TimelineCommands()
 
 # Export the properly named group
