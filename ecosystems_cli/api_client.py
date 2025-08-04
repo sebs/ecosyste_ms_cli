@@ -111,6 +111,7 @@ class APIClient:
                 error_msg = error_data.get("error") or error_data.get("message")
             except (ValueError, TypeError, AttributeError):
                 # If response is not JSON or malformed, error_msg remains None
+                # The actual error text will be included in the exception message
                 pass
 
             if response.status_code == 401:
