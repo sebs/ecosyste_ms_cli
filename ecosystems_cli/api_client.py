@@ -216,10 +216,15 @@ class APIClient:
     # Additional convenience methods for repos API
 
     def get_hosts(self) -> Dict[str, Any]:
-        """Get all repository hosts (repos API)."""
+        """Get all repository hosts (repos API).
+
+        NOTE: This method calls the 'getRegistries' operation due to an inconsistency
+        in the OpenAPI specification. The /hosts endpoint incorrectly uses
+        'getRegistries' as its operation ID. This is documented in KNOWN_ISSUES.md.
+        """
         if self.api_name != "repos":
             raise InvalidAPIError(f"Method get_hosts is only available for 'repos' API, not '{self.api_name}'")
-        return self.call("getRegistries")
+        return self.call("getRegistries")  # OpenAPI spec uses 'getRegistries' for /hosts endpoint
 
     def get_host(self, host_name: str) -> Dict[str, Any]:
         """Get a specific repository host (repos API)."""
