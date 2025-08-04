@@ -98,19 +98,8 @@ ecosystems --format jsonl repos topics
 
 ## Examples
 
-```bash
-# Get all projects from the awesome API
-ecosystems awesome projects
+* ecosystems packages package npmjs.org react --format json | jq '.name'
 
-# List papers with pagination
-ecosystems papers list-papers --page 1 --per-page 10
-
-# Get a specific paper by DOI
-ecosystems papers get "10.1234/example"
-
-# Get mentions for a paper
-ecosystems papers mentions "10.1234/example"
-```
 
 ## Documentation
 

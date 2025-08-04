@@ -203,14 +203,15 @@ class APIClient:
         """Get a specific package from a registry (packages API)."""
         if self.api_name != "packages":
             raise InvalidAPIError(f"Method get_package is only available for 'packages' API, not '{self.api_name}'")
-        return self.call("getPackage", path_params={"registryName": registry_name, "packageName": package_name})
+        return self.call("getRegistryPackage", path_params={"registryName": registry_name, "packageName": package_name})
 
     def get_package_version(self, registry_name: str, package_name: str, version: str) -> Dict[str, Any]:
         """Get a specific package version (packages API)."""
         if self.api_name != "packages":
             raise InvalidAPIError(f"Method get_package_version is only available for 'packages' API, not '{self.api_name}'")
         return self.call(
-            "getPackageVersion", path_params={"registryName": registry_name, "packageName": package_name, "version": version}
+            "getRegistryPackageVersion",
+            path_params={"registryName": registry_name, "packageName": package_name, "versionNumber": version},
         )
 
     # Additional convenience methods for repos API

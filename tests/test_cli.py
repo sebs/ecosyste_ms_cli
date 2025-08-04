@@ -18,7 +18,10 @@ def runner():
 @pytest.fixture
 def mock_api_client():
     """Create a mock API client for all API groups."""
-    with mock.patch("ecosystems_cli.commands.base.get_client") as mock_client:
+    with (
+        mock.patch("ecosystems_cli.commands.base.get_client") as mock_client,
+        mock.patch("ecosystems_cli.api_client.get_client") as mock_client_api,
+    ):
         client_instance = mock.MagicMock()
         # Always return the test operation for list_operations
         client_instance.list_operations.return_value = [
@@ -47,6 +50,7 @@ def mock_api_client():
 
         client_instance.get_topic.side_effect = get_topic
         mock_client.return_value = client_instance
+        mock_client_api.return_value = client_instance
         yield client_instance
 
 
