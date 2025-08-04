@@ -63,31 +63,10 @@ class BaseCommand:
             # Ensure context object exists
             ctx.ensure_object(dict)
 
-            # Check if values were already set in context (e.g., by tests)
-            # Only preserve them if the provided values are defaults
-            if timeout == DEFAULT_TIMEOUT and "timeout" in ctx.obj:
-                timeout = ctx.obj["timeout"]
-            elif ctx.parent and ctx.parent.obj and timeout == DEFAULT_TIMEOUT:
-                # Use parent value if current value is default
-                parent_timeout = ctx.parent.obj.get("timeout", DEFAULT_TIMEOUT)
-                if parent_timeout != DEFAULT_TIMEOUT:
-                    timeout = parent_timeout
-
-            if format == DEFAULT_OUTPUT_FORMAT and "format" in ctx.obj:
-                format = ctx.obj["format"]
-            elif ctx.parent and ctx.parent.obj and format == DEFAULT_OUTPUT_FORMAT:
-                # Use parent value if current value is default
-                parent_format = ctx.parent.obj.get("format", DEFAULT_OUTPUT_FORMAT)
-                if parent_format != DEFAULT_OUTPUT_FORMAT:
-                    format = parent_format
-
-            if domain is None and "domain" in ctx.obj:
-                domain = ctx.obj["domain"]
-            elif ctx.parent and ctx.parent.obj and domain is None:
-                # Use parent value if current value is None
-                parent_domain = ctx.parent.obj.get("domain")
-                if parent_domain is not None:
-                    domain = parent_domain
+            # Resolve context values using helper function
+            timeout = self._resolve_context_value(ctx, "timeout", timeout, DEFAULT_TIMEOUT)
+            format = self._resolve_context_value(ctx, "format", format, DEFAULT_OUTPUT_FORMAT)
+            domain = self._resolve_context_value(ctx, "domain", domain, None)
 
             # Set the final values
             ctx.obj["timeout"] = timeout
@@ -95,6 +74,35 @@ class BaseCommand:
             ctx.obj["domain"] = domain
 
         self.group = group
+
+    def _resolve_context_value(self, ctx, key, current_value, default_value):
+        """Helper to resolve context values with inheritance.
+
+        Args:
+            ctx: Click context
+            key: Context key to resolve
+            current_value: Current value from command options
+            default_value: Default value for comparison
+
+        Returns:
+            Resolved value considering context inheritance
+        """
+        # If current value is not default, use it
+        if current_value != default_value:
+            return current_value
+
+        # Check current context for existing value
+        if key in ctx.obj:
+            return ctx.obj[key]
+
+        # Check parent context
+        if ctx.parent and ctx.parent.obj:
+            parent_value = ctx.parent.obj.get(key, default_value)
+            if parent_value != default_value:
+                return parent_value
+
+        # Return current value (which is the default)
+        return current_value
 
     def list_operations(self) -> Callable:
         """Create a command to list available operations."""
