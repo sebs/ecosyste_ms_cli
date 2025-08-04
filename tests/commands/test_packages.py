@@ -46,8 +46,8 @@ class TestPackagesCommands:
         mock_client.get_registries.assert_called_once()
         mock_print_output.assert_called_once_with({"registries": ["npm", "pypi"]}, "table", console=mock.ANY)
 
-    @mock.patch("ecosystems_cli.commands.base.get_client")
-    @mock.patch("ecosystems_cli.commands.base.print_output")
+    @mock.patch("ecosystems_cli.api_client.get_client")
+    @mock.patch("ecosystems_cli.helpers.print_output.print_output")
     def test_get_registry(self, mock_print_output, mock_get_client):
         """Test getting a specific registry."""
         mock_client = mock.MagicMock()
@@ -58,11 +58,11 @@ class TestPackagesCommands:
 
         assert result.exit_code == 0
         mock_get_client.assert_called_once_with("packages", base_url=None, timeout=20)
-        mock_client.get_registry.assert_called_once_with(name="npm")
+        mock_client.get_registry.assert_called_once_with(registry_name="npm")
         mock_print_output.assert_called_once()
 
-    @mock.patch("ecosystems_cli.commands.base.get_client")
-    @mock.patch("ecosystems_cli.commands.base.print_error")
+    @mock.patch("ecosystems_cli.api_client.get_client")
+    @mock.patch("ecosystems_cli.helpers.print_error.print_error")
     def test_get_registry_error(self, mock_print_error, mock_get_client):
         """Test error handling when getting a registry."""
         mock_client = mock.MagicMock()
@@ -74,8 +74,8 @@ class TestPackagesCommands:
         assert result.exit_code == 0
         mock_print_error.assert_called_once_with("Unexpected error: Registry not found", console=mock.ANY)
 
-    @mock.patch("ecosystems_cli.commands.base.get_client")
-    @mock.patch("ecosystems_cli.commands.base.print_output")
+    @mock.patch("ecosystems_cli.api_client.get_client")
+    @mock.patch("ecosystems_cli.helpers.print_output.print_output")
     def test_get_package(self, mock_print_output, mock_get_client):
         """Test getting a specific package."""
         mock_client = mock.MagicMock()
@@ -86,10 +86,10 @@ class TestPackagesCommands:
 
         assert result.exit_code == 0
         mock_get_client.assert_called_once_with("packages", base_url=None, timeout=20)
-        mock_client.get_package.assert_called_once_with(registry="npm", package="react")
+        mock_client.get_package.assert_called_once_with(registry_name="npm", package_name="react")
 
-    @mock.patch("ecosystems_cli.commands.base.get_client")
-    @mock.patch("ecosystems_cli.commands.base.print_output")
+    @mock.patch("ecosystems_cli.api_client.get_client")
+    @mock.patch("ecosystems_cli.helpers.print_output.print_output")
     def test_get_package_version(self, mock_print_output, mock_get_client):
         """Test getting a specific package version."""
         mock_client = mock.MagicMock()
@@ -102,4 +102,4 @@ class TestPackagesCommands:
 
         assert result.exit_code == 0
         mock_get_client.assert_called_once_with("packages", base_url=None, timeout=20)
-        mock_client.get_package_version.assert_called_once_with(registry="npm", package="react", version="18.0.0")
+        mock_client.get_package_version.assert_called_once_with(registry_name="npm", package_name="react", version="18.0.0")

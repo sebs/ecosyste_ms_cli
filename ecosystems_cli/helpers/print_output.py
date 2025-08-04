@@ -1,13 +1,10 @@
 from typing import Any, List
 
 from rich.console import Console
-from rich.syntax import Syntax
 
 from ecosystems_cli.constants import (
     DEFAULT_OUTPUT_FORMAT,
     DEFAULT_TABLE_TITLE,
-    JSON_SYNTAX,
-    JSON_THEME,
     MAX_SELECTED_FIELDS,
     PRIORITY_FIELDS,
     TABLE_HEADER_STYLE,
@@ -85,8 +82,8 @@ def _format_json(data: Any, console: Console) -> None:
     import json
 
     json_str = json.dumps(data, indent=2)
-    syntax = Syntax(json_str, JSON_SYNTAX, theme=JSON_THEME, line_numbers=False)
-    console.print(syntax)
+    # Use plain print to avoid Rich formatting
+    print(json_str)
 
 
 def _format_tsv(data: Any, console: Console) -> None:
