@@ -71,27 +71,46 @@ def main(ctx, timeout, format, domain):
     ctx.obj["domain"] = domain
 
 
-# Add command groups to main
-main.add_command(advisories)
-main.add_command(archives)
-main.add_command(commits)
-main.add_command(docker)
-main.add_command(repos)
-main.add_command(packages)
-main.add_command(summary)
-main.add_command(awesome)
-main.add_command(papers)
-main.add_command(ost)
-main.add_command(parser)
-main.add_command(get_resolver_group())
-main.add_command(sbom)
-main.add_command(licenses)
-main.add_command(diff)
-main.add_command(timeline)
-main.add_command(issues)
-main.add_command(sponsors)
-main.add_command(opencollective)
-main.add_command(ruby)
+# Command Registration Strategy:
+# We use a hybrid approach for command registration to balance usability and flexibility:
+#
+# 1. High-level API commands (e.g., 'ecosystems repos', 'ecosystems packages')
+#    - Registered via COMMAND_REGISTRY below
+#    - Provide user-friendly commands with custom logic and convenience methods
+#    - Each command is a BaseCommand subclass with tailored functionality
+#
+# 2. Low-level operation commands (e.g., 'ecosystems op repos get_topic')
+#    - Registered dynamically in register_op_commands()
+#    - Provide direct access to all API operations
+#    - Auto-generated from OpenAPI specifications
+
+# Command registry - maps API names to their command instances
+COMMAND_REGISTRY = {
+    "advisories": advisories,
+    "archives": archives,
+    "commits": commits,
+    "docker": docker,
+    "repos": repos,
+    "packages": packages,
+    "summary": summary,
+    "awesome": awesome,
+    "papers": papers,
+    "ost": ost,
+    "parser": parser,
+    "resolver": get_resolver_group(),
+    "sbom": sbom,
+    "licenses": licenses,
+    "diff": diff,
+    "timeline": timeline,
+    "issues": issues,
+    "sponsors": sponsors,
+    "opencollective": opencollective,
+    "ruby": ruby,
+}
+
+# Register all high-level commands dynamically from the registry
+for api_name, command in COMMAND_REGISTRY.items():
+    main.add_command(command)
 
 
 @main.group()
@@ -221,17 +240,24 @@ def _print_operations(operations: List[Dict]):
 
 
 # Register dynamic 'op' commands for each API
-for api_name in SUPPORTED_APIS:
-    # Create a sub-group for each API under 'op'
-    api_group = click.Group(name=api_name, help=f"Operations for {api_name} API")
-    op.add_command(api_group)
+# This provides direct access to API operations with parameters as arguments
+def register_op_commands():
+    """Register dynamic operation commands for all supported APIs."""
+    for api_name in SUPPORTED_APIS:
+        # Create a sub-group for each API under 'op'
+        api_group = click.Group(name=api_name, help=f"Direct operations for {api_name} API")
+        op.add_command(api_group)
 
-    # Create client to get operations
-    client = get_client(api_name)
+        # Create client to get operations
+        client = get_client(api_name)
 
-    # Register each operation as a command
-    for operation in client.list_operations():
-        operation_id = operation.get("id")
-        if operation_id and operation_id not in ["list", "operations"]:  # Skip reserved command names
-            cmd = create_dynamic_command(api_name, operation_id, client)
-            api_group.add_command(cmd)
+        # Register each operation as a command
+        for operation in client.list_operations():
+            operation_id = operation.get("id")
+            if operation_id and operation_id not in ["list", "operations"]:  # Skip reserved command names
+                cmd = create_dynamic_command(api_name, operation_id, client)
+                api_group.add_command(cmd)
+
+
+# Register the dynamic commands
+register_op_commands()
