@@ -8,25 +8,6 @@ DEFAULT_CONTENT_TYPE = "application/json"
 # Supported APIs
 SUPPORTED_APIS = [
     "advisories",
-    "archives",
-    "commits",
-    "docker",
-    "diff",
-    "repos",
-    "packages",
-    "summary",
-    "awesome",
-    "papers",
-    "ost",
-    "parser",
-    "resolver",
-    "sbom",
-    "licenses",
-    "timeline",
-    "issues",
-    "sponsors",
-    "opencollective",
-    "ruby",
 ]
 
 # Output Formats

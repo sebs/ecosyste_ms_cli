@@ -2,6 +2,7 @@
 
 from typing import Dict, Type
 
+from .advisories import AdvisoriesOperationHandler
 from .archives import ArchivesOperationHandler
 from .base import OperationHandler
 from .default import DefaultOperationHandler
@@ -13,6 +14,7 @@ class OperationHandlerFactory:
     """Factory for creating operation handlers."""
 
     _handlers: Dict[str, Type[OperationHandler]] = {
+        "advisories": AdvisoriesOperationHandler,
         "resolver": ResolverOperationHandler,
         "archives": ArchivesOperationHandler,
         "docker": DockerOperationHandler,

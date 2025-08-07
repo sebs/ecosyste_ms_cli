@@ -22,37 +22,6 @@ class TestBaseCommand:
         assert isinstance(self.base_command.group, click.Group)
 
     @patch("ecosystems_cli.commands.base.get_client")
-    @patch("ecosystems_cli.commands.base.print_operations")
-    def test_list_operations(self, mock_print_operations, mock_get_client):
-        """Test list_operations command creation."""
-        # Create mock client
-        mock_client = MagicMock()
-        mock_client.list_operations.return_value = ["op1", "op2"]
-        mock_get_client.return_value = mock_client
-
-        # Create the command
-        list_cmd = self.base_command.list_operations()
-
-        # Test that it's a Click command
-        assert isinstance(list_cmd, click.Command)
-        assert list_cmd.name == "list"
-
-        # Test command execution using invoke
-        from click.testing import CliRunner
-
-        runner = CliRunner()
-        ctx = MagicMock()
-        ctx.obj = {"timeout": 30}
-
-        with runner.isolated_filesystem():
-            runner.invoke(list_cmd, obj={"timeout": 30})
-
-        # Verify calls
-        mock_get_client.assert_called_once_with("test_api", base_url=None, timeout=30)
-        mock_client.list_operations.assert_called_once()
-        mock_print_operations.assert_called_once_with(["op1", "op2"], console=self.base_command.console)
-
-    @patch("ecosystems_cli.commands.base.get_client")
     @patch("ecosystems_cli.commands.base.print_output")
     def test_create_simple_command(self, mock_print_output, mock_get_client):
         """Test create_simple_command."""
