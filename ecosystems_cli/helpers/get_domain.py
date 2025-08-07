@@ -8,7 +8,7 @@ def get_domain_with_precedence(
     api_name: str, domain_override: Optional[str] = None, env_prefix: str = "ECOSYSTEMS"
 ) -> Optional[str]:
     """
-    Get the API domain with proper precedence: ENV > --domain > default.
+    Get the API domain with proper precedence: --domain > ENV > default.
 
     Args:
         api_name: Name of the API (e.g., 'repos', 'packages')
@@ -22,21 +22,21 @@ def get_domain_with_precedence(
     1. {ENV_PREFIX}_{API_NAME}_DOMAIN (e.g., ECOSYSTEMS_REPOS_DOMAIN)
     2. {ENV_PREFIX}_DOMAIN (e.g., ECOSYSTEMS_DOMAIN)
     """
-    # First check API-specific environment variable
+    # First check --domain parameter if provided
+    if domain_override:
+        return domain_override
+
+    # Then check API-specific environment variable
     api_specific_env = f"{env_prefix}_{api_name.upper()}_DOMAIN"
     api_specific_domain = os.environ.get(api_specific_env)
     if api_specific_domain:
         return api_specific_domain
 
-    # Check general environment variable
+    # Finally check general environment variable
     general_env = f"{env_prefix}_DOMAIN"
     general_domain = os.environ.get(general_env)
     if general_domain:
         return general_domain
-
-    # Use --domain parameter if provided
-    if domain_override:
-        return domain_override
 
     # Return None to use default
     return None

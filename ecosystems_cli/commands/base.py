@@ -16,7 +16,6 @@ from ecosystems_cli.constants import (
 from ecosystems_cli.exceptions import EcosystemsCLIError
 from ecosystems_cli.helpers.get_domain import build_base_url, get_domain_with_precedence
 from ecosystems_cli.helpers.print_error import print_error
-from ecosystems_cli.helpers.print_operations import print_operations
 from ecosystems_cli.helpers.print_output import print_output
 
 
@@ -104,35 +103,6 @@ class BaseCommand:
         # Return current value (which is the default)
         return current_value
 
-    def list_operations(self) -> Callable:
-        """Create a command to list available operations."""
-
-        @common_options
-        @click.pass_context
-        def list_operations_impl(ctx, timeout, format, domain):
-            """List available operations for the API."""
-            # Update context with command-level options
-            ctx.ensure_object(dict)
-            if timeout != DEFAULT_TIMEOUT:
-                ctx.obj["timeout"] = timeout
-            if format != DEFAULT_OUTPUT_FORMAT:
-                ctx.obj["format"] = format
-            if domain is not None:
-                ctx.obj["domain"] = domain
-
-            # Get domain with proper precedence
-            domain = get_domain_with_precedence(self.api_name, ctx.obj.get("domain"))
-            base_url = build_base_url(domain, self.api_name)
-
-            client = get_client(self.api_name, base_url=base_url, timeout=ctx.obj.get("timeout", DEFAULT_TIMEOUT))
-            print_operations(client.list_operations(), console=self.console)
-
-        # Set the function name and docstring dynamically
-        list_operations_impl.__name__ = f"list_{self.api_name}_operations"
-        list_operations_impl.__doc__ = f"List available operations for {self.api_name} API."
-
-        return self.group.command("list")(list_operations_impl)
-
     def create_simple_command(self, name: str, method_name: str, description: str, operation_id: str = None) -> Callable:
         """Create a simple command that calls an API method without parameters.
 
@@ -162,7 +132,7 @@ class BaseCommand:
             client = get_client(self.api_name, base_url=base_url, timeout=ctx.obj.get("timeout", DEFAULT_TIMEOUT))
             try:
                 if operation_id and method_name == "call":
-                    result = client.call(operation_id)
+                    result = client.call(operation_id, path_params={}, query_params={})
                 else:
                     result = getattr(client, method_name)()
                 print_output(result, ctx.obj.get("format", DEFAULT_OUTPUT_FORMAT), console=self.console)

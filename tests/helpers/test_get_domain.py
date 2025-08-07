@@ -29,11 +29,11 @@ class TestGetDomainWithPrecedence:
         result = get_domain_with_precedence("repos", None)
         assert result == "repos.domain.com"
 
-    def test_env_var_takes_precedence_over_domain_param(self, monkeypatch):
-        """Test that env var takes precedence over --domain parameter."""
+    def test_domain_param_takes_precedence_over_env_var(self, monkeypatch):
+        """Test that --domain parameter takes precedence over env var."""
         monkeypatch.setenv("ECOSYSTEMS_REPOS_DOMAIN", "env.domain.com")
         result = get_domain_with_precedence("repos", "param.domain.com")
-        assert result == "env.domain.com"
+        assert result == "param.domain.com"
 
     def test_custom_env_prefix(self, monkeypatch):
         """Test using a custom environment variable prefix."""
@@ -48,24 +48,28 @@ class TestGetDomainWithPrecedence:
         assert result == "packages.domain.com"
 
     def test_precedence_order_complete(self, monkeypatch):
-        """Test complete precedence order: API env > general env > param."""
+        """Test complete precedence order: param > API env > general env."""
         # Set all three sources
         monkeypatch.setenv("ECOSYSTEMS_DOMAIN", "general.domain.com")
         monkeypatch.setenv("ECOSYSTEMS_REPOS_DOMAIN", "repos.domain.com")
 
-        # API-specific env should win
+        # Param should always win when provided
         result = get_domain_with_precedence("repos", "param.domain.com")
+        assert result == "param.domain.com"
+
+        # Without param, API-specific env should win
+        result = get_domain_with_precedence("repos", None)
         assert result == "repos.domain.com"
 
         # Remove API-specific, general env should win
         monkeypatch.delenv("ECOSYSTEMS_REPOS_DOMAIN")
-        result = get_domain_with_precedence("repos", "param.domain.com")
+        result = get_domain_with_precedence("repos", None)
         assert result == "general.domain.com"
 
-        # Remove general env, param should win
+        # Remove general env, should return None
         monkeypatch.delenv("ECOSYSTEMS_DOMAIN")
-        result = get_domain_with_precedence("repos", "param.domain.com")
-        assert result == "param.domain.com"
+        result = get_domain_with_precedence("repos", None)
+        assert result is None
 
 
 class TestBuildBaseUrl:

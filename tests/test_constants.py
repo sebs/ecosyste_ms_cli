@@ -28,29 +28,10 @@ class TestAPIConfiguration:
         """Test supported APIs list."""
         expected_apis = [
             "advisories",
-            "archives",
-            "commits",
-            "docker",
-            "diff",
-            "repos",
-            "packages",
-            "summary",
-            "awesome",
-            "papers",
-            "ost",
-            "parser",
-            "resolver",
-            "sbom",
-            "licenses",
-            "timeline",
-            "issues",
-            "sponsors",
-            "opencollective",
-            "ruby",
         ]
         assert constants.SUPPORTED_APIS == expected_apis
         assert isinstance(constants.SUPPORTED_APIS, list)
-        assert len(constants.SUPPORTED_APIS) == 20
+        assert len(constants.SUPPORTED_APIS) == 1
         assert all(isinstance(api, str) for api in constants.SUPPORTED_APIS)
 
 

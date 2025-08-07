@@ -9,25 +9,6 @@ from rich.panel import Panel
 
 from ecosystems_cli.api_client import get_client
 from ecosystems_cli.commands.advisories import advisories
-from ecosystems_cli.commands.archives import archives
-from ecosystems_cli.commands.awesome import awesome
-from ecosystems_cli.commands.commits import commits
-from ecosystems_cli.commands.diff import diff
-from ecosystems_cli.commands.docker import docker
-from ecosystems_cli.commands.issues import issues
-from ecosystems_cli.commands.licenses import licenses
-from ecosystems_cli.commands.opencollective import opencollective
-from ecosystems_cli.commands.ost import ost
-from ecosystems_cli.commands.packages import packages
-from ecosystems_cli.commands.papers import papers
-from ecosystems_cli.commands.parser import parser
-from ecosystems_cli.commands.repos import repos
-from ecosystems_cli.commands.resolver import get_resolver_group
-from ecosystems_cli.commands.ruby import ruby
-from ecosystems_cli.commands.sbom import sbom
-from ecosystems_cli.commands.sponsors import sponsors
-from ecosystems_cli.commands.summary import summary
-from ecosystems_cli.commands.timeline import timeline
 from ecosystems_cli.constants import (
     DEFAULT_OUTPUT_FORMAT,
     DEFAULT_TIMEOUT,
@@ -87,25 +68,6 @@ def main(ctx, timeout, format, domain):
 # Command registry - maps API names to their command instances
 COMMAND_REGISTRY = {
     "advisories": advisories,
-    "archives": archives,
-    "commits": commits,
-    "docker": docker,
-    "repos": repos,
-    "packages": packages,
-    "summary": summary,
-    "awesome": awesome,
-    "papers": papers,
-    "ost": ost,
-    "parser": parser,
-    "resolver": get_resolver_group(),
-    "sbom": sbom,
-    "licenses": licenses,
-    "diff": diff,
-    "timeline": timeline,
-    "issues": issues,
-    "sponsors": sponsors,
-    "opencollective": opencollective,
-    "ruby": ruby,
 }
 
 # Register all high-level commands dynamically from the registry
