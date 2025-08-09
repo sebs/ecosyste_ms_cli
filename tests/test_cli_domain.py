@@ -14,7 +14,7 @@ class TestCLIDomainConfiguration:
         """Set up test fixtures."""
         self.runner = CliRunner()
 
-    @patch("ecosystems_cli.commands.base.get_client")
+    @patch("ecosystems_cli.commands.execution.get_client")
     def test_domain_parameter_in_main_command(self, mock_get_client):
         """Test --domain parameter at main command level."""
         mock_client = MagicMock()
@@ -29,7 +29,7 @@ class TestCLIDomainConfiguration:
         call_args = mock_get_client.call_args
         assert call_args[1]["base_url"] == "https://custom.api.com/api/v1"
 
-    @patch("ecosystems_cli.commands.base.get_client")
+    @patch("ecosystems_cli.commands.execution.get_client")
     def test_domain_parameter_in_subcommand(self, mock_get_client):
         """Test --domain parameter at subcommand level."""
         mock_client = MagicMock()
@@ -44,7 +44,7 @@ class TestCLIDomainConfiguration:
         call_args = mock_get_client.call_args
         assert call_args[1]["base_url"] == "https://sub.api.com/api/v1"
 
-    @patch("ecosystems_cli.commands.base.get_client")
+    @patch("ecosystems_cli.commands.execution.get_client")
     def test_domain_env_var_general(self, mock_get_client, monkeypatch):
         """Test general ECOSYSTEMS_DOMAIN environment variable."""
         monkeypatch.setenv("ECOSYSTEMS_DOMAIN", "env.api.com")
@@ -61,7 +61,7 @@ class TestCLIDomainConfiguration:
         call_args = mock_get_client.call_args
         assert call_args[1]["base_url"] == "https://env.api.com/api/v1"
 
-    @patch("ecosystems_cli.commands.base.get_client")
+    @patch("ecosystems_cli.commands.execution.get_client")
     def test_domain_env_var_api_specific(self, mock_get_client, monkeypatch):
         """Test API-specific environment variable."""
         monkeypatch.setenv("ECOSYSTEMS_ADVISORIES_DOMAIN", "advisories.api.com")
@@ -78,7 +78,7 @@ class TestCLIDomainConfiguration:
         call_args = mock_get_client.call_args
         assert call_args[1]["base_url"] == "https://advisories.api.com/api/v1"
 
-    @patch("ecosystems_cli.commands.base.get_client")
+    @patch("ecosystems_cli.commands.execution.get_client")
     def test_domain_precedence_param_over_env(self, mock_get_client, monkeypatch):
         """Test that command parameter takes precedence over env var."""
         monkeypatch.setenv("ECOSYSTEMS_DOMAIN", "env.api.com")
@@ -95,7 +95,7 @@ class TestCLIDomainConfiguration:
         call_args = mock_get_client.call_args
         assert call_args[1]["base_url"] == "https://param.api.com/api/v1"
 
-    @patch("ecosystems_cli.commands.base.get_client")
+    @patch("ecosystems_cli.commands.execution.get_client")
     def test_domain_precedence_api_env_over_general(self, mock_get_client, monkeypatch):
         """Test that API-specific env var takes precedence over general env var."""
         monkeypatch.setenv("ECOSYSTEMS_DOMAIN", "general.api.com")
@@ -113,7 +113,7 @@ class TestCLIDomainConfiguration:
         call_args = mock_get_client.call_args
         assert call_args[1]["base_url"] == "https://advisories.api.com/api/v1"
 
-    @patch("ecosystems_cli.commands.base.get_client")
+    @patch("ecosystems_cli.commands.execution.get_client")
     def test_domain_inherited_from_parent_context(self, mock_get_client):
         """Test domain is properly inherited from parent context."""
         mock_client = MagicMock()
