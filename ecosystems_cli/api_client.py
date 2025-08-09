@@ -115,9 +115,9 @@ class APIClient:
                 pass
 
             if response.status_code == 401:
-                raise APIAuthenticationError(error_msg)
+                raise APIAuthenticationError(str(error_msg))
             elif response.status_code == 404:
-                raise APINotFoundError(error_msg)
+                raise APINotFoundError(str(error_msg))
             elif response.status_code >= 500:
                 # Include URL in server error for better debugging
                 msg = f"Server error at {url}"
@@ -125,7 +125,7 @@ class APIClient:
                     msg += f": {error_msg}"
                 raise APIServerError(response.status_code, msg)
             else:
-                raise APIHTTPError(response.status_code, error_msg)
+                raise APIHTTPError(response.status_code, str(error_msg))
 
         # Return JSON response if available, otherwise return response text
         try:
@@ -171,120 +171,14 @@ class APIClient:
 
         return operations
 
-    # Convenience methods for common operations
-
-    def get_topics(self) -> Dict[str, Any]:
-        """Get all topics (repos API)."""
-        if self.api_name != "repos":
-            raise InvalidAPIError(f"Method get_topics is only available for 'repos' API, not '{self.api_name}'")
-        return self.call("topics")
-
-    def get_topic(self, topic_name: str) -> Dict[str, Any]:
-        """Get a specific topic (repos API)."""
-        if self.api_name != "repos":
-            raise InvalidAPIError(f"Method get_topic is only available for 'repos' API, not '{self.api_name}'")
-        return self.call("topic", path_params={"topic": topic_name})
-
-    def get_registries(self) -> Dict[str, Any]:
-        """Get all registries (packages API)."""
-        if self.api_name != "packages":
-            raise InvalidAPIError(f"Method get_registries is only available for 'packages' API, not '{self.api_name}'")
-        return self.call("getRegistries")
-
-    def get_registry(self, registry_name: str) -> Dict[str, Any]:
-        """Get a specific registry (packages API)."""
-        if self.api_name != "packages":
-            raise InvalidAPIError(f"Method get_registry is only available for 'packages' API, not '{self.api_name}'")
-        return self.call("getRegistry", path_params={"registryName": registry_name})
-
-    # Additional convenience methods for packages API
-
-    def get_package(self, registry_name: str, package_name: str) -> Dict[str, Any]:
-        """Get a specific package from a registry (packages API)."""
-        if self.api_name != "packages":
-            raise InvalidAPIError(f"Method get_package is only available for 'packages' API, not '{self.api_name}'")
-        return self.call("getRegistryPackage", path_params={"registryName": registry_name, "packageName": package_name})
-
-    def get_package_version(self, registry_name: str, package_name: str, version: str) -> Dict[str, Any]:
-        """Get a specific package version (packages API)."""
-        if self.api_name != "packages":
-            raise InvalidAPIError(f"Method get_package_version is only available for 'packages' API, not '{self.api_name}'")
-        return self.call(
-            "getRegistryPackageVersion",
-            path_params={"registryName": registry_name, "packageName": package_name, "versionNumber": version},
-        )
-
-    # Additional convenience methods for repos API
-
-    def get_hosts(self) -> Dict[str, Any]:
-        """Get all repository hosts (repos API).
-
-        NOTE: This method calls the 'getRegistries' operation due to an inconsistency
-        in the OpenAPI specification. The /hosts endpoint incorrectly uses
-        'getRegistries' as its operation ID. This is documented in KNOWN_ISSUES.md.
-        """
-        if self.api_name != "repos":
-            raise InvalidAPIError(f"Method get_hosts is only available for 'repos' API, not '{self.api_name}'")
-        return self.call("getRegistries")  # OpenAPI spec uses 'getRegistries' for /hosts endpoint
-
-    def get_host(self, host_name: str) -> Dict[str, Any]:
-        """Get a specific repository host (repos API)."""
-        if self.api_name != "repos":
-            raise InvalidAPIError(f"Method get_host is only available for 'repos' API, not '{self.api_name}'")
-        return self.call("getHost", path_params={"hostName": host_name})
-
-    def get_repository(self, host_name: str, owner: str, repo: str) -> Dict[str, Any]:
-        """Get a specific repository (repos API)."""
-        if self.api_name != "repos":
-            raise InvalidAPIError(f"Method get_repository is only available for 'repos' API, not '{self.api_name}'")
-        return self.call("getHostRepository", path_params={"hostName": host_name, "repositoryName": f"{owner}/{repo}"})
-
-    # Additional convenience methods for papers API
-
-    def list_papers(
-        self,
-        page: Optional[int] = None,
-        per_page: Optional[int] = None,
-        sort: Optional[str] = None,
-        order: Optional[str] = None,
-    ) -> Dict[str, Any]:
-        """List all papers (papers API)."""
-        if self.api_name != "papers":
-            raise InvalidAPIError(f"Method list_papers is only available for 'papers' API, not '{self.api_name}'")
-        query_params = {}
-        if page is not None:
-            query_params["page"] = page
-        if per_page is not None:
-            query_params["per_page"] = per_page
-        if sort is not None:
-            query_params["sort"] = sort
-        if order is not None:
-            query_params["order"] = order
-        return self.call("listPapers", query_params=query_params if query_params else None)
-
-    def get_paper(self, doi: str) -> Dict[str, Any]:
-        """Get a specific paper by DOI (papers API)."""
-        if self.api_name != "papers":
-            raise InvalidAPIError(f"Method get_paper is only available for 'papers' API, not '{self.api_name}'")
-        return self.call("getPaper", path_params={"doi": doi})
-
-    def get_paper_mentions(self, doi: str, page: Optional[int] = None, per_page: Optional[int] = None) -> Dict[str, Any]:
-        """List all mentions for a paper (papers API)."""
-        if self.api_name != "papers":
-            raise InvalidAPIError(f"Method get_paper_mentions is only available for 'papers' API, not '{self.api_name}'")
-        query_params = {}
-        if page is not None:
-            query_params["page"] = page
-        if per_page is not None:
-            query_params["per_page"] = per_page
-        return self.call("listPaperMentions", path_params={"doi": doi}, query_params=query_params if query_params else None)
+    # Convenience methods for common operations can be added here as needed
 
 
 def get_client(api_name: str, base_url: Optional[str] = None, timeout: int = DEFAULT_TIMEOUT) -> APIClient:
     """Get API client for specified API.
 
     Args:
-        api_name: Name of the API (packages, repos, summary, awesome, papers)
+        api_name: Name of the API (advisories)
         base_url: Base URL for the API. If not provided, uses default.
         timeout: Timeout in seconds for HTTP requests. Default is 20 seconds.
     """
