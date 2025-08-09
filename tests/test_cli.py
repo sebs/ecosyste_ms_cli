@@ -19,7 +19,7 @@ def runner():
 def mock_api_client():
     """Create a mock API client for advisories API."""
     with (
-        mock.patch("ecosystems_cli.commands.base.get_client") as mock_client,
+        mock.patch("ecosystems_cli.commands.execution.get_client") as mock_client,
         mock.patch("ecosystems_cli.api_client.get_client") as mock_client_api,
     ):
         client_instance = mock.MagicMock()
