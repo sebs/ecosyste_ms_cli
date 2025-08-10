@@ -29,16 +29,6 @@ def test_advisories_help_output():
     assert "--format" in result.output
 
 
-def test_op_help_output():
-    """Test that op command help output includes expected information."""
-    runner = CliRunner()
-    result = runner.invoke(cli, ["op", "--help"])
-
-    assert result.exit_code == 0
-    assert "Direct access to API operations" in result.output
-    assert "advisories" in result.output
-
-
 def test_subcommand_help_includes_global_options():
     """Test that subcommand help includes global options."""
     runner = CliRunner()

@@ -128,26 +128,3 @@ class TestCLIDomainConfiguration:
         mock_get_client.assert_called_once()
         call_args = mock_get_client.call_args
         assert call_args[1]["base_url"] == "https://main.api.com/api/v1"
-
-    @patch("ecosystems_cli.api_client.requests.request")
-    def test_op_command_with_domain(self, mock_request):
-        """Test op command with domain parameter."""
-        # Mock the API response
-        mock_request.return_value.status_code = 200
-        mock_request.return_value.json.return_value = {"result": "success"}
-
-        result = self.runner.invoke(main, ["--domain", "custom.api.com", "op", "advisories", "getAdvisories"])
-
-        # Check that the command ran successfully
-        # The op commands are created at module load time, so we just verify it doesn't error
-        # and that a request would be made with the custom domain when executed
-        assert result.exit_code == 0
-        if mock_request.called:
-            # If a request was made, it should use the custom domain
-            calls = mock_request.call_args_list
-            # Check if custom domain is in any of the calls
-            urls_called = [str(call) for call in calls]
-            # The op command may default to the standard domain since commands are created at import time
-            # This is a known limitation of dynamic command registration
-            # We'll just check that the command executed without error
-            assert len(urls_called) >= 0  # Test passes if no error occurred

@@ -15,7 +15,6 @@ from ecosystems_cli.constants import (
     ERROR_PANEL_STYLE,
     ERROR_PREFIX,
     OUTPUT_FORMATS,
-    SUPPORTED_APIS,
 )
 from ecosystems_cli.exceptions import EcosystemsCLIError, JSONParseError
 from ecosystems_cli.helpers.format_value import format_value
@@ -26,7 +25,7 @@ from ecosystems_cli.helpers.print_output import print_output
 console = Console()
 
 
-@click.group()
+@click.group(invoke_without_command=True)
 @click.option(
     "--timeout",
     default=DEFAULT_TIMEOUT,
@@ -43,9 +42,31 @@ console = Console()
     default=None,
     help="Override the API domain. Example: api.example.com",
 )
+@click.option(
+    "--install-completion",
+    is_flag=True,
+    help="Show instructions for installing shell completion.",
+)
 @click.pass_context
-def main(ctx, timeout, format, domain):
+def main(ctx, timeout, format, domain, install_completion):
     """Ecosystems CLI for interacting with ecosyste.ms APIs."""
+    # Handle completion installation instructions
+    if install_completion:
+        click.echo("Shell completion installation instructions:\n")
+        click.echo("For bash, add to ~/.bashrc:")
+        click.echo('  eval "$(_ECOSYSTEMS_COMPLETE=bash_source ecosystems)"')
+        click.echo("\nFor zsh, add to ~/.zshrc:")
+        click.echo('  eval "$(_ECOSYSTEMS_COMPLETE=zsh_source ecosystems)"')
+        click.echo("\nFor fish, add to ~/.config/fish/config.fish:")
+        click.echo("  _ECOSYSTEMS_COMPLETE=fish_source ecosystems | source")
+        click.echo("\nThen restart your shell or source the configuration file.")
+        ctx.exit()
+
+    # If no command is provided and not handling completion, show help
+    if ctx.invoked_subcommand is None:
+        click.echo(ctx.get_help())
+        ctx.exit()
+
     ctx.ensure_object(dict)
     ctx.obj["timeout"] = timeout
     ctx.obj["format"] = format
@@ -75,13 +96,7 @@ for api_name, command in COMMAND_REGISTRY.items():
     main.add_command(command)
 
 
-@main.group()
-def op():
-    """Direct access to API operations with parameters as arguments."""
-    pass
-
-
-# Dynamic op commands will be registered below
+# Dynamic op commands have been removed
 
 
 def _parse_json_param(param: Optional[str]) -> Optional[Dict]:
@@ -130,53 +145,6 @@ def _call_operation(api: str, operation: str, path_params: str, query_params: st
         _print_error(f"Unexpected error: {str(e)}")
 
 
-def create_dynamic_command(api_name: str, operation_id: str, client):
-    """Create a dynamic command for an operation with appropriate parameters."""
-    operation_details = client.endpoints.get(operation_id, {})
-    required_params = operation_details.get("required_params", {})
-    summary = operation_details.get("summary", "No description available")
-
-    # Create a function that will be the command
-    @click.argument("params", nargs=-1)
-    def dynamic_command(params):
-        """Execute the operation with provided parameters."""
-        # Process parameters
-        path_params = {}
-        query_params = {}
-
-        # Map positional arguments to parameters
-        param_names = list(required_params.keys())
-        for i, value in enumerate(params):
-            if i < len(param_names):
-                param_name = param_names[i]
-                param_location = required_params[param_name].get("in")
-
-                if param_location == "path":
-                    path_params[param_name] = value
-                elif param_location == "query":
-                    query_params[param_name] = value
-
-        try:
-            result = client.call(operation_id=operation_id, path_params=path_params, query_params=query_params)
-            # Default to table format
-            _print_output(result, DEFAULT_OUTPUT_FORMAT)
-        except EcosystemsCLIError as e:
-            _print_error(str(e))
-        except Exception as e:
-            _print_error(f"Unexpected error: {str(e)}")
-
-    # Set the docstring
-    dynamic_command.__doc__ = summary
-    if required_params:
-        param_docs = [
-            f"\n  {name}: {details.get('description', 'No description')}" for name, details in required_params.items()
-        ]
-        dynamic_command.__doc__ += "\n\nParameters:" + "".join(param_docs)
-
-    # Create a proper Click command
-    return click.command(name=operation_id)(dynamic_command)
-
-
 def _print_output(data: Any, format_type: str = "table"):
     """Print data in the specified format."""
     print_output(data, format_type, console=console)
@@ -199,27 +167,3 @@ def _print_error(error_msg: str):
 
 def _print_operations(operations: List[Dict]):
     print_operations(operations, console=console)
-
-
-# Register dynamic 'op' commands for each API
-# This provides direct access to API operations with parameters as arguments
-def register_op_commands():
-    """Register dynamic operation commands for all supported APIs."""
-    for api_name in SUPPORTED_APIS:
-        # Create a sub-group for each API under 'op'
-        api_group = click.Group(name=api_name, help=f"Direct operations for {api_name} API")
-        op.add_command(api_group)
-
-        # Create client to get operations
-        client = get_client(api_name)
-
-        # Register each operation as a command
-        for operation in client.list_operations():
-            operation_id = operation.get("id")
-            if operation_id and operation_id not in ["list", "operations"]:  # Skip reserved command names
-                cmd = create_dynamic_command(api_name, operation_id, client)
-                api_group.add_command(cmd)
-
-
-# Register the dynamic commands
-register_op_commands()
