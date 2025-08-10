@@ -69,7 +69,7 @@ class TestErrorHandling:
     def test_invalid_json_params(self, runner, mock_api_client):
         """Test handling invalid JSON parameters."""
         # Act
-        result = runner.invoke(main, ["op", "advisories", "test_op", "-p", "{invalid json}"])
+        result = runner.invoke(main, ["advisories", "call", "test_op", "-p", "{invalid json}"])
 
         # Assert
         assert result.exit_code != 0
