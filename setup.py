@@ -20,6 +20,7 @@ setup(
         "requests",
         "pyyaml",
         "rich",
+        "mcp",
     ],
     extras_require={
         "dev": ["pytest", "black", "isort", "flake8", "bandit", "complexipy"],
