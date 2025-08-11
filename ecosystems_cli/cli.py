@@ -9,6 +9,7 @@ from rich.panel import Panel
 
 from ecosystems_cli.api_client import get_client
 from ecosystems_cli.commands.advisories import advisories
+from ecosystems_cli.commands.mcp import mcp
 from ecosystems_cli.constants import (
     DEFAULT_OUTPUT_FORMAT,
     DEFAULT_TIMEOUT,
@@ -95,7 +96,8 @@ COMMAND_REGISTRY = {
 for api_name, command in COMMAND_REGISTRY.items():
     main.add_command(command)
 
-
+# Register MCP server command
+main.add_command(mcp)
 # Dynamic op commands have been removed
 
 

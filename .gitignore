@@ -5,3 +5,4 @@ __pycache__
 .claude
 CLAUDE.md
 improvements.txt
+claude_mcp_config.json
