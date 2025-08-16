@@ -9,6 +9,7 @@ from rich.panel import Panel
 
 from ecosystems_cli.api_client import get_client
 from ecosystems_cli.commands.advisories import advisories
+from ecosystems_cli.commands.issues import issues
 from ecosystems_cli.commands.mcp import mcp
 from ecosystems_cli.commands.packages import packages
 from ecosystems_cli.commands.repos import repos
@@ -92,6 +93,7 @@ def main(ctx, timeout, format, domain, install_completion):
 # Command registry - maps API names to their command instances
 COMMAND_REGISTRY = {
     "advisories": advisories,
+    "issues": issues,
     "packages": packages,
     "repos": repos,
 }
