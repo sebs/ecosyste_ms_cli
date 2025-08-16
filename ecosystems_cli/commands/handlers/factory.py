@@ -6,7 +6,7 @@ from .advisories import AdvisoriesOperationHandler
 from .archives import ArchivesOperationHandler
 from .base import OperationHandler
 from .default import DefaultOperationHandler
-from .docker import DockerOperationHandler
+from .packages import PackagesOperationHandler
 from .resolver import ResolverOperationHandler
 
 
@@ -15,9 +15,9 @@ class OperationHandlerFactory:
 
     _handlers: Dict[str, Type[OperationHandler]] = {
         "advisories": AdvisoriesOperationHandler,
+        "packages": PackagesOperationHandler,
         "resolver": ResolverOperationHandler,
         "archives": ArchivesOperationHandler,
-        "docker": DockerOperationHandler,
     }
 
     @classmethod
