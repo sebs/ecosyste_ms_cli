@@ -11,6 +11,7 @@ from ecosystems_cli.api_client import get_client
 from ecosystems_cli.commands.advisories import advisories
 from ecosystems_cli.commands.mcp import mcp
 from ecosystems_cli.commands.packages import packages
+from ecosystems_cli.commands.repos import repos
 from ecosystems_cli.constants import (
     DEFAULT_OUTPUT_FORMAT,
     DEFAULT_TIMEOUT,
@@ -92,6 +93,7 @@ def main(ctx, timeout, format, domain, install_completion):
 COMMAND_REGISTRY = {
     "advisories": advisories,
     "packages": packages,
+    "repos": repos,
 }
 
 # Register all high-level commands dynamically from the registry
