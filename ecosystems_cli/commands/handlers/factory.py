@@ -10,6 +10,7 @@ from .issues import IssuesOperationHandler
 from .packages import PackagesOperationHandler
 from .repos import ReposOperationHandler
 from .resolver import ResolverOperationHandler
+from .timeline import TimelineOperationHandler
 
 
 class OperationHandlerFactory:
@@ -22,6 +23,7 @@ class OperationHandlerFactory:
         "repos": ReposOperationHandler,
         "resolver": ResolverOperationHandler,
         "archives": ArchivesOperationHandler,
+        "timeline": TimelineOperationHandler,
     }
 
     @classmethod

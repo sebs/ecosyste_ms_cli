@@ -13,6 +13,7 @@ from ecosystems_cli.commands.issues import issues
 from ecosystems_cli.commands.mcp import mcp
 from ecosystems_cli.commands.packages import packages
 from ecosystems_cli.commands.repos import repos
+from ecosystems_cli.commands.timeline import timeline
 from ecosystems_cli.constants import (
     DEFAULT_OUTPUT_FORMAT,
     DEFAULT_TIMEOUT,
@@ -96,6 +97,7 @@ COMMAND_REGISTRY = {
     "issues": issues,
     "packages": packages,
     "repos": repos,
+    "timeline": timeline,
 }
 
 # Register all high-level commands dynamically from the registry
