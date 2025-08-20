@@ -100,3 +100,57 @@ class TestAdvisoriesCommands:
 
         assert result.exit_code == 0
         mock_print_error.assert_called_once_with("Unexpected error: Advisory not found", console=mock.ANY)
+
+    @mock.patch("ecosystems_cli.commands.execution.get_client")
+    @mock.patch("ecosystems_cli.commands.execution.print_output")
+    def test_lookup_advisories_by_purl(self, mock_print_output, mock_get_client):
+        """Test looking up advisories by Package URL (PURL)."""
+        mock_client = mock.MagicMock()
+        mock_client.call.return_value = [
+            {
+                "uuid": "adv-123",
+                "title": "Lodash Prototype Pollution",
+                "severity": "high",
+                "cvss_score": 7.4,
+                "packages": [
+                    {
+                        "ecosystem": "npm",
+                        "package_name": "lodash",
+                        "purl": "pkg:npm/lodash",
+                        "affected_versions": ["< 4.17.21"],
+                        "unaffected_versions": [">= 4.17.21"],
+                    }
+                ],
+            }
+        ]
+        mock_get_client.return_value = mock_client
+
+        result = self.runner.invoke(
+            self.advisories_group,
+            ["lookup_advisories_by_purl", "--purl", "pkg:npm/lodash@4.17.20"],
+            obj={"timeout": 20, "format": "json"},
+        )
+
+        assert result.exit_code == 0
+        mock_get_client.assert_called_once_with("advisories", base_url=None, timeout=20)
+        mock_client.call.assert_called_once_with(
+            "lookupAdvisoriesByPurl",
+            path_params={},
+            query_params={"purl": "pkg:npm/lodash@4.17.20"},
+        )
+        mock_print_output.assert_called_once()
+
+    @mock.patch("ecosystems_cli.commands.execution.get_client")
+    @mock.patch("ecosystems_cli.commands.execution.print_error")
+    def test_lookup_advisories_by_purl_invalid(self, mock_print_error, mock_get_client):
+        """Test error handling for invalid PURL in lookup."""
+        mock_client = mock.MagicMock()
+        mock_client.call.side_effect = Exception("Invalid PURL format")
+        mock_get_client.return_value = mock_client
+
+        result = self.runner.invoke(
+            self.advisories_group, ["lookup_advisories_by_purl", "--purl", "invalid-purl"], obj={"timeout": 20}
+        )
+
+        assert result.exit_code == 0
+        mock_print_error.assert_called_once_with("Unexpected error: Invalid PURL format", console=mock.ANY)
