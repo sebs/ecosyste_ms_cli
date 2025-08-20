@@ -19,25 +19,41 @@ class AdvisoriesOperationHandler(OperationHandler):
         Returns:
             Tuple of (path_params, query_params)
         """
+        handlers = {
+            "getAdvisory": self._handle_get_advisory,
+            "getAdvisories": self._handle_query_params,
+            "getAdvisoriesPackages": self._handle_no_params,
+            "lookupAdvisoriesByPurl": self._handle_query_params,
+        }
+
+        handler = handlers.get(operation_id, self._handle_default)
+        return handler(args, kwargs)
+
+    def _handle_get_advisory(self, args: tuple, kwargs: dict) -> Tuple[Dict[str, Any], Dict[str, Any]]:
+        """Handle getAdvisory operation parameters."""
         path_params = {}
-        query_params = {}
 
-        if operation_id == "getAdvisory":
-            # The advisory UUID is a path parameter
-            if args:
-                path_params["advisoryUUID"] = args[0]
-            elif "advisoryUUID" in kwargs:
-                path_params["advisoryUUID"] = kwargs.pop("advisoryUUID")
-            elif "advisoryuuid" in kwargs:
-                # Handle lowercased version from click
-                path_params["advisoryUUID"] = kwargs.pop("advisoryuuid")
-        elif operation_id == "getAdvisories":
-            # All parameters are query parameters
-            for key, value in kwargs.items():
-                if value is not None:
-                    query_params[key] = value
-        elif operation_id == "getAdvisoriesPackages":
-            # No parameters for this operation
-            pass
+        if args:
+            path_params["advisoryUUID"] = args[0]
+        else:
+            advisory_uuid = kwargs.pop("advisoryUUID", None) or kwargs.pop("advisoryuuid", None)
+            if advisory_uuid:
+                path_params["advisoryUUID"] = advisory_uuid
 
-        return path_params, query_params
+        return path_params, {}
+
+    def _handle_query_params(self, args: tuple, kwargs: dict) -> Tuple[Dict[str, Any], Dict[str, Any]]:
+        """Handle operations that only have query parameters."""
+        _ = args  # Unused but required for consistent interface
+        query_params = {key: value for key, value in kwargs.items() if value is not None}
+        return {}, query_params
+
+    def _handle_no_params(self, args: tuple, kwargs: dict) -> Tuple[Dict[str, Any], Dict[str, Any]]:
+        """Handle operations with no parameters."""
+        _ = args, kwargs  # Unused but required for consistent interface
+        return {}, {}
+
+    def _handle_default(self, args: tuple, kwargs: dict) -> Tuple[Dict[str, Any], Dict[str, Any]]:
+        """Default handler for unknown operations."""
+        _ = args, kwargs  # Unused but required for consistent interface
+        return {}, {}
