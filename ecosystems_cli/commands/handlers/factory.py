@@ -5,6 +5,7 @@ from typing import Dict, Type
 from .advisories import AdvisoriesOperationHandler
 from .archives import ArchivesOperationHandler
 from .base import OperationHandler
+from .commits import CommitsOperationHandler
 from .default import DefaultOperationHandler
 from .issues import IssuesOperationHandler
 from .packages import PackagesOperationHandler
@@ -18,6 +19,7 @@ class OperationHandlerFactory:
 
     _handlers: Dict[str, Type[OperationHandler]] = {
         "advisories": AdvisoriesOperationHandler,
+        "commits": CommitsOperationHandler,
         "issues": IssuesOperationHandler,
         "packages": PackagesOperationHandler,
         "repos": ReposOperationHandler,
