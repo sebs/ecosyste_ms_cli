@@ -11,6 +11,7 @@ from .issues import IssuesOperationHandler
 from .packages import PackagesOperationHandler
 from .repos import ReposOperationHandler
 from .resolver import ResolverOperationHandler
+from .sponsors import SponsorsOperationHandler
 from .timeline import TimelineOperationHandler
 
 
@@ -25,6 +26,7 @@ class OperationHandlerFactory:
         "repos": ReposOperationHandler,
         "resolver": ResolverOperationHandler,
         "archives": ArchivesOperationHandler,
+        "sponsors": SponsorsOperationHandler,
         "timeline": TimelineOperationHandler,
     }
 
