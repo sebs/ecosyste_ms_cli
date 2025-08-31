@@ -23,7 +23,7 @@ setup(
         "mcp",
     ],
     extras_require={
-        "dev": ["pytest", "black", "isort", "flake8", "bandit", "complexipy"],
+        "dev": ["pytest", "pytest-asyncio", "black", "isort", "flake8", "bandit", "complexipy"],
     },
     entry_points={
         "console_scripts": [
