@@ -14,6 +14,7 @@ from ecosystems_cli.commands.issues import issues
 from ecosystems_cli.commands.mcp import mcp
 from ecosystems_cli.commands.packages import packages
 from ecosystems_cli.commands.repos import repos
+from ecosystems_cli.commands.sponsors import sponsors
 from ecosystems_cli.commands.timeline import timeline
 from ecosystems_cli.constants import (
     DEFAULT_OUTPUT_FORMAT,
@@ -99,6 +100,7 @@ COMMAND_REGISTRY = {
     "issues": issues,
     "packages": packages,
     "repos": repos,
+    "sponsors": sponsors,
     "timeline": timeline,
 }
 
