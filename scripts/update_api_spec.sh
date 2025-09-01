@@ -10,3 +10,5 @@ curl -sL https://sponsors.ecosyste.ms/docs/api/v1/openapi.yaml > apis/sponsors.o
 curl -sL https://docker.ecosyste.ms/docs/api/v1/openapi.yaml > apis/docker.openapi.yaml
 
 curl -sL https://opencollective.ecosyste.ms/docs/api/v1/openapi.yaml > apis/opencollective.openapi.yaml
+
+curl -sL https://dependabot.ecosyste.ms/docs/api/v1/openapi.yaml > apis/dependabot.openapi.yaml

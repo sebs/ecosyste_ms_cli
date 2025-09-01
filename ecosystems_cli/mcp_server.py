@@ -24,7 +24,17 @@ class EcosystemsMCPServer:
 
     def __init__(self):
         self.server = Server("ecosystems-cli")
-        self.apis = ["advisories", "repos", "packages", "issues", "sponsors", "timeline", "docker", "opencollective"]
+        self.apis = [
+            "advisories",
+            "dependabot",
+            "repos",
+            "packages",
+            "issues",
+            "sponsors",
+            "timeline",
+            "docker",
+            "opencollective",
+        ]
         self._register_handlers()
 
     def _register_handlers(self):

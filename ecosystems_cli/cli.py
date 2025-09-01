@@ -10,6 +10,7 @@ from rich.panel import Panel
 from ecosystems_cli.api_client import get_client
 from ecosystems_cli.commands.advisories import advisories
 from ecosystems_cli.commands.commits import commits
+from ecosystems_cli.commands.dependabot import dependabot
 from ecosystems_cli.commands.docker import docker
 from ecosystems_cli.commands.issues import issues
 from ecosystems_cli.commands.mcp import mcp
@@ -99,6 +100,7 @@ def main(ctx, timeout, format, domain, install_completion):
 COMMAND_REGISTRY = {
     "advisories": advisories,
     "commits": commits,
+    "dependabot": dependabot,
     "docker": docker,
     "issues": issues,
     "opencollective": opencollective,
