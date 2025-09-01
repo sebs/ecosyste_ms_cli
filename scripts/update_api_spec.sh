@@ -7,3 +7,4 @@ curl -sL https://timeline.ecosyste.ms/docs/api/v1/openapi.yaml > apis/timeline.o
 curl -sL https://commits.ecosyste.ms/docs/api/v1/openapi.yaml > apis/commits.openapi.yaml
 curl -sL https://issues.ecosyste.ms/docs/api/v1/openapi.yaml > apis/issues.openapi.yaml
 curl -sL https://sponsors.ecosyste.ms/docs/api/v1/openapi.yaml > apis/sponsors.openapi.yaml
+curl -sL https://docker.ecosyste.ms/docs/api/v1/openapi.yaml > apis/docker.openapi.yaml
