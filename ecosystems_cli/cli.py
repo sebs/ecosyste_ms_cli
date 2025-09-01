@@ -13,6 +13,7 @@ from ecosystems_cli.commands.commits import commits
 from ecosystems_cli.commands.docker import docker
 from ecosystems_cli.commands.issues import issues
 from ecosystems_cli.commands.mcp import mcp
+from ecosystems_cli.commands.opencollective import opencollective
 from ecosystems_cli.commands.packages import packages
 from ecosystems_cli.commands.repos import repos
 from ecosystems_cli.commands.sponsors import sponsors
@@ -100,6 +101,7 @@ COMMAND_REGISTRY = {
     "commits": commits,
     "docker": docker,
     "issues": issues,
+    "opencollective": opencollective,
     "packages": packages,
     "repos": repos,
     "sponsors": sponsors,

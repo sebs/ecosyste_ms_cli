@@ -59,7 +59,8 @@ class TestEcosystemsMCPServer:
         """Test that MCP server initializes correctly."""
         assert mcp_server.server is not None
         assert mcp_server.server.name == "ecosystems-cli"
-        assert mcp_server.apis == ["advisories", "repos", "packages", "issues", "sponsors", "timeline", "docker"]
+        expected_apis = ["advisories", "repos", "packages", "issues", "sponsors", "timeline", "docker", "opencollective"]
+        assert mcp_server.apis == expected_apis
 
     @pytest.mark.asyncio
     @patch("ecosystems_cli.mcp_server.load_api_spec")
