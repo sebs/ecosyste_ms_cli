@@ -70,6 +70,7 @@ class TestEcosystemsMCPServer:
             "docker",
             "opencollective",
             "parser",
+            "resolve",
         ]
         assert mcp_server.apis == expected_apis
 
