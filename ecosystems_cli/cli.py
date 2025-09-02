@@ -18,6 +18,7 @@ from ecosystems_cli.commands.opencollective import opencollective
 from ecosystems_cli.commands.packages import packages
 from ecosystems_cli.commands.parser import parser
 from ecosystems_cli.commands.repos import repos
+from ecosystems_cli.commands.resolve import resolve
 from ecosystems_cli.commands.sponsors import sponsors
 from ecosystems_cli.commands.timeline import timeline
 from ecosystems_cli.constants import (
@@ -108,6 +109,7 @@ COMMAND_REGISTRY = {
     "packages": packages,
     "parser": parser,
     "repos": repos,
+    "resolve": resolve,
     "sponsors": sponsors,
     "timeline": timeline,
 }

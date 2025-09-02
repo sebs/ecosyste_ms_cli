@@ -35,6 +35,7 @@ class EcosystemsMCPServer:
             "docker",
             "opencollective",
             "parser",
+            "resolve",
         ]
         self._register_handlers()
 
