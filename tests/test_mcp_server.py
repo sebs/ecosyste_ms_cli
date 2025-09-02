@@ -65,6 +65,7 @@ class TestEcosystemsMCPServer:
             "repos",
             "packages",
             "issues",
+            "licenses",
             "sponsors",
             "timeline",
             "docker",

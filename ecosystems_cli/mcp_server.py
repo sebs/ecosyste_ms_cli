@@ -30,6 +30,7 @@ class EcosystemsMCPServer:
             "repos",
             "packages",
             "issues",
+            "licenses",
             "sponsors",
             "timeline",
             "docker",
