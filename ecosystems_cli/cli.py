@@ -13,6 +13,7 @@ from ecosystems_cli.commands.commits import commits
 from ecosystems_cli.commands.dependabot import dependabot
 from ecosystems_cli.commands.docker import docker
 from ecosystems_cli.commands.issues import issues
+from ecosystems_cli.commands.licenses import licenses
 from ecosystems_cli.commands.mcp import mcp
 from ecosystems_cli.commands.opencollective import opencollective
 from ecosystems_cli.commands.packages import packages
@@ -106,6 +107,7 @@ COMMAND_REGISTRY = {
     "dependabot": dependabot,
     "docker": docker,
     "issues": issues,
+    "licenses": licenses,
     "opencollective": opencollective,
     "packages": packages,
     "parser": parser,
