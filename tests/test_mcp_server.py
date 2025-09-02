@@ -69,6 +69,7 @@ class TestEcosystemsMCPServer:
             "timeline",
             "docker",
             "opencollective",
+            "parser",
         ]
         assert mcp_server.apis == expected_apis
 
