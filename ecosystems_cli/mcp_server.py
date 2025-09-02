@@ -26,6 +26,7 @@ class EcosystemsMCPServer:
         self.server = Server("ecosystems-cli")
         self.apis = [
             "advisories",
+            "archives",
             "dependabot",
             "repos",
             "packages",

@@ -61,6 +61,7 @@ class TestEcosystemsMCPServer:
         assert mcp_server.server.name == "ecosystems-cli"
         expected_apis = [
             "advisories",
+            "archives",
             "dependabot",
             "repos",
             "packages",
