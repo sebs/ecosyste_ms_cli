@@ -17,3 +17,5 @@ curl -sL https://sbom.ecosyste.ms/docs/api/v1/openapi.yaml > apis/sbom.openapi.y
 curl -sL https://licenses.ecosyste.ms/docs/api/v1/openapi.yaml > apis/licenses.openapi.yaml
 curl -sL https://archives.ecosyste.ms/docs/api/v1/openapi.yaml > apis/archives.openapi.yaml
 curl -sL https://diff.ecosyste.ms/docs/api/v1/openapi.yaml > apis/diff.openapi.yaml
+curl -sL https://diff.ecosyste.ms/docs/api/v1/openapi.yaml > apis/diff.openapi.yaml
+curl -sL https://summary.ecosyste.ms/docs/api/v1/openapi.yaml > apis/summary.openapi.yaml

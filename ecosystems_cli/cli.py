@@ -24,6 +24,7 @@ from ecosystems_cli.commands.repos import repos
 from ecosystems_cli.commands.resolve import resolve
 from ecosystems_cli.commands.sbom import sbom
 from ecosystems_cli.commands.sponsors import sponsors
+from ecosystems_cli.commands.summary import summary
 from ecosystems_cli.commands.timeline import timeline
 from ecosystems_cli.constants import (
     DEFAULT_OUTPUT_FORMAT,
@@ -119,6 +120,7 @@ COMMAND_REGISTRY = {
     "resolve": resolve,
     "sbom": sbom,
     "sponsors": sponsors,
+    "summary": summary,
     "timeline": timeline,
 }
 
