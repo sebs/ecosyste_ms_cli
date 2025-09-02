@@ -28,6 +28,7 @@ class EcosystemsMCPServer:
             "advisories",
             "archives",
             "dependabot",
+            "diff",
             "repos",
             "packages",
             "issues",
