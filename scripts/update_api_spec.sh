@@ -14,3 +14,4 @@ curl -sL https://dependabot.ecosyste.ms/docs/api/v1/openapi.yaml > apis/dependab
 curl -sL https://parser.ecosyste.ms/docs/api/v1/openapi.yaml > apis/parser.openapi.yaml
 curl -sL https://resolve.ecosyste.ms/docs/api/v1/openapi.yaml > apis/resolve.openapi.yaml
 curl -sL https://sbom.ecosyste.ms/docs/api/v1/openapi.yaml > apis/sbom.openapi.yaml
+curl -sL https://licenses.ecosyste.ms/docs/api/v1/openapi.yaml > apis/licenses.openapi.yaml

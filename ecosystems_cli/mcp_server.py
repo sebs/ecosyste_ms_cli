@@ -36,6 +36,7 @@ class EcosystemsMCPServer:
             "opencollective",
             "parser",
             "resolve",
+            "sbom",
         ]
         self._register_handlers()
 

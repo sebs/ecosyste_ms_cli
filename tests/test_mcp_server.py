@@ -71,6 +71,7 @@ class TestEcosystemsMCPServer:
             "opencollective",
             "parser",
             "resolve",
+            "sbom",
         ]
         assert mcp_server.apis == expected_apis
 
