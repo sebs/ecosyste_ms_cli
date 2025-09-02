@@ -12,6 +12,7 @@ from ecosystems_cli.commands.advisories import advisories
 from ecosystems_cli.commands.archives import archives
 from ecosystems_cli.commands.commits import commits
 from ecosystems_cli.commands.dependabot import dependabot
+from ecosystems_cli.commands.diff import diff
 from ecosystems_cli.commands.docker import docker
 from ecosystems_cli.commands.issues import issues
 from ecosystems_cli.commands.licenses import licenses
@@ -107,6 +108,7 @@ COMMAND_REGISTRY = {
     "archives": archives,
     "commits": commits,
     "dependabot": dependabot,
+    "diff": diff,
     "docker": docker,
     "issues": issues,
     "licenses": licenses,

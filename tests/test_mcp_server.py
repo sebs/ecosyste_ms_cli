@@ -63,6 +63,7 @@ class TestEcosystemsMCPServer:
             "advisories",
             "archives",
             "dependabot",
+            "diff",
             "repos",
             "packages",
             "issues",
