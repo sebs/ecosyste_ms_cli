@@ -8,7 +8,8 @@ curl -sL https://commits.ecosyste.ms/docs/api/v1/openapi.yaml > apis/commits.ope
 curl -sL https://issues.ecosyste.ms/docs/api/v1/openapi.yaml > apis/issues.openapi.yaml
 curl -sL https://sponsors.ecosyste.ms/docs/api/v1/openapi.yaml > apis/sponsors.openapi.yaml
 curl -sL https://docker.ecosyste.ms/docs/api/v1/openapi.yaml > apis/docker.openapi.yaml
-
 curl -sL https://opencollective.ecosyste.ms/docs/api/v1/openapi.yaml > apis/opencollective.openapi.yaml
-
 curl -sL https://dependabot.ecosyste.ms/docs/api/v1/openapi.yaml > apis/dependabot.openapi.yaml
+
+curl -sL https://parser.ecosyste.ms/docs/api/v1/openapi.yaml > apis/parser.openapi.yaml
+curl -sL https://resolve.ecosyste.ms/docs/api/v1/openapi.yaml > apis/resolve.openapi.yaml

@@ -34,6 +34,7 @@ class EcosystemsMCPServer:
             "timeline",
             "docker",
             "opencollective",
+            "parser",
         ]
         self._register_handlers()
 

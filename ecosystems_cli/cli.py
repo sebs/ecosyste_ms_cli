@@ -16,6 +16,7 @@ from ecosystems_cli.commands.issues import issues
 from ecosystems_cli.commands.mcp import mcp
 from ecosystems_cli.commands.opencollective import opencollective
 from ecosystems_cli.commands.packages import packages
+from ecosystems_cli.commands.parser import parser
 from ecosystems_cli.commands.repos import repos
 from ecosystems_cli.commands.sponsors import sponsors
 from ecosystems_cli.commands.timeline import timeline
@@ -105,6 +106,7 @@ COMMAND_REGISTRY = {
     "issues": issues,
     "opencollective": opencollective,
     "packages": packages,
+    "parser": parser,
     "repos": repos,
     "sponsors": sponsors,
     "timeline": timeline,
