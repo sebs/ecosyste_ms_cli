@@ -7,11 +7,19 @@ from .archives import ArchivesOperationHandler
 from .base import OperationHandler
 from .commits import CommitsOperationHandler
 from .default import DefaultOperationHandler
+from .dependabot import DependabotOperationHandler
+from .diff import DiffOperationHandler
+from .docker import DockerOperationHandler
 from .issues import IssuesOperationHandler
+from .licenses import LicensesOperationHandler
+from .opencollective import OpenCollectiveOperationHandler
 from .packages import PackagesOperationHandler
+from .parser import ParserOperationHandler
 from .repos import ReposOperationHandler
-from .resolver import ResolverOperationHandler
+from .resolve import ResolveOperationHandler
+from .sbom import SbomOperationHandler
 from .sponsors import SponsorsOperationHandler
+from .summary import SummaryOperationHandler
 from .timeline import TimelineOperationHandler
 
 
@@ -20,13 +28,21 @@ class OperationHandlerFactory:
 
     _handlers: Dict[str, Type[OperationHandler]] = {
         "advisories": AdvisoriesOperationHandler,
-        "commits": CommitsOperationHandler,
-        "issues": IssuesOperationHandler,
-        "packages": PackagesOperationHandler,
-        "repos": ReposOperationHandler,
-        "resolver": ResolverOperationHandler,
         "archives": ArchivesOperationHandler,
+        "commits": CommitsOperationHandler,
+        "dependabot": DependabotOperationHandler,
+        "diff": DiffOperationHandler,
+        "docker": DockerOperationHandler,
+        "issues": IssuesOperationHandler,
+        "licenses": LicensesOperationHandler,
+        "opencollective": OpenCollectiveOperationHandler,
+        "packages": PackagesOperationHandler,
+        "parser": ParserOperationHandler,
+        "repos": ReposOperationHandler,
+        "resolve": ResolveOperationHandler,
+        "sbom": SbomOperationHandler,
         "sponsors": SponsorsOperationHandler,
+        "summary": SummaryOperationHandler,
         "timeline": TimelineOperationHandler,
     }
 
