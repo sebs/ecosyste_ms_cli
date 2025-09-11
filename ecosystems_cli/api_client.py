@@ -1,5 +1,6 @@
 """API client for ecosystems CLI using requests."""
 
+from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
 import requests
@@ -15,6 +16,7 @@ from ecosystems_cli.exceptions import (
     APIConnectionError,
     APIHTTPError,
     APINotFoundError,
+    APIRateLimitError,
     APIServerError,
     APITimeoutError,
     InvalidAPIError,
@@ -65,6 +67,41 @@ class APIClient:
     def _build_url(self, path: str, path_params: Dict[str, Any]) -> str:
         """Build URL with path parameters (delegated to helper)."""
         return build_url(self.base_url, path, path_params)
+
+    def _parse_rate_limit_headers(self, response: requests.Response) -> Dict[str, Any]:
+        """Parse rate limiting headers from HTTP response."""
+        headers = response.headers
+        rate_limit_info = {}
+
+        # Parse X-RateLimit-* headers
+        if "X-RateLimit-Limit" in headers:
+            try:
+                rate_limit_info["limit"] = int(headers["X-RateLimit-Limit"])
+            except ValueError:
+                pass
+
+        if "X-RateLimit-Remaining" in headers:
+            try:
+                rate_limit_info["remaining"] = int(headers["X-RateLimit-Remaining"])
+            except ValueError:
+                pass
+
+        if "X-RateLimit-Reset" in headers:
+            try:
+                reset_timestamp = int(headers["X-RateLimit-Reset"])
+                reset_datetime = datetime.fromtimestamp(reset_timestamp, tz=timezone.utc)
+                rate_limit_info["reset_time"] = reset_datetime.strftime("%Y-%m-%d %H:%M:%S UTC")
+            except (ValueError, OSError):
+                pass
+
+        # Parse Retry-After header (standard HTTP header)
+        if "Retry-After" in headers:
+            try:
+                rate_limit_info["retry_after"] = int(headers["Retry-After"])
+            except ValueError:
+                pass
+
+        return rate_limit_info
 
     def _make_request(
         self,
@@ -118,6 +155,15 @@ class APIClient:
                 raise APIAuthenticationError(str(error_msg))
             elif response.status_code == 404:
                 raise APINotFoundError(str(error_msg))
+            elif response.status_code == 429:
+                # Handle rate limiting
+                rate_limit_info = self._parse_rate_limit_headers(response)
+                raise APIRateLimitError(
+                    limit=rate_limit_info.get("limit"),
+                    remaining=rate_limit_info.get("remaining"),
+                    reset_time=rate_limit_info.get("reset_time"),
+                    retry_after=rate_limit_info.get("retry_after"),
+                )
             elif response.status_code >= 500:
                 # Include URL in server error for better debugging
                 msg = f"Server error at {url}"

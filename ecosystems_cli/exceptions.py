@@ -54,6 +54,29 @@ class APIServerError(APIHTTPError):
         super().__init__(status_code, message or f"Server error (HTTP {status_code})")
 
 
+class APIRateLimitError(APIHTTPError):
+    """Raised when API rate limit is exceeded (429)."""
+
+    def __init__(self, limit: int = None, remaining: int = None, reset_time: str = None, retry_after: int = None):
+        self.limit = limit
+        self.remaining = remaining
+        self.reset_time = reset_time
+        self.retry_after = retry_after
+
+        message = "Rate limit exceeded."
+        if limit is not None:
+            message += f"\nLimit: {limit} requests per window"
+        if remaining is not None:
+            message += f"\nRemaining: {remaining} requests"
+        if reset_time:
+            message += f"\nReset: {reset_time}"
+        if retry_after is not None:
+            message += f"\nRetry after: {retry_after} seconds"
+        message += "\nPlease wait before retrying."
+
+        super().__init__(429, message)
+
+
 class ConfigurationError(EcosystemsCLIError):
     """Base exception for configuration-related errors."""
 

@@ -11,6 +11,7 @@ from ecosystems_cli.exceptions import (
     APIAuthenticationError,
     APIHTTPError,
     APINotFoundError,
+    APIRateLimitError,
     APIServerError,
 )
 
@@ -320,6 +321,146 @@ class TestAPIClient:
 
         assert "Bad request" in str(exc_info.value)
         assert exc_info.value.status_code == 400
+
+    @mock.patch("requests.request")
+    def test_rate_limit_error_with_all_headers(self, mock_request, monkeypatch, mock_spec):
+        """Test that 429 errors are handled properly with all rate limit headers."""
+        # Arrange
+        mock_open = mock.mock_open(read_data=yaml.dump(mock_spec))
+        monkeypatch.setattr("builtins.open", mock_open)
+        monkeypatch.setattr(Path, "exists", lambda self: True)
+        client = APIClient("test")
+
+        mock_response = mock.Mock()
+        mock_response.raise_for_status.side_effect = pytest.importorskip("requests").exceptions.HTTPError()
+        mock_response.status_code = 429
+        mock_response.json.return_value = {"error": "Too Many Requests"}
+        mock_response.headers = {
+            "X-RateLimit-Limit": "1000",
+            "X-RateLimit-Remaining": "0",
+            "X-RateLimit-Reset": "1735128000",  # 2024-12-25 12:00:00 UTC
+            "Retry-After": "3600",
+        }
+        mock_request.return_value = mock_response
+
+        # Act & Assert
+        with pytest.raises(APIRateLimitError) as exc_info:
+            client._make_request("get", "/test")
+
+        error = exc_info.value
+        assert error.status_code == 429
+        assert error.limit == 1000
+        assert error.remaining == 0
+        assert error.retry_after == 3600
+        assert "2024-12-25 12:00:00 UTC" in error.reset_time
+        assert "Rate limit exceeded" in str(error)
+        assert "1000 requests per window" in str(error)
+        assert "0 requests" in str(error)
+        assert "3600 seconds" in str(error)
+
+    @mock.patch("requests.request")
+    def test_rate_limit_error_with_minimal_headers(self, mock_request, monkeypatch, mock_spec):
+        """Test that 429 errors work with minimal headers."""
+        # Arrange
+        mock_open = mock.mock_open(read_data=yaml.dump(mock_spec))
+        monkeypatch.setattr("builtins.open", mock_open)
+        monkeypatch.setattr(Path, "exists", lambda self: True)
+        client = APIClient("test")
+
+        mock_response = mock.Mock()
+        mock_response.raise_for_status.side_effect = pytest.importorskip("requests").exceptions.HTTPError()
+        mock_response.status_code = 429
+        mock_response.json.return_value = {"error": "Too Many Requests"}
+        mock_response.headers = {}  # No rate limit headers
+        mock_request.return_value = mock_response
+
+        # Act & Assert
+        with pytest.raises(APIRateLimitError) as exc_info:
+            client._make_request("get", "/test")
+
+        error = exc_info.value
+        assert error.status_code == 429
+        assert error.limit is None
+        assert error.remaining is None
+        assert error.retry_after is None
+        assert error.reset_time is None
+        assert "Rate limit exceeded" in str(error)
+        assert "Please wait before retrying" in str(error)
+
+    @mock.patch("requests.request")
+    def test_rate_limit_error_with_invalid_headers(self, mock_request, monkeypatch, mock_spec):
+        """Test that 429 errors handle invalid header values gracefully."""
+        # Arrange
+        mock_open = mock.mock_open(read_data=yaml.dump(mock_spec))
+        monkeypatch.setattr("builtins.open", mock_open)
+        monkeypatch.setattr(Path, "exists", lambda self: True)
+        client = APIClient("test")
+
+        mock_response = mock.Mock()
+        mock_response.raise_for_status.side_effect = pytest.importorskip("requests").exceptions.HTTPError()
+        mock_response.status_code = 429
+        mock_response.json.return_value = {"error": "Too Many Requests"}
+        mock_response.headers = {
+            "X-RateLimit-Limit": "invalid",  # Invalid integer
+            "X-RateLimit-Remaining": "also-invalid",  # Invalid integer
+            "X-RateLimit-Reset": "not-a-timestamp",  # Invalid timestamp
+            "Retry-After": "not-a-number",  # Invalid integer
+        }
+        mock_request.return_value = mock_response
+
+        # Act & Assert
+        with pytest.raises(APIRateLimitError) as exc_info:
+            client._make_request("get", "/test")
+
+        error = exc_info.value
+        assert error.status_code == 429
+        assert error.limit is None  # Should be None due to invalid value
+        assert error.remaining is None  # Should be None due to invalid value
+        assert error.retry_after is None  # Should be None due to invalid value
+        assert error.reset_time is None  # Should be None due to invalid value
+        assert "Rate limit exceeded" in str(error)
+
+    def test_parse_rate_limit_headers_valid(self, monkeypatch, mock_spec):
+        """Test parsing valid rate limit headers."""
+        # Arrange
+        mock_open = mock.mock_open(read_data=yaml.dump(mock_spec))
+        monkeypatch.setattr("builtins.open", mock_open)
+        monkeypatch.setattr(Path, "exists", lambda self: True)
+        client = APIClient("test")
+
+        mock_response = mock.Mock()
+        mock_response.headers = {
+            "X-RateLimit-Limit": "1000",
+            "X-RateLimit-Remaining": "500",
+            "X-RateLimit-Reset": "1735128000",  # 2024-12-25 12:00:00 UTC
+            "Retry-After": "3600",
+        }
+
+        # Act
+        result = client._parse_rate_limit_headers(mock_response)
+
+        # Assert
+        assert result["limit"] == 1000
+        assert result["remaining"] == 500
+        assert "2024-12-25 12:00:00 UTC" in result["reset_time"]
+        assert result["retry_after"] == 3600
+
+    def test_parse_rate_limit_headers_empty(self, monkeypatch, mock_spec):
+        """Test parsing when no rate limit headers are present."""
+        # Arrange
+        mock_open = mock.mock_open(read_data=yaml.dump(mock_spec))
+        monkeypatch.setattr("builtins.open", mock_open)
+        monkeypatch.setattr(Path, "exists", lambda self: True)
+        client = APIClient("test")
+
+        mock_response = mock.Mock()
+        mock_response.headers = {}
+
+        # Act
+        result = client._parse_rate_limit_headers(mock_response)
+
+        # Assert
+        assert result == {}
 
 
 def test_get_client():
