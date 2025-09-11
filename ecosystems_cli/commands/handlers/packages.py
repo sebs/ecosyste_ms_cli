@@ -8,6 +8,30 @@ from .base import OperationHandler
 class PackagesOperationHandler(OperationHandler):
     """Handler for packages API operations."""
 
+    # CLI parameter names
+    CLI_PARAM_KEYWORD_NAME = "keywordname"
+    CLI_PARAM_REGISTRY_NAME = "registryname"
+    CLI_PARAM_MAINTAINER_LOGIN_UUID = "maintainerloginoruuid"
+    CLI_PARAM_NAMESPACE_NAME = "namespacename"
+    CLI_PARAM_PACKAGE_NAME = "packagename"
+    CLI_PARAM_VERSION_NUMBER = "versionnumber"
+
+    # OpenAPI parameter names
+    API_PARAM_KEYWORD_NAME = "keywordName"
+    API_PARAM_REGISTRY_NAME = "registryName"
+    API_PARAM_MAINTAINER_LOGIN_UUID = "MaintainerLoginOrUUID"
+    API_PARAM_NAMESPACE_NAME = "namespaceName"
+    API_PARAM_PACKAGE_NAME = "packageName"
+    API_PARAM_VERSION_NUMBER = "versionNumber"
+
+    def _extract_param(self, kwargs: dict, cli_name: str, api_name: str) -> str | None:
+        """Extract parameter from kwargs, trying both CLI and API names."""
+        if api_name in kwargs:
+            return kwargs.pop(api_name)
+        elif cli_name in kwargs:
+            return kwargs.pop(cli_name)
+        return None
+
     def build_params(self, operation_id: str, args: tuple, kwargs: dict) -> Tuple[Dict[str, Any], Dict[str, Any]]:
         """Build parameters for packages API operations.
 
@@ -26,30 +50,29 @@ class PackagesOperationHandler(OperationHandler):
         if operation_id == "getKeyword":
             # The keyword name is a path parameter
             if args:
-                path_params["keywordName"] = args[0]
-            elif "keywordName" in kwargs:
-                path_params["keywordName"] = kwargs.pop("keywordName")
-            elif "keywordname" in kwargs:
-                # Handle lowercased version from click
-                path_params["keywordName"] = kwargs.pop("keywordname")
+                path_params[self.API_PARAM_KEYWORD_NAME] = args[0]
+            else:
+                keyword_name = self._extract_param(kwargs, self.CLI_PARAM_KEYWORD_NAME, self.API_PARAM_KEYWORD_NAME)
+                if keyword_name:
+                    path_params[self.API_PARAM_KEYWORD_NAME] = keyword_name
 
         elif operation_id == "getRegistry":
             # The registry name is a path parameter
             if args:
-                path_params["registryName"] = args[0]
-            elif "registryName" in kwargs:
-                path_params["registryName"] = kwargs.pop("registryName")
-            elif "registryname" in kwargs:
-                path_params["registryName"] = kwargs.pop("registryname")
+                path_params[self.API_PARAM_REGISTRY_NAME] = args[0]
+            else:
+                registry_name = self._extract_param(kwargs, self.CLI_PARAM_REGISTRY_NAME, self.API_PARAM_REGISTRY_NAME)
+                if registry_name:
+                    path_params[self.API_PARAM_REGISTRY_NAME] = registry_name
 
         elif operation_id == "lookupRegistryPackage":
             # Registry name is a path parameter
             if args:
-                path_params["registryName"] = args[0]
-            elif "registryName" in kwargs:
-                path_params["registryName"] = kwargs.pop("registryName")
-            elif "registryname" in kwargs:
-                path_params["registryName"] = kwargs.pop("registryname")
+                path_params[self.API_PARAM_REGISTRY_NAME] = args[0]
+            else:
+                registry_name = self._extract_param(kwargs, self.CLI_PARAM_REGISTRY_NAME, self.API_PARAM_REGISTRY_NAME)
+                if registry_name:
+                    path_params[self.API_PARAM_REGISTRY_NAME] = registry_name
 
         elif operation_id == "getRegistryMaintainers":
             # Registry name is a path parameter

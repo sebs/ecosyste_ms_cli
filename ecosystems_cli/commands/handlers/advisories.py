@@ -8,6 +8,11 @@ from .base import OperationHandler
 class AdvisoriesOperationHandler(OperationHandler):
     """Handler for advisories API operations."""
 
+    # CLI parameter names
+    CLI_PARAM_ADVISORY_UUID = "advisoryuuid"
+    # OpenAPI parameter names
+    API_PARAM_ADVISORY_UUID = "advisoryUUID"
+
     def build_params(self, operation_id: str, args: tuple, kwargs: dict) -> Tuple[Dict[str, Any], Dict[str, Any]]:
         """Build parameters for advisories API operations.
 
@@ -33,12 +38,9 @@ class AdvisoriesOperationHandler(OperationHandler):
         """Handle getAdvisory operation parameters."""
         path_params = {}
 
-        if args:
-            path_params["advisoryUUID"] = args[0]
-        else:
-            advisory_uuid = kwargs.pop("advisoryUUID", None) or kwargs.pop("advisoryuuid", None)
-            if advisory_uuid:
-                path_params["advisoryUUID"] = advisory_uuid
+        advisory_uuid = args[0] if args else kwargs.pop(self.CLI_PARAM_ADVISORY_UUID, None)
+        if advisory_uuid:
+            path_params[self.API_PARAM_ADVISORY_UUID] = advisory_uuid
 
         return path_params, {}
 
