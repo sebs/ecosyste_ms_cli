@@ -104,14 +104,3 @@ Common types include:
 - `chore`: Changes to the build process or auxiliary tools
 
 Example: `feat(cli): add examples to command help text`
-
-## API Structure
-
-The CLI provides access to four ecosyste.ms APIs:
-
-1. **packages** - Package registry data
-2. **repos** - Repository data
-3. **summary** - Summary data
-4. **awesome** - Awesome lists data
-
-Each API has its own set of operations that can be accessed through convenience commands or the generic `call` command.

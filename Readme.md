@@ -1,7 +1,7 @@
 # Ecosystems CLI
 
-[![Build-Test-Lint](https://github.com/sebs/ecosyste_ms_cli/actions/workflows/build-test-lint.yml/badge.svg)](https://github.com/sebs/ecosyste_ms_cli/actions/workflows/build-test-lint.yml)
-[![Latest Release](https://img.shields.io/github/v/release/sebs/ecosyste_ms_cli)](https://github.com/sebs/ecosyste_ms_cli/releases/latest)
+[![Build-Test-Lint](https://github.com/ecosyste-ms/actions/workflows/build-test-lint.yml/badge.svg)](https://github.com/ecosyste-ms/ecosyste_ms_cli/actions/workflows/build-test-lint.yml)
+[![Latest Release](https://img.shields.io/github/v/release/ecosyste-ms/ecosyste_ms_cli)](https://github.com/ecosyste-ms/ecosyste_ms_cli/releases/latest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 A command-line interface for interacting with ecosyste.ms APIs.
@@ -9,11 +9,11 @@ A command-line interface for interacting with ecosyste.ms APIs.
 ## Installation
 
 Requirements:
-- Python 3.12+
+- Python >= 3.12
 
 ```bash
 # Clone the repository
-git clone git@github.com:sebs/ecosyste_ms_cli.git
+git clone git@github.com:ecosyste-ms/ecosyste_ms_cli.git
 cd ecosyste_ms_cli
 
 # Set up virtual environment and install dependencies
@@ -55,46 +55,27 @@ ecosystems --format jsonl repos topics
 
 ## Available Commands
 
-### Repos API
-- `repos topics` - List all topics
-- `repos topic` - Get a specific topic
-- `repos hosts` - List all repository hosts
-- `repos host` - Get a specific host
-- `repos repository` - Get a specific repository
-- `repos list` - List available operations
-- `repos call` - Call an operation directly
+The CLI provides access to various [ecosyste.ms APIs](https://ecosyste.ms/api). Each command group corresponds to an API endpoint:
 
-### Packages API
-- `packages registries` - List all registries
-- `packages registry` - Get a specific registry
-- `packages package` - Get a specific package
-- `packages version` - Get a specific package version
-- `packages list` - List available operations
-- `packages call` - Call an operation directly
+- **`advisories`** - Security advisories and vulnerability data
+- **`archives`** - Package archive analysis
+- **`commits`** - Repository commit data
+- **`dependabot`** - Dependabot integration data
+- **`diff`** - File and archive comparison
+- **`docker`** - Docker image metadata
+- **`issues`** - Repository issues and pull requests
+- **`licenses`** - License detection and analysis
+- **`opencollective`** - Open Collective funding data
+- **`packages`** - Package registry information
+- **`parser`** - Dependency file parsing
+- **`repos`** - Repository data and metadata
+- **`resolve`** - Dependency resolution
+- **`sbom`** - Software Bill of Materials generation
+- **`sponsors`** - GitHub Sponsors data
+- **`summary`** - Aggregated summaries
+- **`timeline`** - Event timeline data
 
-### Summary API
-- `summary repo` - Get repository summary
-- `summary package` - Get package summary
-- `summary list` - List available operations
-- `summary call` - Call an operation directly
-
-### Awesome API
-- `awesome projects` - List all projects
-- `awesome project` - Get a specific project
-- `awesome lists` - List all lists
-- `awesome list` - Get a specific list
-- `awesome list-projects` - Get projects in a list
-- `awesome topics` - List all topics
-- `awesome topic` - Get a specific topic
-- `awesome operations` - List available operations
-- `awesome call` - Call an operation directly
-
-### Papers API
-- `papers list-papers` - List all papers
-- `papers get` - Get a specific paper by DOI
-- `papers mentions` - List all mentions for a paper
-- `papers list` - List available operations
-- `papers call` - Call an operation directly
+Use `--help` with any command for detailed usage and examples.
 
 ## Examples
 
@@ -103,6 +84,7 @@ ecosystems --format jsonl repos topics
 
 ## Documentation
 
-- [Development Guide](Development.md) - Information about development, testing, and release processes
+- [Development Guide](docs/DEVELOPMENT.md) - Information about development, testing, and release processes
+- [MCP Server](docs/MCP.md) - **[Experimental]** Model Context Protocol server for AI assistants
 - [Changelog](CHANGELOG.md) - History of changes and releases
 - [License](LICENSE) - MIT License details
