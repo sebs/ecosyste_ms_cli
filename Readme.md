@@ -1,6 +1,8 @@
 # Ecosystems CLI
 
-[![Build-Test-Lint](https://github.com/ecosyste-ms/actions/workflows/build-test-lint.yml/badge.svg)](https://github.com/ecosyste-ms/ecosyste_ms_cli/actions/workflows/build-test-lint.yml)
+> The cli is still in a development phase. Some aspects of documentation or dev-x are lacking and some aspects of this software might havew bugs.
+
+[![build-test-lint](https://github.com/ecosyste-ms/ecosyste_ms_cli/actions/workflows/build-test-lint.yml/badge.svg)](https://github.com/ecosyste-ms/ecosyste_ms_cli/actions/workflows/build-test-lint.yml)
 [![Latest Release](https://img.shields.io/github/v/release/ecosyste-ms/ecosyste_ms_cli)](https://github.com/ecosyste-ms/ecosyste_ms_cli/releases/latest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
