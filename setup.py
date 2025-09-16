@@ -6,7 +6,7 @@ setup(
     description="CLI for ecosyste.ms API",
     author="Sebastian Schürmann",
     author_email="sebastian.schurmann@gmail.com",
-    url="https://github.com/sebs/ecosyste_ms_cli",
+    url="https://github.com/ecosyste-ms/ecosyste_ms_cli",
     packages=find_packages(),
     include_package_data=True,
     license="MIT",

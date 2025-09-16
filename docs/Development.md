@@ -6,7 +6,7 @@ This document contains information for developers working on the Ecosystems CLI 
 
 ```bash
 # Clone the repository
-git clone git@github.com:sebs/ecosyste_ms_cli.git
+git clone git@github.com:ecosyste-ms/ecosyste_ms_cli.git
 cd ecosyste_ms_cli
 
 # Set up virtual environment and install dependencies

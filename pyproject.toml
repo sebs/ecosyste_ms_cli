@@ -71,5 +71,5 @@ dev = ["pytest", "pytest-asyncio", "black", "isort", "flake8", "bandit", "comple
 ecosystems = "ecosystems_cli.cli:main"
 
 [project.urls]
-Homepage = "https://github.com/sebs/ecosyste_ms_cli"
-Repository = "https://github.com/sebs/ecosyste_ms_cli"
+Homepage = "https://github.com/ecosyste-ms/ecosyste_ms_cli"
+Repository = "https://github.com/ecosyste-ms/ecosyste_ms_cli"
