@@ -1,5 +1,5 @@
 ---
-openapi: 3.0.1
+openapi: 3.1.1
 info:
   title: 'Ecosyste.ms: commits'
   description: 'An open API service providing commit metadata for open source projects. '
@@ -333,12 +333,3 @@ components:
           type: boolean
         html_url:
           type: string
-        stats:
-          type: object
-          properties:
-            files_changed:
-              type: integer
-            additions:
-              type: integer
-            deletions:
-              type: integer
