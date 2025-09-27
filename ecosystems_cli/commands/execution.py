@@ -15,7 +15,7 @@ from ecosystems_cli.helpers.print_output import print_output
 console = Console()
 
 
-def update_context(ctx, timeout: int, format: str, domain: Optional[str]):
+def update_context(ctx, timeout: int, format: str, domain: Optional[str], mailto: Optional[str] = None):
     """Update context with command-level options if they differ from defaults.
 
     Args:
@@ -23,6 +23,7 @@ def update_context(ctx, timeout: int, format: str, domain: Optional[str]):
         timeout: Timeout value from command options
         format: Format value from command options
         domain: Domain value from command options
+        mailto: Email address for polite pool access
     """
     ctx.ensure_object(dict)
     if timeout != DEFAULT_TIMEOUT:
@@ -31,6 +32,8 @@ def update_context(ctx, timeout: int, format: str, domain: Optional[str]):
         ctx.obj["format"] = format
     if domain is not None:
         ctx.obj["domain"] = domain
+    if mailto is not None:
+        ctx.obj["mailto"] = mailto
 
 
 def execute_api_call(
@@ -58,7 +61,7 @@ def execute_api_call(
     domain = get_domain_with_precedence(api_name, ctx.obj.get("domain"))
     base_url = build_base_url(domain, api_name)
 
-    client = get_client(api_name, base_url=base_url, timeout=ctx.obj.get("timeout", DEFAULT_TIMEOUT))
+    client = get_client(api_name, base_url=base_url, timeout=ctx.obj.get("timeout", DEFAULT_TIMEOUT), mailto=ctx.obj.get("mailto"))
 
     try:
         if operation_id:

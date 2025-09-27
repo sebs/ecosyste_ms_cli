@@ -30,6 +30,11 @@ def common_options(f):
         default=None,
         help="Override the API domain. Example: api.example.com",
     )(f)
+    f = click.option(
+        "--mailto",
+        default=None,
+        help="Email address for polite pool access. Example: you@example.com",
+    )(f)
     return f
 
 
@@ -46,11 +51,11 @@ def api_command(api_name: str, operation_id: Optional[str] = None, method_name: 
         @common_options
         @click.pass_context
         @wraps(func)
-        def wrapper(ctx, timeout, format, domain, *args, **kwargs):
+        def wrapper(ctx, timeout, format, domain, mailto, *args, **kwargs):
             from ecosystems_cli.commands.execution import execute_api_call, update_context
 
             # Update context with command-level options
-            update_context(ctx, timeout, format, domain)
+            update_context(ctx, timeout, format, domain, mailto)
 
             # Execute API call
             if operation_id:

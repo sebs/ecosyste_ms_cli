@@ -32,13 +32,14 @@ from ecosystems_cli.helpers.parse_parameters import parse_parameters
 class APIClient:
     """Client for interacting with ecosyste.ms APIs."""
 
-    def __init__(self, api_name: str, base_url: Optional[str] = None, timeout: int = DEFAULT_TIMEOUT):
+    def __init__(self, api_name: str, base_url: Optional[str] = None, timeout: int = DEFAULT_TIMEOUT, mailto: Optional[str] = None):
         """Initialize API client.
 
         Args:
             api_name: Name of the API (packages, repos, summary)
             base_url: Base URL for the API. If not provided, uses default.
             timeout: Timeout in seconds for HTTP requests. Default is DEFAULT_TIMEOUT seconds.
+            mailto: Email address for polite pool access.
         """
         self.api_name = api_name
         try:
@@ -48,6 +49,7 @@ class APIClient:
         self.base_url = base_url or self._get_default_base_url()
         self.endpoints = parse_endpoints(self.spec)
         self.timeout = timeout
+        self.mailto = mailto
 
     def _get_default_base_url(self) -> str:
         """Get default base URL from OpenAPI specification."""
@@ -123,8 +125,15 @@ class APIClient:
         if "Content-Type" not in headers:
             headers["Content-Type"] = DEFAULT_CONTENT_TYPE
 
-        # Set user-agent header
-        headers["User-Agent"] = f"ecosyste_ms_cli ({__version__})"
+        # Set user-agent header with optional mailto
+        if self.mailto:
+            headers["User-Agent"] = f"ecosyste_ms_cli ({__version__}) mailto:{self.mailto}"
+        else:
+            headers["User-Agent"] = f"ecosyste_ms_cli ({__version__})"
+
+        # Also add mailto as query parameter if provided
+        if self.mailto and "mailto" not in query_params:
+            query_params["mailto"] = self.mailto
 
         try:
             response = requests.request(
@@ -220,12 +229,13 @@ class APIClient:
     # Convenience methods for common operations can be added here as needed
 
 
-def get_client(api_name: str, base_url: Optional[str] = None, timeout: int = DEFAULT_TIMEOUT) -> APIClient:
+def get_client(api_name: str, base_url: Optional[str] = None, timeout: int = DEFAULT_TIMEOUT, mailto: Optional[str] = None) -> APIClient:
     """Get API client for specified API.
 
     Args:
         api_name: Name of the API (advisories)
         base_url: Base URL for the API. If not provided, uses default.
         timeout: Timeout in seconds for HTTP requests. Default is 20 seconds.
+        mailto: Email address for polite pool access.
     """
-    return APIClient(api_name=api_name, base_url=base_url, timeout=timeout)
+    return APIClient(api_name=api_name, base_url=base_url, timeout=timeout, mailto=mailto)

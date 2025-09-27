@@ -60,12 +60,17 @@ console = Console()
     help="Override the API domain. Example: api.example.com",
 )
 @click.option(
+    "--mailto",
+    default=None,
+    help="Email address for polite pool access. Example: you@example.com",
+)
+@click.option(
     "--install-completion",
     is_flag=True,
     help="Show instructions for installing shell completion.",
 )
 @click.pass_context
-def main(ctx, timeout, format, domain, install_completion):
+def main(ctx, timeout, format, domain, mailto, install_completion):
     """Ecosystems CLI for interacting with ecosyste.ms APIs."""
     # Handle completion installation instructions
     if install_completion:
@@ -88,6 +93,7 @@ def main(ctx, timeout, format, domain, install_completion):
     ctx.obj["timeout"] = timeout
     ctx.obj["format"] = format
     ctx.obj["domain"] = domain
+    ctx.obj["mailto"] = mailto
 
 
 # Command Registration Strategy:

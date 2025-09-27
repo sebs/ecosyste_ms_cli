@@ -38,17 +38,19 @@ class APICommandGenerator:
         @click.group(help=f"Commands for the {api_name} API.")
         @common_options
         @click.pass_context
-        def api_group(ctx, timeout, format, domain):
+        def api_group(ctx, timeout, format, domain, mailto):
             f"""Commands for the {api_name} API."""
             ctx.ensure_object(dict)
 
             timeout = resolve_context_value(ctx, "timeout", timeout, DEFAULT_TIMEOUT)
             format = resolve_context_value(ctx, "format", format, DEFAULT_OUTPUT_FORMAT)
             domain = resolve_context_value(ctx, "domain", domain, None)
+            mailto = resolve_context_value(ctx, "mailto", mailto, None)
 
             ctx.obj["timeout"] = timeout
             ctx.obj["format"] = format
             ctx.obj["domain"] = domain
+            ctx.obj["mailto"] = mailto
 
         api_group.name = api_name
         return api_group
@@ -97,10 +99,10 @@ class APICommandGenerator:
             @api_group.command(name=command_name, help=description)
             @common_options
             @click.pass_context
-            def command_impl(ctx, timeout, format, domain, *args, **kwargs):
+            def command_impl(ctx, timeout, format, domain, mailto, *args, **kwargs):
                 from ecosystems_cli.commands.execution import execute_api_call, update_context
 
-                update_context(ctx, timeout, format, domain)
+                update_context(ctx, timeout, format, domain, mailto)
                 execute_api_call(ctx, api_name, operation_id=op_id, call_args=args, call_kwargs=kwargs)
 
             for decorator in reversed(click_decorators):
