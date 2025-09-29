@@ -32,7 +32,9 @@ from ecosystems_cli.helpers.parse_parameters import parse_parameters
 class APIClient:
     """Client for interacting with ecosyste.ms APIs."""
 
-    def __init__(self, api_name: str, base_url: Optional[str] = None, timeout: int = DEFAULT_TIMEOUT, mailto: Optional[str] = None):
+    def __init__(
+        self, api_name: str, base_url: Optional[str] = None, timeout: int = DEFAULT_TIMEOUT, mailto: Optional[str] = None
+    ):
         """Initialize API client.
 
         Args:
@@ -229,7 +231,9 @@ class APIClient:
     # Convenience methods for common operations can be added here as needed
 
 
-def get_client(api_name: str, base_url: Optional[str] = None, timeout: int = DEFAULT_TIMEOUT, mailto: Optional[str] = None) -> APIClient:
+def get_client(
+    api_name: str, base_url: Optional[str] = None, timeout: int = DEFAULT_TIMEOUT, mailto: Optional[str] = None
+) -> APIClient:
     """Get API client for specified API.
 
     Args:

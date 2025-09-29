@@ -30,7 +30,7 @@ class TestAdvisoriesCommands:
         result = self.runner.invoke(self.advisories_group, ["get_advisories_packages"], obj={"timeout": 20, "format": "table"})
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("advisories", base_url=None, timeout=20)
+        mock_get_client.assert_called_once_with("advisories", base_url=None, timeout=20, mailto=None)
         mock_client.call.assert_called_once_with("getAdvisoriesPackages", path_params={}, query_params={})
         mock_print_output.assert_called_once()
 
@@ -49,7 +49,7 @@ class TestAdvisoriesCommands:
         )
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("advisories", base_url=None, timeout=20)
+        mock_get_client.assert_called_once_with("advisories", base_url=None, timeout=20, mailto=None)
         mock_client.call.assert_called_once_with(
             "getAdvisories",
             path_params={},
@@ -80,7 +80,7 @@ class TestAdvisoriesCommands:
         )
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("advisories", base_url=None, timeout=20)
+        mock_get_client.assert_called_once_with("advisories", base_url=None, timeout=20, mailto=None)
         mock_client.call.assert_called_once_with(
             "getAdvisory",
             path_params={"advisoryUUID": "test-uuid-123"},
@@ -132,7 +132,7 @@ class TestAdvisoriesCommands:
         )
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("advisories", base_url=None, timeout=20)
+        mock_get_client.assert_called_once_with("advisories", base_url=None, timeout=20, mailto=None)
         mock_client.call.assert_called_once_with(
             "lookupAdvisoriesByPurl",
             path_params={},

@@ -34,7 +34,7 @@ class TestTimelineCommands:
         )
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("timeline", base_url=None, timeout=20)
+        mock_get_client.assert_called_once_with("timeline", base_url=None, timeout=20, mailto=None)
         mock_client.call.assert_called_once_with(
             "getEvents",
             path_params={},
@@ -65,7 +65,7 @@ class TestTimelineCommands:
         )
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("timeline", base_url=None, timeout=20)
+        mock_get_client.assert_called_once_with("timeline", base_url=None, timeout=20, mailto=None)
         mock_client.call.assert_called_once_with(
             "getEvent",
             path_params={"repoName": "ecosyste-ms/timeline"},

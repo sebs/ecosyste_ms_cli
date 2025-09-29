@@ -38,7 +38,7 @@ class TestPackagesCommands:
         )
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("packages", base_url=None, timeout=20)
+        mock_get_client.assert_called_once_with("packages", base_url=None, timeout=20, mailto=None)
         mock_client.call.assert_called_once_with(
             "lookupPackage",
             path_params={},
@@ -71,7 +71,7 @@ class TestPackagesCommands:
         )
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("packages", base_url=None, timeout=20)
+        mock_get_client.assert_called_once_with("packages", base_url=None, timeout=20, mailto=None)
         mock_client.call.assert_called_once_with(
             "lookupPackage",
             path_params={},
@@ -99,7 +99,7 @@ class TestPackagesCommands:
         )
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("packages", base_url=None, timeout=20)
+        mock_get_client.assert_called_once_with("packages", base_url=None, timeout=20, mailto=None)
         mock_client.call.assert_called_once_with(
             "getKeywords",
             path_params={},
@@ -132,7 +132,7 @@ class TestPackagesCommands:
         )
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("packages", base_url=None, timeout=20)
+        mock_get_client.assert_called_once_with("packages", base_url=None, timeout=20, mailto=None)
         mock_client.call.assert_called_once_with(
             "getKeyword",
             path_params={"keywordName": "typescript"},
@@ -158,7 +158,7 @@ class TestPackagesCommands:
         )
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("packages", base_url=None, timeout=20)
+        mock_get_client.assert_called_once_with("packages", base_url=None, timeout=20, mailto=None)
         mock_client.call.assert_called_once_with(
             "getRegistries",
             path_params={},

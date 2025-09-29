@@ -35,7 +35,7 @@ class TestIssuesCommands:
         )
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("issues", base_url=None, timeout=20)
+        mock_get_client.assert_called_once_with("issues", base_url=None, timeout=20, mailto=None)
         mock_client.call.assert_called_once_with(
             "repositoriesLookup",
             path_params={},
@@ -63,7 +63,7 @@ class TestIssuesCommands:
         )
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("issues", base_url=None, timeout=20)
+        mock_get_client.assert_called_once_with("issues", base_url=None, timeout=20, mailto=None)
         mock_client.call.assert_called_once_with(
             "getRegistries",
             path_params={},

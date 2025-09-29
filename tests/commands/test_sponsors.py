@@ -34,7 +34,7 @@ class TestSponsorsCommands:
         )
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("sponsors", base_url=None, timeout=20)
+        mock_get_client.assert_called_once_with("sponsors", base_url=None, timeout=20, mailto=None)
         mock_client.call.assert_called_once_with(
             "listAccounts",
             path_params={},
@@ -66,7 +66,7 @@ class TestSponsorsCommands:
         )
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("sponsors", base_url=None, timeout=20)
+        mock_get_client.assert_called_once_with("sponsors", base_url=None, timeout=20, mailto=None)
         mock_client.call.assert_called_once_with(
             "getAccount",
             path_params={"login": "octocat"},
@@ -92,7 +92,7 @@ class TestSponsorsCommands:
         )
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("sponsors", base_url=None, timeout=20)
+        mock_get_client.assert_called_once_with("sponsors", base_url=None, timeout=20, mailto=None)
         mock_client.call.assert_called_once_with(
             "listAccountSponsors",
             path_params={"login": "octocat"},
@@ -118,7 +118,7 @@ class TestSponsorsCommands:
         )
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("sponsors", base_url=None, timeout=20)
+        mock_get_client.assert_called_once_with("sponsors", base_url=None, timeout=20, mailto=None)
         mock_client.call.assert_called_once_with(
             "listSponsors",
             path_params={},

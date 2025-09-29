@@ -61,7 +61,9 @@ def execute_api_call(
     domain = get_domain_with_precedence(api_name, ctx.obj.get("domain"))
     base_url = build_base_url(domain, api_name)
 
-    client = get_client(api_name, base_url=base_url, timeout=ctx.obj.get("timeout", DEFAULT_TIMEOUT), mailto=ctx.obj.get("mailto"))
+    client = get_client(
+        api_name, base_url=base_url, timeout=ctx.obj.get("timeout", DEFAULT_TIMEOUT), mailto=ctx.obj.get("mailto")
+    )
 
     try:
         if operation_id:

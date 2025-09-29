@@ -471,4 +471,4 @@ def test_get_client():
         get_client("test", "https://custom.example.com")
 
         # Assert
-        mock_init.assert_called_once_with(api_name="test", base_url="https://custom.example.com", timeout=20)
+        mock_init.assert_called_once_with(api_name="test", base_url="https://custom.example.com", timeout=20, mailto=None)

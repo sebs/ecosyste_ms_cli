@@ -34,7 +34,7 @@ class TestReposCommands:
         )
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("repos", base_url=None, timeout=20)
+        mock_get_client.assert_called_once_with("repos", base_url=None, timeout=20, mailto=None)
         mock_client.call.assert_called_once_with(
             "topics",
             path_params={},
@@ -67,7 +67,7 @@ class TestReposCommands:
         )
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("repos", base_url=None, timeout=20)
+        mock_get_client.assert_called_once_with("repos", base_url=None, timeout=20, mailto=None)
         mock_client.call.assert_called_once_with(
             "topic",
             path_params={"topic": "machine-learning"},
@@ -96,7 +96,7 @@ class TestReposCommands:
         )
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("repos", base_url=None, timeout=20)
+        mock_get_client.assert_called_once_with("repos", base_url=None, timeout=20, mailto=None)
         mock_client.call.assert_called_once_with(
             "repositoriesLookup",
             path_params={},
@@ -127,7 +127,7 @@ class TestReposCommands:
         )
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("repos", base_url=None, timeout=20)
+        mock_get_client.assert_called_once_with("repos", base_url=None, timeout=20, mailto=None)
         mock_client.call.assert_called_once_with(
             "repositoriesLookup",
             path_params={},
@@ -155,7 +155,7 @@ class TestReposCommands:
         )
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("repos", base_url=None, timeout=20)
+        mock_get_client.assert_called_once_with("repos", base_url=None, timeout=20, mailto=None)
         mock_client.call.assert_called_once_with(
             "usage",
             path_params={},
