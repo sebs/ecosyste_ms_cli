@@ -8,8 +8,10 @@ setup:
 	$(PYTHON) -m venv $(VENV)
 	$(BIN)/pip install --upgrade pip
 	$(BIN)/pip install -e .[dev]
+	pre-commit install
 
 clean:
+	pre-commit uninstall
 	rm -rf $(VENV)
 	rm -rf *.egg-info
 	rm -rf dist
