@@ -3,6 +3,7 @@
 import asyncio
 import json
 import logging
+import signal
 from typing import Any, Dict, List
 
 from mcp.server import Server
@@ -233,7 +234,28 @@ class EcosystemsMCPServer:
 def run_mcp_server():
     """Entry point for running the MCP server."""
     server = EcosystemsMCPServer()
-    asyncio.run(server.run())
+
+    # Set up signal handlers for graceful shutdown
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+
+    shutdown_event = asyncio.Event()
+
+    def signal_handler(sig, frame):
+        """Handle shutdown signals gracefully."""
+        logger.info(f"Received signal {sig}, initiating graceful shutdown...")
+        loop.call_soon_threadsafe(shutdown_event.set)
+
+    # Register signal handlers
+    signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGTERM, signal_handler)
+
+    try:
+        loop.run_until_complete(server.run())
+    except KeyboardInterrupt:
+        logger.info("Keyboard interrupt received, shutting down gracefully...")
+    finally:
+        loop.close()
 
 
 if __name__ == "__main__":
