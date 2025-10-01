@@ -1,6 +1,6 @@
 """Handler for issues API operations."""
 
-from typing import Any, Dict, Tuple
+from typing import Any, Dict, Optional, Tuple
 
 from .base import OperationHandler
 
@@ -16,7 +16,7 @@ class IssuesOperationHandler(OperationHandler):
     API_PARAM_HOST_NAME = "hostName"
     API_PARAM_REPOSITORY_NAME = "repositoryName"
 
-    def _extract_param(self, kwargs: dict, cli_name: str, api_name: str) -> str | None:
+    def _extract_param(self, kwargs: dict, cli_name: str, api_name: str) -> Optional[str]:
         """Extract parameter from kwargs, trying both CLI and API names."""
         if api_name in kwargs:
             return kwargs.pop(api_name)

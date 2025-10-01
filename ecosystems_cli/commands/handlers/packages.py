@@ -1,6 +1,6 @@
 """Handler for packages API operations."""
 
-from typing import Any, Dict, Tuple
+from typing import Any, Dict, Optional, Tuple
 
 from .base import OperationHandler
 
@@ -24,7 +24,7 @@ class PackagesOperationHandler(OperationHandler):
     API_PARAM_PACKAGE_NAME = "packageName"
     API_PARAM_VERSION_NUMBER = "versionNumber"
 
-    def _extract_param(self, kwargs: dict, cli_name: str, api_name: str) -> str | None:
+    def _extract_param(self, kwargs: dict, cli_name: str, api_name: str) -> Optional[str]:
         """Extract parameter from kwargs, trying both CLI and API names."""
         if api_name in kwargs:
             return kwargs.pop(api_name)

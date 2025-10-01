@@ -18,21 +18,10 @@ def runner():
 @pytest.fixture
 def mock_api_client():
     """Create a mock API client for advisories API."""
-    with (
-        mock.patch("ecosystems_cli.commands.execution.get_client") as mock_client,
-        mock.patch("ecosystems_cli.api_client.get_client") as mock_client_api,
-    ):
-        client_instance = mock.MagicMock()
-        # Always return the test operation for list_operations
-        client_instance.list_operations.return_value = [
-            {"id": "test_op", "method": "GET", "path": "/test", "summary": "Test operation"}
-        ]
-        # Mock call method
-        client_instance.call.return_value = {"result": "success"}
-
-        mock_client.return_value = client_instance
-        mock_client_api.return_value = client_instance
-        yield client_instance
+    with mock.patch("ecosystems_cli.commands.execution.bravado_factory") as mock_factory:
+        # Mock the call method to return success
+        mock_factory.call.return_value = {"result": "success"}
+        yield mock_factory
 
 
 class TestAdvisoriesCommands:

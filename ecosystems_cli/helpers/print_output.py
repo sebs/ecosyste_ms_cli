@@ -9,8 +9,8 @@ from ecosystems_cli.constants import (
     PRIORITY_FIELDS,
     TABLE_HEADER_STYLE,
 )
+from ecosystems_cli.helpers.flatten_dict import flatten_dict
 from ecosystems_cli.helpers.format_value import format_value
-from ecosystems_cli.helpers.parse_endpoints import flatten_dict
 
 
 class TableFieldSelector:

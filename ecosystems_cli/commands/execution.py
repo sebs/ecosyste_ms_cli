@@ -4,7 +4,7 @@ from typing import Optional
 
 from rich.console import Console
 
-from ecosystems_cli.api_client import get_client
+from ecosystems_cli.bravado_client import _factory as bravado_factory
 from ecosystems_cli.commands.handlers import OperationHandlerFactory
 from ecosystems_cli.constants import DEFAULT_OUTPUT_FORMAT, DEFAULT_TIMEOUT
 from ecosystems_cli.exceptions import EcosystemsCLIError
@@ -61,23 +61,34 @@ def execute_api_call(
     domain = get_domain_with_precedence(api_name, ctx.obj.get("domain"))
     base_url = build_base_url(domain, api_name)
 
-    client = get_client(
-        api_name, base_url=base_url, timeout=ctx.obj.get("timeout", DEFAULT_TIMEOUT), mailto=ctx.obj.get("mailto")
-    )
-
     try:
         if operation_id:
             if call_args or call_kwargs:
                 # Use operation handler to build parameters
                 handler = OperationHandlerFactory.get_handler(api_name)
                 path_params, query_params = handler.build_params(operation_id, call_args, call_kwargs)
-                result = client.call(operation_id, path_params=path_params, query_params=query_params)
+                result = bravado_factory.call(
+                    api_name,
+                    operation_id,
+                    path_params=path_params,
+                    query_params=query_params,
+                    timeout=ctx.obj.get("timeout", DEFAULT_TIMEOUT),
+                    mailto=ctx.obj.get("mailto"),
+                    base_url=base_url,
+                )
             else:
                 # Simple operation call without parameters
-                result = client.call(operation_id, path_params={}, query_params={})
+                result = bravado_factory.call(
+                    api_name,
+                    operation_id,
+                    path_params={},
+                    query_params={},
+                    timeout=ctx.obj.get("timeout", DEFAULT_TIMEOUT),
+                    mailto=ctx.obj.get("mailto"),
+                    base_url=base_url,
+                )
         elif method_name:
-            # Direct method call
-            result = getattr(client, method_name)(**call_kwargs)
+            raise ValueError("Direct method calls not supported with Bravado client")
         else:
             raise ValueError("Either method_name or operation_id must be provided")
 

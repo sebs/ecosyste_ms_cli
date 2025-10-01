@@ -16,12 +16,11 @@ class TestPackagesCommands:
 
         self.packages_group = packages
 
-    @mock.patch("ecosystems_cli.commands.execution.get_client")
+    @mock.patch("ecosystems_cli.commands.execution.bravado_factory")
     @mock.patch("ecosystems_cli.commands.execution.print_output")
-    def test_lookup_package(self, mock_print_output, mock_get_client):
+    def test_lookup_package(self, mock_print_output, mock_bravado_factory):
         """Test looking up a package by name and ecosystem."""
-        mock_client = mock.MagicMock()
-        mock_client.call.return_value = [
+        mock_bravado_factory.call.return_value = [
             {
                 "ecosystem": "npm",
                 "name": "react",
@@ -29,7 +28,6 @@ class TestPackagesCommands:
                 "description": "React is a JavaScript library for building user interfaces.",
             }
         ]
-        mock_get_client.return_value = mock_client
 
         result = self.runner.invoke(
             self.packages_group,
@@ -38,23 +36,25 @@ class TestPackagesCommands:
         )
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("packages", base_url=None, timeout=20, mailto=None)
-        mock_client.call.assert_called_once_with(
+        mock_bravado_factory.call.assert_called_once_with(
+            "packages",
             "lookupPackage",
             path_params={},
             query_params={
                 "ecosystem": "npm",
                 "name": "react",
             },
+            timeout=mock.ANY,
+            mailto=mock.ANY,
+            base_url=mock.ANY,
         )
         mock_print_output.assert_called_once()
 
-    @mock.patch("ecosystems_cli.commands.execution.get_client")
+    @mock.patch("ecosystems_cli.commands.execution.bravado_factory")
     @mock.patch("ecosystems_cli.commands.execution.print_output")
-    def test_lookup_package_by_purl(self, mock_print_output, mock_get_client):
+    def test_lookup_package_by_purl(self, mock_print_output, mock_bravado_factory):
         """Test looking up a package by purl."""
-        mock_client = mock.MagicMock()
-        mock_client.call.return_value = [
+        mock_bravado_factory.call.return_value = [
             {
                 "ecosystem": "pypi",
                 "name": "django",
@@ -62,7 +62,6 @@ class TestPackagesCommands:
                 "repository_url": "https://github.com/django/django",
             }
         ]
-        mock_get_client.return_value = mock_client
 
         result = self.runner.invoke(
             self.packages_group,
@@ -71,26 +70,27 @@ class TestPackagesCommands:
         )
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("packages", base_url=None, timeout=20, mailto=None)
-        mock_client.call.assert_called_once_with(
+        mock_bravado_factory.call.assert_called_once_with(
+            "packages",
             "lookupPackage",
             path_params={},
             query_params={
                 "purl": "pkg:pypi/django",
             },
+            timeout=mock.ANY,
+            mailto=mock.ANY,
+            base_url=mock.ANY,
         )
         mock_print_output.assert_called_once()
 
-    @mock.patch("ecosystems_cli.commands.execution.get_client")
+    @mock.patch("ecosystems_cli.commands.execution.bravado_factory")
     @mock.patch("ecosystems_cli.commands.execution.print_output")
-    def test_get_keywords(self, mock_print_output, mock_get_client):
+    def test_get_keywords(self, mock_print_output, mock_bravado_factory):
         """Test getting keywords."""
-        mock_client = mock.MagicMock()
-        mock_client.call.return_value = [
+        mock_bravado_factory.call.return_value = [
             {"name": "javascript", "packages_count": 1000},
             {"name": "react", "packages_count": 500},
         ]
-        mock_get_client.return_value = mock_client
 
         result = self.runner.invoke(
             self.packages_group,
@@ -99,23 +99,25 @@ class TestPackagesCommands:
         )
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("packages", base_url=None, timeout=20, mailto=None)
-        mock_client.call.assert_called_once_with(
+        mock_bravado_factory.call.assert_called_once_with(
+            "packages",
             "getKeywords",
             path_params={},
             query_params={
                 "page": 1,
                 "per_page": 20,
             },
+            timeout=mock.ANY,
+            mailto=mock.ANY,
+            base_url=mock.ANY,
         )
         mock_print_output.assert_called_once()
 
-    @mock.patch("ecosystems_cli.commands.execution.get_client")
+    @mock.patch("ecosystems_cli.commands.execution.bravado_factory")
     @mock.patch("ecosystems_cli.commands.execution.print_output")
-    def test_get_keyword(self, mock_print_output, mock_get_client):
+    def test_get_keyword(self, mock_print_output, mock_bravado_factory):
         """Test getting a specific keyword."""
-        mock_client = mock.MagicMock()
-        mock_client.call.return_value = {
+        mock_bravado_factory.call.return_value = {
             "name": "typescript",
             "packages_count": 300,
             "packages": [
@@ -123,7 +125,6 @@ class TestPackagesCommands:
                 {"ecosystem": "npm", "name": "@types/react"},
             ],
         }
-        mock_get_client.return_value = mock_client
 
         result = self.runner.invoke(
             self.packages_group,
@@ -132,24 +133,25 @@ class TestPackagesCommands:
         )
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("packages", base_url=None, timeout=20, mailto=None)
-        mock_client.call.assert_called_once_with(
+        mock_bravado_factory.call.assert_called_once_with(
+            "packages",
             "getKeyword",
             path_params={"keywordName": "typescript"},
             query_params={},
+            timeout=mock.ANY,
+            mailto=mock.ANY,
+            base_url=mock.ANY,
         )
         mock_print_output.assert_called_once()
 
-    @mock.patch("ecosystems_cli.commands.execution.get_client")
+    @mock.patch("ecosystems_cli.commands.execution.bravado_factory")
     @mock.patch("ecosystems_cli.commands.execution.print_output")
-    def test_get_registries(self, mock_print_output, mock_get_client):
+    def test_get_registries(self, mock_print_output, mock_bravado_factory):
         """Test getting registries."""
-        mock_client = mock.MagicMock()
-        mock_client.call.return_value = [
+        mock_bravado_factory.call.return_value = [
             {"name": "npmjs.org", "ecosystem": "npm", "packages_count": 2000000},
             {"name": "pypi.org", "ecosystem": "pypi", "packages_count": 400000},
         ]
-        mock_get_client.return_value = mock_client
 
         result = self.runner.invoke(
             self.packages_group,
@@ -158,21 +160,22 @@ class TestPackagesCommands:
         )
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("packages", base_url=None, timeout=20, mailto=None)
-        mock_client.call.assert_called_once_with(
+        mock_bravado_factory.call.assert_called_once_with(
+            "packages",
             "getRegistries",
             path_params={},
             query_params={},
+            timeout=mock.ANY,
+            mailto=mock.ANY,
+            base_url=mock.ANY,
         )
         mock_print_output.assert_called_once()
 
-    @mock.patch("ecosystems_cli.commands.execution.get_client")
+    @mock.patch("ecosystems_cli.commands.execution.bravado_factory")
     @mock.patch("ecosystems_cli.commands.execution.print_error")
-    def test_lookup_package_error(self, mock_print_error, mock_get_client):
+    def test_lookup_package_error(self, mock_print_error, mock_bravado_factory):
         """Test error handling when looking up a package."""
-        mock_client = mock.MagicMock()
-        mock_client.call.side_effect = Exception("Package not found")
-        mock_get_client.return_value = mock_client
+        mock_bravado_factory.call.side_effect = Exception("Package not found")
 
         result = self.runner.invoke(
             self.packages_group,
