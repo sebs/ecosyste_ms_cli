@@ -1,12 +1,63 @@
 """Handler for repos API operations."""
 
-from typing import Any, Dict, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from .base import OperationHandler
 
 
 class ReposOperationHandler(OperationHandler):
     """Handler for repos API operations."""
+
+    # Operation parameter configuration
+    # Maps operation_id -> list of (api_param_name, lowercase_variants)
+    OPERATION_PARAMS = {
+        "topic": [("topic", ["topic"])],
+        "getHost": [("hostName", ["hostname"])],
+        "getHostOwners": [("hostName", ["hostname"])],
+        "lookupHostOwner": [("HostName", ["hostname"])],
+        "getHostOwner": [("hostName", ["hostname"]), ("ownerLogin", ["ownerlogin"])],
+        "getHostOwnerRepositories": [("hostName", ["hostname"]), ("ownerLogin", ["ownerlogin"])],
+        "getHostRepositories": [("hostName", ["hostname"])],
+        "getHostRepositoryNames": [("hostName", ["hostname"])],
+        "getHostOwnerNames": [("hostName", ["hostname"])],
+        "getHostRepository": [("hostName", ["hostname"]), ("repositoryName", ["repositoryname"])],
+        "getHostRepositoryManifests": [("hostName", ["hostname"]), ("repositoryName", ["repositoryname"])],
+        "getHostRepositoryTags": [("hostName", ["hostname"]), ("repositoryName", ["repositoryname"])],
+        "getHostRepositoryTag": [("hostName", ["hostname"]), ("repositoryName", ["repositoryname"]), ("tag", ["tag"])],
+        "getHostRepositoryTagManifests": [("hostName", ["hostname"]), ("repositoryName", ["repositoryname"]), ("tag", ["tag"])],
+        "getHostRepositoryReleases": [("hostName", ["hostname"]), ("repositoryName", ["repositoryname"])],
+        "getHostRepositorySbom": [("hostName", ["hostname"]), ("repositoryName", ["repositoryname"])],
+        "getHostRepositoryRelease": [
+            ("hostName", ["hostname"]),
+            ("repositoryName", ["repositoryname"]),
+            ("release", ["release"]),
+        ],
+        "usageEcosystem": [("ecosystem", ["ecosystem"])],
+        "usagePackage": [("ecosystem", ["ecosystem"]), ("package", ["package"])],
+        "usagePackageDependencies": [("ecosystem", ["ecosystem"]), ("package", ["package"])],
+    }
+
+    def _extract_param(self, kwargs: dict, api_name: str, lowercase_variants: List[str]) -> Optional[str]:
+        """Extract parameter from kwargs, trying API name first, then lowercase variants.
+
+        Args:
+            kwargs: Keyword arguments dict
+            api_name: The API parameter name (exact case)
+            lowercase_variants: List of lowercase parameter name variants to try
+
+        Returns:
+            Parameter value if found, None otherwise
+        """
+        # Try exact API name first
+        if api_name in kwargs:
+            return kwargs.pop(api_name)
+
+        # Try lowercase variants
+        for variant in lowercase_variants:
+            if variant in kwargs:
+                return kwargs.pop(variant)
+
+        return None
 
     def build_params(self, operation_id: str, args: tuple, kwargs: dict) -> Tuple[Dict[str, Any], Dict[str, Any]]:
         """Build parameters for repos API operations.
@@ -22,255 +73,19 @@ class ReposOperationHandler(OperationHandler):
         path_params = {}
         query_params = {}
 
-        # Handle path parameters for specific operations
-        if operation_id == "topic":
-            # The topic is a path parameter
-            if args:
-                path_params["topic"] = args[0]
-            elif "topic" in kwargs:
-                path_params["topic"] = kwargs.pop("topic")
+        # Get parameter configuration for this operation
+        param_config = self.OPERATION_PARAMS.get(operation_id, [])
 
-        elif operation_id == "getHost":
-            # The host name is a path parameter
-            if args:
-                path_params["hostName"] = args[0]
-            elif "hostName" in kwargs:
-                path_params["hostName"] = kwargs.pop("hostName")
-            elif "hostname" in kwargs:
-                path_params["hostName"] = kwargs.pop("hostname")
-
-        elif operation_id == "getHostOwners":
-            # The host name is a path parameter
-            if args:
-                path_params["hostName"] = args[0]
-            elif "hostName" in kwargs:
-                path_params["hostName"] = kwargs.pop("hostName")
-            elif "hostname" in kwargs:
-                path_params["hostName"] = kwargs.pop("hostname")
-
-        elif operation_id == "lookupHostOwner":
-            # The host name is a path parameter
-            if args:
-                path_params["HostName"] = args[0]
-            elif "HostName" in kwargs:
-                path_params["HostName"] = kwargs.pop("HostName")
-            elif "hostname" in kwargs:
-                path_params["HostName"] = kwargs.pop("hostname")
-
-        elif operation_id == "getHostOwner":
-            # The host name and owner login are path parameters
-            if len(args) >= 2:
-                path_params["hostName"] = args[0]
-                path_params["ownerLogin"] = args[1]
+        # Extract path parameters from args or kwargs
+        for i, (api_name, lowercase_variants) in enumerate(param_config):
+            if i < len(args):
+                # Use positional argument
+                path_params[api_name] = args[i]
             else:
-                if "hostName" in kwargs:
-                    path_params["hostName"] = kwargs.pop("hostName")
-                elif "hostname" in kwargs:
-                    path_params["hostName"] = kwargs.pop("hostname")
-                if "ownerLogin" in kwargs:
-                    path_params["ownerLogin"] = kwargs.pop("ownerLogin")
-                elif "ownerlogin" in kwargs:
-                    path_params["ownerLogin"] = kwargs.pop("ownerlogin")
-
-        elif operation_id == "getHostOwnerRepositories":
-            # The host name and owner login are path parameters
-            if len(args) >= 2:
-                path_params["hostName"] = args[0]
-                path_params["ownerLogin"] = args[1]
-            else:
-                if "hostName" in kwargs:
-                    path_params["hostName"] = kwargs.pop("hostName")
-                elif "hostname" in kwargs:
-                    path_params["hostName"] = kwargs.pop("hostname")
-                if "ownerLogin" in kwargs:
-                    path_params["ownerLogin"] = kwargs.pop("ownerLogin")
-                elif "ownerlogin" in kwargs:
-                    path_params["ownerLogin"] = kwargs.pop("ownerlogin")
-
-        elif operation_id == "getHostRepositories":
-            # The host name is a path parameter
-            if args:
-                path_params["hostName"] = args[0]
-            elif "hostName" in kwargs:
-                path_params["hostName"] = kwargs.pop("hostName")
-            elif "hostname" in kwargs:
-                path_params["hostName"] = kwargs.pop("hostname")
-
-        elif operation_id == "getHostRepositoryNames":
-            # The host name is a path parameter
-            if args:
-                path_params["hostName"] = args[0]
-            elif "hostName" in kwargs:
-                path_params["hostName"] = kwargs.pop("hostName")
-            elif "hostname" in kwargs:
-                path_params["hostName"] = kwargs.pop("hostname")
-
-        elif operation_id == "getHostOwnerNames":
-            # The host name is a path parameter
-            if args:
-                path_params["hostName"] = args[0]
-            elif "hostName" in kwargs:
-                path_params["hostName"] = kwargs.pop("hostName")
-            elif "hostname" in kwargs:
-                path_params["hostName"] = kwargs.pop("hostname")
-
-        elif operation_id == "getHostRepository":
-            # The host name and repository name are path parameters
-            if len(args) >= 2:
-                path_params["hostName"] = args[0]
-                path_params["repositoryName"] = args[1]
-            else:
-                if "hostName" in kwargs:
-                    path_params["hostName"] = kwargs.pop("hostName")
-                elif "hostname" in kwargs:
-                    path_params["hostName"] = kwargs.pop("hostname")
-                if "repositoryName" in kwargs:
-                    path_params["repositoryName"] = kwargs.pop("repositoryName")
-                elif "repositoryname" in kwargs:
-                    path_params["repositoryName"] = kwargs.pop("repositoryname")
-
-        elif operation_id == "getHostRepositoryManifests":
-            # The host name and repository name are path parameters
-            if len(args) >= 2:
-                path_params["hostName"] = args[0]
-                path_params["repositoryName"] = args[1]
-            else:
-                if "hostName" in kwargs:
-                    path_params["hostName"] = kwargs.pop("hostName")
-                elif "hostname" in kwargs:
-                    path_params["hostName"] = kwargs.pop("hostname")
-                if "repositoryName" in kwargs:
-                    path_params["repositoryName"] = kwargs.pop("repositoryName")
-                elif "repositoryname" in kwargs:
-                    path_params["repositoryName"] = kwargs.pop("repositoryname")
-
-        elif operation_id == "getHostRepositoryTags":
-            # The host name and repository name are path parameters
-            if len(args) >= 2:
-                path_params["hostName"] = args[0]
-                path_params["repositoryName"] = args[1]
-            else:
-                if "hostName" in kwargs:
-                    path_params["hostName"] = kwargs.pop("hostName")
-                elif "hostname" in kwargs:
-                    path_params["hostName"] = kwargs.pop("hostname")
-                if "repositoryName" in kwargs:
-                    path_params["repositoryName"] = kwargs.pop("repositoryName")
-                elif "repositoryname" in kwargs:
-                    path_params["repositoryName"] = kwargs.pop("repositoryname")
-
-        elif operation_id == "getHostRepositoryTag":
-            # The host name, repository name, and tag are path parameters
-            if len(args) >= 3:
-                path_params["hostName"] = args[0]
-                path_params["repositoryName"] = args[1]
-                path_params["tag"] = args[2]
-            else:
-                if "hostName" in kwargs:
-                    path_params["hostName"] = kwargs.pop("hostName")
-                elif "hostname" in kwargs:
-                    path_params["hostName"] = kwargs.pop("hostname")
-                if "repositoryName" in kwargs:
-                    path_params["repositoryName"] = kwargs.pop("repositoryName")
-                elif "repositoryname" in kwargs:
-                    path_params["repositoryName"] = kwargs.pop("repositoryname")
-                if "tag" in kwargs:
-                    path_params["tag"] = kwargs.pop("tag")
-
-        elif operation_id == "getHostRepositoryTagManifests":
-            # The host name, repository name, and tag are path parameters
-            if len(args) >= 3:
-                path_params["hostName"] = args[0]
-                path_params["repositoryName"] = args[1]
-                path_params["tag"] = args[2]
-            else:
-                if "hostName" in kwargs:
-                    path_params["hostName"] = kwargs.pop("hostName")
-                elif "hostname" in kwargs:
-                    path_params["hostName"] = kwargs.pop("hostname")
-                if "repositoryName" in kwargs:
-                    path_params["repositoryName"] = kwargs.pop("repositoryName")
-                elif "repositoryname" in kwargs:
-                    path_params["repositoryName"] = kwargs.pop("repositoryname")
-                if "tag" in kwargs:
-                    path_params["tag"] = kwargs.pop("tag")
-
-        elif operation_id == "getHostRepositoryReleases":
-            # The host name and repository name are path parameters
-            if len(args) >= 2:
-                path_params["hostName"] = args[0]
-                path_params["repositoryName"] = args[1]
-            else:
-                if "hostName" in kwargs:
-                    path_params["hostName"] = kwargs.pop("hostName")
-                elif "hostname" in kwargs:
-                    path_params["hostName"] = kwargs.pop("hostname")
-                if "repositoryName" in kwargs:
-                    path_params["repositoryName"] = kwargs.pop("repositoryName")
-                elif "repositoryname" in kwargs:
-                    path_params["repositoryName"] = kwargs.pop("repositoryname")
-
-        elif operation_id == "getHostRepositorySbom":
-            # The host name and repository name are path parameters
-            if len(args) >= 2:
-                path_params["hostName"] = args[0]
-                path_params["repositoryName"] = args[1]
-            else:
-                if "hostName" in kwargs:
-                    path_params["hostName"] = kwargs.pop("hostName")
-                elif "hostname" in kwargs:
-                    path_params["hostName"] = kwargs.pop("hostname")
-                if "repositoryName" in kwargs:
-                    path_params["repositoryName"] = kwargs.pop("repositoryName")
-                elif "repositoryname" in kwargs:
-                    path_params["repositoryName"] = kwargs.pop("repositoryname")
-
-        elif operation_id == "getHostRepositoryRelease":
-            # The host name, repository name, and release are path parameters
-            if len(args) >= 3:
-                path_params["hostName"] = args[0]
-                path_params["repositoryName"] = args[1]
-                path_params["release"] = args[2]
-            else:
-                if "hostName" in kwargs:
-                    path_params["hostName"] = kwargs.pop("hostName")
-                elif "hostname" in kwargs:
-                    path_params["hostName"] = kwargs.pop("hostname")
-                if "repositoryName" in kwargs:
-                    path_params["repositoryName"] = kwargs.pop("repositoryName")
-                elif "repositoryname" in kwargs:
-                    path_params["repositoryName"] = kwargs.pop("repositoryname")
-                if "release" in kwargs:
-                    path_params["release"] = kwargs.pop("release")
-
-        elif operation_id == "usageEcosystem":
-            # The ecosystem is a path parameter
-            if args:
-                path_params["ecosystem"] = args[0]
-            elif "ecosystem" in kwargs:
-                path_params["ecosystem"] = kwargs.pop("ecosystem")
-
-        elif operation_id == "usagePackage":
-            # The ecosystem and package are path parameters
-            if len(args) >= 2:
-                path_params["ecosystem"] = args[0]
-                path_params["package"] = args[1]
-            else:
-                if "ecosystem" in kwargs:
-                    path_params["ecosystem"] = kwargs.pop("ecosystem")
-                if "package" in kwargs:
-                    path_params["package"] = kwargs.pop("package")
-
-        elif operation_id == "usagePackageDependencies":
-            # The ecosystem and package are path parameters
-            if len(args) >= 2:
-                path_params["ecosystem"] = args[0]
-                path_params["package"] = args[1]
-            else:
-                if "ecosystem" in kwargs:
-                    path_params["ecosystem"] = kwargs.pop("ecosystem")
-                if "package" in kwargs:
-                    path_params["package"] = kwargs.pop("package")
+                # Try to extract from kwargs
+                value = self._extract_param(kwargs, api_name, lowercase_variants)
+                if value is not None:
+                    path_params[api_name] = value
 
         # For all operations, remaining kwargs are query parameters
         for key, value in kwargs.items():

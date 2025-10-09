@@ -1,6 +1,6 @@
 """Handler for packages API operations."""
 
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from .base import OperationHandler
 
@@ -8,28 +8,57 @@ from .base import OperationHandler
 class PackagesOperationHandler(OperationHandler):
     """Handler for packages API operations."""
 
-    # CLI parameter names
-    CLI_PARAM_KEYWORD_NAME = "keywordname"
-    CLI_PARAM_REGISTRY_NAME = "registryname"
-    CLI_PARAM_MAINTAINER_LOGIN_UUID = "maintainerloginoruuid"
-    CLI_PARAM_NAMESPACE_NAME = "namespacename"
-    CLI_PARAM_PACKAGE_NAME = "packagename"
-    CLI_PARAM_VERSION_NUMBER = "versionnumber"
+    # Operation parameter configuration
+    # Maps operation_id -> list of (api_param_name, lowercase_variants)
+    OPERATION_PARAMS = {
+        "getKeyword": [("keywordName", ["keywordname"])],
+        "getRegistry": [("registryName", ["registryname"])],
+        "lookupRegistryPackage": [("registryName", ["registryname"])],
+        "getRegistryMaintainers": [("registryName", ["registryname"])],
+        "getRegistryMaintainer": [("registryName", ["registryname"]), ("MaintainerLoginOrUUID", ["maintainerloginoruuid"])],
+        "getRegistryMaintainerPackages": [
+            ("registryName", ["registryname"]),
+            ("MaintainerLoginOrUUID", ["maintainerloginoruuid"]),
+        ],
+        "getRegistryNamespaces": [("registryName", ["registryname"])],
+        "getRegistryNamespace": [("registryName", ["registryname"]), ("namespaceName", ["namespacename"])],
+        "getRegistryNamespacePackages": [("registryName", ["registryname"]), ("namespaceName", ["namespacename"])],
+        "getRegistryPackages": [("registryName", ["registryname"])],
+        "getRegistryPackageNames": [("registryName", ["registryname"])],
+        "getRegistryRecentVersions": [("registryName", ["registryname"])],
+        "getRegistryPackage": [("registryName", ["registryname"]), ("packageName", ["packagename"])],
+        "getRegistryPackageDependentPackages": [("registryName", ["registryname"]), ("packageName", ["packagename"])],
+        "getRegistryPackageDependentPackageKinds": [("registryName", ["registryname"]), ("packageName", ["packagename"])],
+        "getRegistryPackageRelatedPackages": [("registryName", ["registryname"]), ("packageName", ["packagename"])],
+        "getRegistryPackageVersionNumbers": [("registryName", ["registryname"]), ("packageName", ["packagename"])],
+        "getRegistryPackageVersions": [("registryName", ["registryname"]), ("packageName", ["packagename"])],
+        "getRegistryPackageVersion": [
+            ("registryName", ["registryname"]),
+            ("packageName", ["packagename"]),
+            ("versionNumber", ["versionnumber"]),
+        ],
+    }
 
-    # OpenAPI parameter names
-    API_PARAM_KEYWORD_NAME = "keywordName"
-    API_PARAM_REGISTRY_NAME = "registryName"
-    API_PARAM_MAINTAINER_LOGIN_UUID = "MaintainerLoginOrUUID"
-    API_PARAM_NAMESPACE_NAME = "namespaceName"
-    API_PARAM_PACKAGE_NAME = "packageName"
-    API_PARAM_VERSION_NUMBER = "versionNumber"
+    def _extract_param(self, kwargs: dict, api_name: str, lowercase_variants: List[str]) -> Optional[str]:
+        """Extract parameter from kwargs, trying API name first, then lowercase variants.
 
-    def _extract_param(self, kwargs: dict, cli_name: str, api_name: str) -> Optional[str]:
-        """Extract parameter from kwargs, trying both CLI and API names."""
+        Args:
+            kwargs: Keyword arguments dict
+            api_name: The API parameter name (exact case)
+            lowercase_variants: List of lowercase parameter name variants to try
+
+        Returns:
+            Parameter value if found, None otherwise
+        """
+        # Try exact API name first
         if api_name in kwargs:
             return kwargs.pop(api_name)
-        elif cli_name in kwargs:
-            return kwargs.pop(cli_name)
+
+        # Try lowercase variants
+        for variant in lowercase_variants:
+            if variant in kwargs:
+                return kwargs.pop(variant)
+
         return None
 
     def build_params(self, operation_id: str, args: tuple, kwargs: dict) -> Tuple[Dict[str, Any], Dict[str, Any]]:
@@ -46,248 +75,19 @@ class PackagesOperationHandler(OperationHandler):
         path_params = {}
         query_params = {}
 
-        # Handle path parameters for specific operations
-        if operation_id == "getKeyword":
-            # The keyword name is a path parameter
-            if args:
-                path_params[self.API_PARAM_KEYWORD_NAME] = args[0]
+        # Get parameter configuration for this operation
+        param_config = self.OPERATION_PARAMS.get(operation_id, [])
+
+        # Extract path parameters from args or kwargs
+        for i, (api_name, lowercase_variants) in enumerate(param_config):
+            if i < len(args):
+                # Use positional argument
+                path_params[api_name] = args[i]
             else:
-                keyword_name = self._extract_param(kwargs, self.CLI_PARAM_KEYWORD_NAME, self.API_PARAM_KEYWORD_NAME)
-                if keyword_name:
-                    path_params[self.API_PARAM_KEYWORD_NAME] = keyword_name
-
-        elif operation_id == "getRegistry":
-            # The registry name is a path parameter
-            if args:
-                path_params[self.API_PARAM_REGISTRY_NAME] = args[0]
-            else:
-                registry_name = self._extract_param(kwargs, self.CLI_PARAM_REGISTRY_NAME, self.API_PARAM_REGISTRY_NAME)
-                if registry_name:
-                    path_params[self.API_PARAM_REGISTRY_NAME] = registry_name
-
-        elif operation_id == "lookupRegistryPackage":
-            # Registry name is a path parameter
-            if args:
-                path_params[self.API_PARAM_REGISTRY_NAME] = args[0]
-            else:
-                registry_name = self._extract_param(kwargs, self.CLI_PARAM_REGISTRY_NAME, self.API_PARAM_REGISTRY_NAME)
-                if registry_name:
-                    path_params[self.API_PARAM_REGISTRY_NAME] = registry_name
-
-        elif operation_id == "getRegistryMaintainers":
-            # Registry name is a path parameter
-            if args:
-                path_params["registryName"] = args[0]
-            elif "registryName" in kwargs:
-                path_params["registryName"] = kwargs.pop("registryName")
-            elif "registryname" in kwargs:
-                path_params["registryName"] = kwargs.pop("registryname")
-
-        elif operation_id == "getRegistryMaintainer":
-            # Registry name and maintainer login/UUID are path parameters
-            if len(args) >= 2:
-                path_params["registryName"] = args[0]
-                path_params["MaintainerLoginOrUUID"] = args[1]
-            else:
-                if "registryName" in kwargs:
-                    path_params["registryName"] = kwargs.pop("registryName")
-                elif "registryname" in kwargs:
-                    path_params["registryName"] = kwargs.pop("registryname")
-                if "MaintainerLoginOrUUID" in kwargs:
-                    path_params["MaintainerLoginOrUUID"] = kwargs.pop("MaintainerLoginOrUUID")
-                elif "maintainerloginoruuid" in kwargs:
-                    path_params["MaintainerLoginOrUUID"] = kwargs.pop("maintainerloginoruuid")
-
-        elif operation_id == "getRegistryMaintainerPackages":
-            # Registry name and maintainer login/UUID are path parameters
-            if len(args) >= 2:
-                path_params["registryName"] = args[0]
-                path_params["MaintainerLoginOrUUID"] = args[1]
-            else:
-                if "registryName" in kwargs:
-                    path_params["registryName"] = kwargs.pop("registryName")
-                elif "registryname" in kwargs:
-                    path_params["registryName"] = kwargs.pop("registryname")
-                if "MaintainerLoginOrUUID" in kwargs:
-                    path_params["MaintainerLoginOrUUID"] = kwargs.pop("MaintainerLoginOrUUID")
-                elif "maintainerloginoruuid" in kwargs:
-                    path_params["MaintainerLoginOrUUID"] = kwargs.pop("maintainerloginoruuid")
-
-        elif operation_id == "getRegistryNamespaces":
-            # Registry name is a path parameter
-            if args:
-                path_params["registryName"] = args[0]
-            elif "registryName" in kwargs:
-                path_params["registryName"] = kwargs.pop("registryName")
-            elif "registryname" in kwargs:
-                path_params["registryName"] = kwargs.pop("registryname")
-
-        elif operation_id == "getRegistryNamespace":
-            # Registry name and namespace name are path parameters
-            if len(args) >= 2:
-                path_params["registryName"] = args[0]
-                path_params["namespaceName"] = args[1]
-            else:
-                if "registryName" in kwargs:
-                    path_params["registryName"] = kwargs.pop("registryName")
-                elif "registryname" in kwargs:
-                    path_params["registryName"] = kwargs.pop("registryname")
-                if "namespaceName" in kwargs:
-                    path_params["namespaceName"] = kwargs.pop("namespaceName")
-                elif "namespacename" in kwargs:
-                    path_params["namespaceName"] = kwargs.pop("namespacename")
-
-        elif operation_id == "getRegistryNamespacePackages":
-            # Registry name and namespace name are path parameters
-            if len(args) >= 2:
-                path_params["registryName"] = args[0]
-                path_params["namespaceName"] = args[1]
-            else:
-                if "registryName" in kwargs:
-                    path_params["registryName"] = kwargs.pop("registryName")
-                elif "registryname" in kwargs:
-                    path_params["registryName"] = kwargs.pop("registryname")
-                if "namespaceName" in kwargs:
-                    path_params["namespaceName"] = kwargs.pop("namespaceName")
-                elif "namespacename" in kwargs:
-                    path_params["namespaceName"] = kwargs.pop("namespacename")
-
-        elif operation_id == "getRegistryPackages":
-            # Registry name is a path parameter
-            if args:
-                path_params["registryName"] = args[0]
-            elif "registryName" in kwargs:
-                path_params["registryName"] = kwargs.pop("registryName")
-            elif "registryname" in kwargs:
-                path_params["registryName"] = kwargs.pop("registryname")
-
-        elif operation_id == "getRegistryPackageNames":
-            # Registry name is a path parameter
-            if args:
-                path_params["registryName"] = args[0]
-            elif "registryName" in kwargs:
-                path_params["registryName"] = kwargs.pop("registryName")
-            elif "registryname" in kwargs:
-                path_params["registryName"] = kwargs.pop("registryname")
-
-        elif operation_id == "getRegistryRecentVersions":
-            # Registry name is a path parameter
-            if args:
-                path_params["registryName"] = args[0]
-            elif "registryName" in kwargs:
-                path_params["registryName"] = kwargs.pop("registryName")
-            elif "registryname" in kwargs:
-                path_params["registryName"] = kwargs.pop("registryname")
-
-        elif operation_id == "getRegistryPackage":
-            # Registry name and package name are path parameters
-            if len(args) >= 2:
-                path_params["registryName"] = args[0]
-                path_params["packageName"] = args[1]
-            else:
-                if "registryName" in kwargs:
-                    path_params["registryName"] = kwargs.pop("registryName")
-                elif "registryname" in kwargs:
-                    path_params["registryName"] = kwargs.pop("registryname")
-                if "packageName" in kwargs:
-                    path_params["packageName"] = kwargs.pop("packageName")
-                elif "packagename" in kwargs:
-                    path_params["packageName"] = kwargs.pop("packagename")
-
-        elif operation_id == "getRegistryPackageDependentPackages":
-            # Registry name and package name are path parameters
-            if len(args) >= 2:
-                path_params["registryName"] = args[0]
-                path_params["packageName"] = args[1]
-            else:
-                if "registryName" in kwargs:
-                    path_params["registryName"] = kwargs.pop("registryName")
-                elif "registryname" in kwargs:
-                    path_params["registryName"] = kwargs.pop("registryname")
-                if "packageName" in kwargs:
-                    path_params["packageName"] = kwargs.pop("packageName")
-                elif "packagename" in kwargs:
-                    path_params["packageName"] = kwargs.pop("packagename")
-
-        elif operation_id == "getRegistryPackageDependentPackageKinds":
-            # Registry name and package name are path parameters
-            if len(args) >= 2:
-                path_params["registryName"] = args[0]
-                path_params["packageName"] = args[1]
-            else:
-                if "registryName" in kwargs:
-                    path_params["registryName"] = kwargs.pop("registryName")
-                elif "registryname" in kwargs:
-                    path_params["registryName"] = kwargs.pop("registryname")
-                if "packageName" in kwargs:
-                    path_params["packageName"] = kwargs.pop("packageName")
-                elif "packagename" in kwargs:
-                    path_params["packageName"] = kwargs.pop("packagename")
-
-        elif operation_id == "getRegistryPackageRelatedPackages":
-            # Registry name and package name are path parameters
-            if len(args) >= 2:
-                path_params["registryName"] = args[0]
-                path_params["packageName"] = args[1]
-            else:
-                if "registryName" in kwargs:
-                    path_params["registryName"] = kwargs.pop("registryName")
-                elif "registryname" in kwargs:
-                    path_params["registryName"] = kwargs.pop("registryname")
-                if "packageName" in kwargs:
-                    path_params["packageName"] = kwargs.pop("packageName")
-                elif "packagename" in kwargs:
-                    path_params["packageName"] = kwargs.pop("packagename")
-
-        elif operation_id == "getRegistryPackageVersionNumbers":
-            # Registry name and package name are path parameters
-            if len(args) >= 2:
-                path_params["registryName"] = args[0]
-                path_params["packageName"] = args[1]
-            else:
-                if "registryName" in kwargs:
-                    path_params["registryName"] = kwargs.pop("registryName")
-                elif "registryname" in kwargs:
-                    path_params["registryName"] = kwargs.pop("registryname")
-                if "packageName" in kwargs:
-                    path_params["packageName"] = kwargs.pop("packageName")
-                elif "packagename" in kwargs:
-                    path_params["packageName"] = kwargs.pop("packagename")
-
-        elif operation_id == "getRegistryPackageVersions":
-            # Registry name and package name are path parameters
-            if len(args) >= 2:
-                path_params["registryName"] = args[0]
-                path_params["packageName"] = args[1]
-            else:
-                if "registryName" in kwargs:
-                    path_params["registryName"] = kwargs.pop("registryName")
-                elif "registryname" in kwargs:
-                    path_params["registryName"] = kwargs.pop("registryname")
-                if "packageName" in kwargs:
-                    path_params["packageName"] = kwargs.pop("packageName")
-                elif "packagename" in kwargs:
-                    path_params["packageName"] = kwargs.pop("packagename")
-
-        elif operation_id == "getRegistryPackageVersion":
-            # Registry name, package name, and version number are path parameters
-            if len(args) >= 3:
-                path_params["registryName"] = args[0]
-                path_params["packageName"] = args[1]
-                path_params["versionNumber"] = args[2]
-            else:
-                if "registryName" in kwargs:
-                    path_params["registryName"] = kwargs.pop("registryName")
-                elif "registryname" in kwargs:
-                    path_params["registryName"] = kwargs.pop("registryname")
-                if "packageName" in kwargs:
-                    path_params["packageName"] = kwargs.pop("packageName")
-                elif "packagename" in kwargs:
-                    path_params["packageName"] = kwargs.pop("packagename")
-                if "versionNumber" in kwargs:
-                    path_params["versionNumber"] = kwargs.pop("versionNumber")
-                elif "versionnumber" in kwargs:
-                    path_params["versionNumber"] = kwargs.pop("versionnumber")
+                # Try to extract from kwargs
+                value = self._extract_param(kwargs, api_name, lowercase_variants)
+                if value is not None:
+                    path_params[api_name] = value
 
         # For all operations, remaining kwargs are query parameters
         for key, value in kwargs.items():
