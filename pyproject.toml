@@ -23,7 +23,8 @@ line_length = 128
 skip = [".venv"]
 
 [tool.semantic_release]
-version_variable = ["setup.py:version"]
+version_toml = ["pyproject.toml:project.version"]
+version_variables = ["ecosystems_cli/__init__.py:__version__"]
 branch = "main"
 changelog_file = "CHANGELOG.md"
 build_command = "python -m build"
@@ -43,8 +44,16 @@ filterwarnings = [
 ]
 
 [build-system]
-requires = ["setuptools", "wheel"]
+requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["ecosystems_cli*"]
+exclude = ["tests*"]
+
+[tool.setuptools.package-data]
+"*" = ["*.yaml"]
 
 [project]
 name = "ecosystems-cli"
@@ -53,16 +62,22 @@ description = "CLI for ecosyste.ms API"
 authors = [
     {name = "Sebastian Schürmann", email = "sebastian.schurmann@gmail.com"}
 ]
-license = {text = "MIT"}
+license = "MIT"
 readme = "README.md"
 requires-python = ">=3.9"
+keywords = ["ecosystems", "package-manager", "dependencies", "security", "cli"]
 classifiers = [
-    "License :: OSI Approved :: MIT License",
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development",
+    "Topic :: Utilities",
 ]
 dependencies = [
     "click",
@@ -75,7 +90,16 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest", "pytest-asyncio", "black", "isort", "flake8", "bandit", "complexipy"]
+dev = [
+    "pytest",
+    "pytest-asyncio",
+    "black",
+    "isort",
+    "flake8",
+    "bandit",
+    "complexipy",
+    "tomli; python_version < '3.11'"
+]
 
 [project.scripts]
 ecosystems = "ecosystems_cli.cli:main"
