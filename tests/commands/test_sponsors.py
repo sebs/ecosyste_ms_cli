@@ -16,11 +16,11 @@ class TestSponsorsCommands:
 
         self.sponsors_group = sponsors
 
-    @mock.patch("ecosystems_cli.commands.execution.bravado_factory")
+    @mock.patch("ecosystems_cli.commands.execution.api_factory")
     @mock.patch("ecosystems_cli.commands.execution.print_output")
-    def test_list_accounts(self, mock_print_output, mock_bravado_factory):
+    def test_list_accounts(self, mock_print_output, mock_api_factory):
         """Test listing accounts."""
-        mock_bravado_factory.call.return_value = [
+        mock_api_factory.call.return_value = [
             {"login": "octocat", "has_sponsors_listing": True, "sponsors_count": 10},
             {"login": "defunkt", "has_sponsors_listing": False, "sponsors_count": 0},
         ]
@@ -32,7 +32,7 @@ class TestSponsorsCommands:
         )
 
         assert result.exit_code == 0
-        mock_bravado_factory.call.assert_called_once_with(
+        mock_api_factory.call.assert_called_once_with(
             "sponsors",
             "listAccounts",
             path_params={},
@@ -46,11 +46,11 @@ class TestSponsorsCommands:
         )
         mock_print_output.assert_called_once()
 
-    @mock.patch("ecosystems_cli.commands.execution.bravado_factory")
+    @mock.patch("ecosystems_cli.commands.execution.api_factory")
     @mock.patch("ecosystems_cli.commands.execution.print_output")
-    def test_get_account(self, mock_print_output, mock_bravado_factory):
+    def test_get_account(self, mock_print_output, mock_api_factory):
         """Test getting a specific account."""
-        mock_bravado_factory.call.return_value = {
+        mock_api_factory.call.return_value = {
             "login": "octocat",
             "has_sponsors_listing": True,
             "sponsors_count": 10,
@@ -65,7 +65,7 @@ class TestSponsorsCommands:
         )
 
         assert result.exit_code == 0
-        mock_bravado_factory.call.assert_called_once_with(
+        mock_api_factory.call.assert_called_once_with(
             "sponsors",
             "getAccount",
             path_params={"login": "octocat"},
@@ -76,11 +76,11 @@ class TestSponsorsCommands:
         )
         mock_print_output.assert_called_once()
 
-    @mock.patch("ecosystems_cli.commands.execution.bravado_factory")
+    @mock.patch("ecosystems_cli.commands.execution.api_factory")
     @mock.patch("ecosystems_cli.commands.execution.print_output")
-    def test_list_account_sponsors(self, mock_print_output, mock_bravado_factory):
+    def test_list_account_sponsors(self, mock_print_output, mock_api_factory):
         """Test listing sponsors for an account."""
-        mock_bravado_factory.call.return_value = [
+        mock_api_factory.call.return_value = [
             {"id": 1, "status": "active", "funder": {"login": "sponsor1"}, "maintainer": {"login": "octocat"}},
             {"id": 2, "status": "active", "funder": {"login": "sponsor2"}, "maintainer": {"login": "octocat"}},
         ]
@@ -92,7 +92,7 @@ class TestSponsorsCommands:
         )
 
         assert result.exit_code == 0
-        mock_bravado_factory.call.assert_called_once_with(
+        mock_api_factory.call.assert_called_once_with(
             "sponsors",
             "listAccountSponsors",
             path_params={"login": "octocat"},
@@ -103,11 +103,11 @@ class TestSponsorsCommands:
         )
         mock_print_output.assert_called_once()
 
-    @mock.patch("ecosystems_cli.commands.execution.bravado_factory")
+    @mock.patch("ecosystems_cli.commands.execution.api_factory")
     @mock.patch("ecosystems_cli.commands.execution.print_output")
-    def test_list_sponsors(self, mock_print_output, mock_bravado_factory):
+    def test_list_sponsors(self, mock_print_output, mock_api_factory):
         """Test listing all sponsors."""
-        mock_bravado_factory.call.return_value = [
+        mock_api_factory.call.return_value = [
             {"login": "sponsor1", "has_sponsors_listing": False, "sponsors_count": 0},
             {"login": "sponsor2", "has_sponsors_listing": False, "sponsors_count": 0},
         ]
@@ -119,7 +119,7 @@ class TestSponsorsCommands:
         )
 
         assert result.exit_code == 0
-        mock_bravado_factory.call.assert_called_once_with(
+        mock_api_factory.call.assert_called_once_with(
             "sponsors",
             "listSponsors",
             path_params={},
@@ -130,11 +130,11 @@ class TestSponsorsCommands:
         )
         mock_print_output.assert_called_once()
 
-    @mock.patch("ecosystems_cli.commands.execution.bravado_factory")
+    @mock.patch("ecosystems_cli.commands.execution.api_factory")
     @mock.patch("ecosystems_cli.commands.execution.print_error")
-    def test_get_account_error(self, mock_print_error, mock_bravado_factory):
+    def test_get_account_error(self, mock_print_error, mock_api_factory):
         """Test error handling when getting an account."""
-        mock_bravado_factory.call.side_effect = Exception("Account not found")
+        mock_api_factory.call.side_effect = Exception("Account not found")
 
         result = self.runner.invoke(
             self.sponsors_group,

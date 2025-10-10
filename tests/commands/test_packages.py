@@ -16,11 +16,11 @@ class TestPackagesCommands:
 
         self.packages_group = packages
 
-    @mock.patch("ecosystems_cli.commands.execution.bravado_factory")
+    @mock.patch("ecosystems_cli.commands.execution.api_factory")
     @mock.patch("ecosystems_cli.commands.execution.print_output")
-    def test_lookup_package(self, mock_print_output, mock_bravado_factory):
+    def test_lookup_package(self, mock_print_output, mock_api_factory):
         """Test looking up a package by name and ecosystem."""
-        mock_bravado_factory.call.return_value = [
+        mock_api_factory.call.return_value = [
             {
                 "ecosystem": "npm",
                 "name": "react",
@@ -36,7 +36,7 @@ class TestPackagesCommands:
         )
 
         assert result.exit_code == 0
-        mock_bravado_factory.call.assert_called_once_with(
+        mock_api_factory.call.assert_called_once_with(
             "packages",
             "lookupPackage",
             path_params={},
@@ -50,11 +50,11 @@ class TestPackagesCommands:
         )
         mock_print_output.assert_called_once()
 
-    @mock.patch("ecosystems_cli.commands.execution.bravado_factory")
+    @mock.patch("ecosystems_cli.commands.execution.api_factory")
     @mock.patch("ecosystems_cli.commands.execution.print_output")
-    def test_lookup_package_by_purl(self, mock_print_output, mock_bravado_factory):
+    def test_lookup_package_by_purl(self, mock_print_output, mock_api_factory):
         """Test looking up a package by purl."""
-        mock_bravado_factory.call.return_value = [
+        mock_api_factory.call.return_value = [
             {
                 "ecosystem": "pypi",
                 "name": "django",
@@ -70,7 +70,7 @@ class TestPackagesCommands:
         )
 
         assert result.exit_code == 0
-        mock_bravado_factory.call.assert_called_once_with(
+        mock_api_factory.call.assert_called_once_with(
             "packages",
             "lookupPackage",
             path_params={},
@@ -83,11 +83,11 @@ class TestPackagesCommands:
         )
         mock_print_output.assert_called_once()
 
-    @mock.patch("ecosystems_cli.commands.execution.bravado_factory")
+    @mock.patch("ecosystems_cli.commands.execution.api_factory")
     @mock.patch("ecosystems_cli.commands.execution.print_output")
-    def test_get_keywords(self, mock_print_output, mock_bravado_factory):
+    def test_get_keywords(self, mock_print_output, mock_api_factory):
         """Test getting keywords."""
-        mock_bravado_factory.call.return_value = [
+        mock_api_factory.call.return_value = [
             {"name": "javascript", "packages_count": 1000},
             {"name": "react", "packages_count": 500},
         ]
@@ -99,7 +99,7 @@ class TestPackagesCommands:
         )
 
         assert result.exit_code == 0
-        mock_bravado_factory.call.assert_called_once_with(
+        mock_api_factory.call.assert_called_once_with(
             "packages",
             "getKeywords",
             path_params={},
@@ -113,11 +113,11 @@ class TestPackagesCommands:
         )
         mock_print_output.assert_called_once()
 
-    @mock.patch("ecosystems_cli.commands.execution.bravado_factory")
+    @mock.patch("ecosystems_cli.commands.execution.api_factory")
     @mock.patch("ecosystems_cli.commands.execution.print_output")
-    def test_get_keyword(self, mock_print_output, mock_bravado_factory):
+    def test_get_keyword(self, mock_print_output, mock_api_factory):
         """Test getting a specific keyword."""
-        mock_bravado_factory.call.return_value = {
+        mock_api_factory.call.return_value = {
             "name": "typescript",
             "packages_count": 300,
             "packages": [
@@ -133,7 +133,7 @@ class TestPackagesCommands:
         )
 
         assert result.exit_code == 0
-        mock_bravado_factory.call.assert_called_once_with(
+        mock_api_factory.call.assert_called_once_with(
             "packages",
             "getKeyword",
             path_params={"keywordName": "typescript"},
@@ -144,11 +144,11 @@ class TestPackagesCommands:
         )
         mock_print_output.assert_called_once()
 
-    @mock.patch("ecosystems_cli.commands.execution.bravado_factory")
+    @mock.patch("ecosystems_cli.commands.execution.api_factory")
     @mock.patch("ecosystems_cli.commands.execution.print_output")
-    def test_get_registries(self, mock_print_output, mock_bravado_factory):
+    def test_get_registries(self, mock_print_output, mock_api_factory):
         """Test getting registries."""
-        mock_bravado_factory.call.return_value = [
+        mock_api_factory.call.return_value = [
             {"name": "npmjs.org", "ecosystem": "npm", "packages_count": 2000000},
             {"name": "pypi.org", "ecosystem": "pypi", "packages_count": 400000},
         ]
@@ -160,7 +160,7 @@ class TestPackagesCommands:
         )
 
         assert result.exit_code == 0
-        mock_bravado_factory.call.assert_called_once_with(
+        mock_api_factory.call.assert_called_once_with(
             "packages",
             "getRegistries",
             path_params={},
@@ -171,11 +171,11 @@ class TestPackagesCommands:
         )
         mock_print_output.assert_called_once()
 
-    @mock.patch("ecosystems_cli.commands.execution.bravado_factory")
+    @mock.patch("ecosystems_cli.commands.execution.api_factory")
     @mock.patch("ecosystems_cli.commands.execution.print_error")
-    def test_lookup_package_error(self, mock_print_error, mock_bravado_factory):
+    def test_lookup_package_error(self, mock_print_error, mock_api_factory):
         """Test error handling when looking up a package."""
-        mock_bravado_factory.call.side_effect = Exception("Package not found")
+        mock_api_factory.call.side_effect = Exception("Package not found")
 
         result = self.runner.invoke(
             self.packages_group,

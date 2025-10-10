@@ -4,13 +4,13 @@ from typing import Optional
 
 from rich.console import Console
 
-from ecosystems_cli.bravado_client import _factory as bravado_factory
 from ecosystems_cli.commands.handlers import OperationHandlerFactory
 from ecosystems_cli.constants import DEFAULT_OUTPUT_FORMAT, DEFAULT_TIMEOUT
 from ecosystems_cli.exceptions import EcosystemsCLIError
 from ecosystems_cli.helpers.get_domain import build_base_url, get_domain_with_precedence
 from ecosystems_cli.helpers.print_error import print_error
 from ecosystems_cli.helpers.print_output import print_output
+from ecosystems_cli.openapi_client import _factory as api_factory
 
 console = Console()
 
@@ -67,7 +67,7 @@ def execute_api_call(
                 # Use operation handler to build parameters
                 handler = OperationHandlerFactory.get_handler(api_name)
                 path_params, query_params = handler.build_params(operation_id, call_args, call_kwargs)
-                result = bravado_factory.call(
+                result = api_factory.call(
                     api_name,
                     operation_id,
                     path_params=path_params,
@@ -78,7 +78,7 @@ def execute_api_call(
                 )
             else:
                 # Simple operation call without parameters
-                result = bravado_factory.call(
+                result = api_factory.call(
                     api_name,
                     operation_id,
                     path_params={},
@@ -88,7 +88,7 @@ def execute_api_call(
                     base_url=base_url,
                 )
         elif method_name:
-            raise ValueError("Direct method calls not supported with Bravado client")
+            raise ValueError("Direct method calls not supported")
         else:
             raise ValueError("Either method_name or operation_id must be provided")
 

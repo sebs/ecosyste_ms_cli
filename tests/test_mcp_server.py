@@ -140,16 +140,16 @@ class TestEcosystemsMCPServer:
         assert schema["properties"]["body"]["type"] == "object"
 
     @pytest.mark.asyncio
-    @patch("ecosystems_cli.mcp_server.bravado_factory")
+    @patch("ecosystems_cli.mcp_server.api_factory")
     @patch("ecosystems_cli.mcp_server.get_domain_with_precedence")
     @patch("ecosystems_cli.mcp_server.build_base_url")
-    async def test_call_api(self, mock_build_url, mock_get_domain, mock_bravado_factory, mcp_server):
+    async def test_call_api(self, mock_build_url, mock_get_domain, mock_api_factory, mcp_server):
         """Test calling an API operation."""
         # Setup mocks
         mock_get_domain.return_value = "api.example.com"
         mock_build_url.return_value = "https://api.example.com/v1"
 
-        mock_bravado_factory.call.return_value = {"status": "success", "data": {"id": 1}}
+        mock_api_factory.call.return_value = {"status": "success", "data": {"id": 1}}
 
         # Call the API
         result = await mcp_server._call_api(
@@ -163,7 +163,7 @@ class TestEcosystemsMCPServer:
         # Verify the calls
         mock_get_domain.assert_called_once_with("repos", None)
         mock_build_url.assert_called_once_with("api.example.com", "repos")
-        mock_bravado_factory.call.assert_called_once_with(
+        mock_api_factory.call.assert_called_once_with(
             api_name="repos",
             operation_id="get_repository",
             path_params={"host": "github.com", "owner": "test", "name": "repo"},
@@ -210,13 +210,13 @@ class TestEcosystemsMCPServer:
         assert result == {"packages": [{"name": "package1"}]}
 
     @pytest.mark.asyncio
-    @patch("ecosystems_cli.mcp_server.bravado_factory")
-    async def test_call_tool_error_handling(self, mock_bravado_factory, mcp_server):
+    @patch("ecosystems_cli.mcp_server.api_factory")
+    async def test_call_tool_error_handling(self, mock_api_factory, mcp_server):
         """Test error handling in call_tool."""
         # Make the client raise an exception
         from ecosystems_cli.exceptions import EcosystemsCLIError
 
-        mock_bravado_factory.call.side_effect = EcosystemsCLIError("Connection failed")
+        mock_api_factory.call.side_effect = EcosystemsCLIError("Connection failed")
 
         # Test that errors are properly handled
         with pytest.raises(Exception) as exc_info:

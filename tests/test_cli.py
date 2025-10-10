@@ -18,7 +18,7 @@ def runner():
 @pytest.fixture
 def mock_api_client():
     """Create a mock API client for advisories API."""
-    with mock.patch("ecosystems_cli.commands.execution.bravado_factory") as mock_factory:
+    with mock.patch("ecosystems_cli.commands.execution.api_factory") as mock_factory:
         # Mock the call method to return success
         mock_factory.call.return_value = {"result": "success"}
         yield mock_factory

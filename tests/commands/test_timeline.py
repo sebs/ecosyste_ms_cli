@@ -16,11 +16,11 @@ class TestTimelineCommands:
 
         self.timeline_group = timeline
 
-    @mock.patch("ecosystems_cli.commands.execution.bravado_factory")
+    @mock.patch("ecosystems_cli.commands.execution.api_factory")
     @mock.patch("ecosystems_cli.commands.execution.print_output")
-    def test_get_events(self, mock_print_output, mock_bravado_factory):
+    def test_get_events(self, mock_print_output, mock_api_factory):
         """Test getting all events."""
-        mock_bravado_factory.call.return_value = [
+        mock_api_factory.call.return_value = [
             {"actor": "user1", "event_type": "push", "repository": "repo1"},
             {"actor": "user2", "event_type": "pull_request", "repository": "repo2"},
         ]
@@ -32,7 +32,7 @@ class TestTimelineCommands:
         )
 
         assert result.exit_code == 0
-        mock_bravado_factory.call.assert_called_once_with(
+        mock_api_factory.call.assert_called_once_with(
             "timeline",
             "getEvents",
             path_params={},
@@ -46,11 +46,11 @@ class TestTimelineCommands:
         )
         mock_print_output.assert_called_once()
 
-    @mock.patch("ecosystems_cli.commands.execution.bravado_factory")
+    @mock.patch("ecosystems_cli.commands.execution.api_factory")
     @mock.patch("ecosystems_cli.commands.execution.print_output")
-    def test_get_event_for_repository(self, mock_print_output, mock_bravado_factory):
+    def test_get_event_for_repository(self, mock_print_output, mock_api_factory):
         """Test getting events for a specific repository."""
-        mock_bravado_factory.call.return_value = {
+        mock_api_factory.call.return_value = {
             "actor": "user1",
             "event_type": "push",
             "repository": "ecosyste-ms/timeline",
@@ -64,7 +64,7 @@ class TestTimelineCommands:
         )
 
         assert result.exit_code == 0
-        mock_bravado_factory.call.assert_called_once_with(
+        mock_api_factory.call.assert_called_once_with(
             "timeline",
             "getEvent",
             path_params={"repoName": "ecosyste-ms/timeline"},

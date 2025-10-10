@@ -11,11 +11,11 @@ from mcp.server.models import InitializationOptions
 from mcp.server.stdio import stdio_server
 from mcp.types import ServerCapabilities, TextContent, Tool
 
-from ecosystems_cli.bravado_client import _factory as bravado_factory
 from ecosystems_cli.constants import DEFAULT_TIMEOUT
 from ecosystems_cli.exceptions import EcosystemsCLIError
 from ecosystems_cli.helpers.get_domain import build_base_url, get_domain_with_precedence
 from ecosystems_cli.helpers.load_api_spec import load_api_spec
+from ecosystems_cli.openapi_client import _factory as api_factory
 
 logger = logging.getLogger(__name__)
 
@@ -204,9 +204,9 @@ class EcosystemsMCPServer:
         domain = get_domain_with_precedence(api, None)
         base_url = build_base_url(domain, api)
 
-        # Call the operation using bravado factory
+        # Call the operation using API factory
         try:
-            result = bravado_factory.call(
+            result = api_factory.call(
                 api_name=api,
                 operation_id=operation,
                 path_params=path_params if path_params else None,

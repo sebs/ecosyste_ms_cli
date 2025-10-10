@@ -16,11 +16,11 @@ class TestIssuesCommands:
 
         self.issues_group = issues
 
-    @mock.patch("ecosystems_cli.commands.execution.bravado_factory")
+    @mock.patch("ecosystems_cli.commands.execution.api_factory")
     @mock.patch("ecosystems_cli.commands.execution.print_output")
-    def test_repositories_lookup(self, mock_print_output, mock_bravado_factory):
+    def test_repositories_lookup(self, mock_print_output, mock_api_factory):
         """Test repository lookup."""
-        mock_bravado_factory.call.return_value = {
+        mock_api_factory.call.return_value = {
             "full_name": "octocat/hello-world",
             "html_url": "https://github.com/octocat/hello-world",
             "open_issues_count": 42,
@@ -33,7 +33,7 @@ class TestIssuesCommands:
         )
 
         assert result.exit_code == 0
-        mock_bravado_factory.call.assert_called_once_with(
+        mock_api_factory.call.assert_called_once_with(
             "issues",
             "repositoriesLookup",
             path_params={},
@@ -46,11 +46,11 @@ class TestIssuesCommands:
         )
         mock_print_output.assert_called_once()
 
-    @mock.patch("ecosystems_cli.commands.execution.bravado_factory")
+    @mock.patch("ecosystems_cli.commands.execution.api_factory")
     @mock.patch("ecosystems_cli.commands.execution.print_output")
-    def test_get_registries(self, mock_print_output, mock_bravado_factory):
+    def test_get_registries(self, mock_print_output, mock_api_factory):
         """Test getting registries."""
-        mock_bravado_factory.call.return_value = [
+        mock_api_factory.call.return_value = [
             {"name": "github", "url": "https://github.com"},
             {"name": "gitlab", "url": "https://gitlab.com"},
         ]
@@ -62,7 +62,7 @@ class TestIssuesCommands:
         )
 
         assert result.exit_code == 0
-        mock_bravado_factory.call.assert_called_once_with(
+        mock_api_factory.call.assert_called_once_with(
             "issues",
             "getRegistries",
             path_params={},
