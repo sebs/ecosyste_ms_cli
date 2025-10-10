@@ -42,8 +42,7 @@ class ParserOperationHandler(OperationHandler):
         """Handle getJob operation parameters."""
         path_params = {}
 
-        # Try multiple parameter name variations
-        job_id = args[0] if args else kwargs.get("jobID") or kwargs.get("jobid") or kwargs.get("job_id")
+        job_id = args[0] if args else kwargs.get("job_id")
         if job_id:
             path_params["jobID"] = job_id
 
