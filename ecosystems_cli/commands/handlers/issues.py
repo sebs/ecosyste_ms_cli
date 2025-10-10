@@ -1,6 +1,6 @@
 """Handler for issues API operations."""
 
-from typing import Any, Dict, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from .base import OperationHandler
 
@@ -8,20 +8,40 @@ from .base import OperationHandler
 class IssuesOperationHandler(OperationHandler):
     """Handler for issues API operations."""
 
-    # CLI parameter names
-    CLI_PARAM_HOST_NAME = "hostname"
-    CLI_PARAM_REPOSITORY_NAME = "repositoryname"
+    # Operation parameter configuration
+    # Maps operation_id -> list of (api_param_name, lowercase_variants)
+    OPERATION_PARAMS = {
+        "getHost": [("hostName", ["hostname"])],
+        "getHostRepositories": [("hostName", ["hostname"])],
+        "getHostRepository": [("hostName", ["hostname"]), ("repositoryName", ["repositoryname"])],
+        "getHostRepositoryIssues": [("hostName", ["hostname"]), ("repositoryName", ["repositoryname"])],
+        "getHostRepositoryIssue": [
+            ("hostName", ["hostname"]),
+            ("repositoryName", ["repositoryname"]),
+            ("issueNumber", ["issuenumber", "issue_number"]),
+        ],
+    }
 
-    # OpenAPI parameter names
-    API_PARAM_HOST_NAME = "hostName"
-    API_PARAM_REPOSITORY_NAME = "repositoryName"
+    def _extract_param(self, kwargs: dict, api_name: str, lowercase_variants: List[str]) -> Optional[str]:
+        """Extract parameter from kwargs, trying API name first, then lowercase variants.
 
-    def _extract_param(self, kwargs: dict, cli_name: str, api_name: str) -> str | None:
-        """Extract parameter from kwargs, trying both CLI and API names."""
+        Args:
+            kwargs: Keyword arguments dict
+            api_name: The API parameter name (exact case)
+            lowercase_variants: List of lowercase parameter name variants to try
+
+        Returns:
+            Parameter value if found, None otherwise
+        """
+        # Try exact API name first
         if api_name in kwargs:
             return kwargs.pop(api_name)
-        elif cli_name in kwargs:
-            return kwargs.pop(cli_name)
+
+        # Try lowercase variants
+        for variant in lowercase_variants:
+            if variant in kwargs:
+                return kwargs.pop(variant)
+
         return None
 
     def build_params(self, operation_id: str, args: tuple, kwargs: dict) -> Tuple[Dict[str, Any], Dict[str, Any]]:
@@ -38,76 +58,19 @@ class IssuesOperationHandler(OperationHandler):
         path_params = {}
         query_params = {}
 
-        # Handle path parameters for specific operations
-        if operation_id == "getHost":
-            # The host name is a path parameter
-            if args:
-                path_params[self.API_PARAM_HOST_NAME] = args[0]
-            else:
-                host_name = self._extract_param(kwargs, self.CLI_PARAM_HOST_NAME, self.API_PARAM_HOST_NAME)
-                if host_name:
-                    path_params[self.API_PARAM_HOST_NAME] = host_name
+        # Get parameter configuration for this operation
+        param_config = self.OPERATION_PARAMS.get(operation_id, [])
 
-        elif operation_id == "getHostRepositories":
-            # The host name is a path parameter
-            if args:
-                path_params[self.API_PARAM_HOST_NAME] = args[0]
+        # Extract path parameters from args or kwargs
+        for i, (api_name, lowercase_variants) in enumerate(param_config):
+            if i < len(args):
+                # Use positional argument
+                path_params[api_name] = args[i]
             else:
-                host_name = self._extract_param(kwargs, self.CLI_PARAM_HOST_NAME, self.API_PARAM_HOST_NAME)
-                if host_name:
-                    path_params[self.API_PARAM_HOST_NAME] = host_name
-
-        elif operation_id == "getHostRepository":
-            # The host name and repository name are path parameters
-            if len(args) >= 2:
-                path_params["hostName"] = args[0]
-                path_params["repositoryName"] = args[1]
-            else:
-                if "hostName" in kwargs:
-                    path_params["hostName"] = kwargs.pop("hostName")
-                elif "hostname" in kwargs:
-                    path_params["hostName"] = kwargs.pop("hostname")
-                if "repositoryName" in kwargs:
-                    path_params["repositoryName"] = kwargs.pop("repositoryName")
-                elif "repositoryname" in kwargs:
-                    path_params["repositoryName"] = kwargs.pop("repositoryname")
-
-        elif operation_id == "getHostRepositoryIssues":
-            # The host name and repository name are path parameters
-            if len(args) >= 2:
-                path_params["hostName"] = args[0]
-                path_params["repositoryName"] = args[1]
-            else:
-                if "hostName" in kwargs:
-                    path_params["hostName"] = kwargs.pop("hostName")
-                elif "hostname" in kwargs:
-                    path_params["hostName"] = kwargs.pop("hostname")
-                if "repositoryName" in kwargs:
-                    path_params["repositoryName"] = kwargs.pop("repositoryName")
-                elif "repositoryname" in kwargs:
-                    path_params["repositoryName"] = kwargs.pop("repositoryname")
-
-        elif operation_id == "getHostRepositoryIssue":
-            # The host name, repository name, and issue number are path parameters
-            if len(args) >= 3:
-                path_params["hostName"] = args[0]
-                path_params["repositoryName"] = args[1]
-                path_params["issueNumber"] = args[2]
-            else:
-                if "hostName" in kwargs:
-                    path_params["hostName"] = kwargs.pop("hostName")
-                elif "hostname" in kwargs:
-                    path_params["hostName"] = kwargs.pop("hostname")
-                if "repositoryName" in kwargs:
-                    path_params["repositoryName"] = kwargs.pop("repositoryName")
-                elif "repositoryname" in kwargs:
-                    path_params["repositoryName"] = kwargs.pop("repositoryname")
-                if "issueNumber" in kwargs:
-                    path_params["issueNumber"] = kwargs.pop("issueNumber")
-                elif "issuenumber" in kwargs:
-                    path_params["issueNumber"] = kwargs.pop("issuenumber")
-                elif "issue_number" in kwargs:
-                    path_params["issueNumber"] = kwargs.pop("issue_number")
+                # Try to extract from kwargs
+                value = self._extract_param(kwargs, api_name, lowercase_variants)
+                if value is not None:
+                    path_params[api_name] = value
 
         # For all operations, remaining kwargs are query parameters
         for key, value in kwargs.items():

@@ -16,16 +16,14 @@ class TestTimelineCommands:
 
         self.timeline_group = timeline
 
-    @mock.patch("ecosystems_cli.commands.execution.get_client")
+    @mock.patch("ecosystems_cli.commands.execution.api_factory")
     @mock.patch("ecosystems_cli.commands.execution.print_output")
-    def test_get_events(self, mock_print_output, mock_get_client):
+    def test_get_events(self, mock_print_output, mock_api_factory):
         """Test getting all events."""
-        mock_client = mock.MagicMock()
-        mock_client.call.return_value = [
+        mock_api_factory.call.return_value = [
             {"actor": "user1", "event_type": "push", "repository": "repo1"},
             {"actor": "user2", "event_type": "pull_request", "repository": "repo2"},
         ]
-        mock_get_client.return_value = mock_client
 
         result = self.runner.invoke(
             self.timeline_group,
@@ -34,29 +32,30 @@ class TestTimelineCommands:
         )
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("timeline", base_url=None, timeout=20, mailto=None)
-        mock_client.call.assert_called_once_with(
+        mock_api_factory.call.assert_called_once_with(
+            "timeline",
             "getEvents",
             path_params={},
             query_params={
                 "page": 1,
                 "per_page": 10,
             },
+            timeout=mock.ANY,
+            mailto=mock.ANY,
+            base_url=mock.ANY,
         )
         mock_print_output.assert_called_once()
 
-    @mock.patch("ecosystems_cli.commands.execution.get_client")
+    @mock.patch("ecosystems_cli.commands.execution.api_factory")
     @mock.patch("ecosystems_cli.commands.execution.print_output")
-    def test_get_event_for_repository(self, mock_print_output, mock_get_client):
+    def test_get_event_for_repository(self, mock_print_output, mock_api_factory):
         """Test getting events for a specific repository."""
-        mock_client = mock.MagicMock()
-        mock_client.call.return_value = {
+        mock_api_factory.call.return_value = {
             "actor": "user1",
             "event_type": "push",
             "repository": "ecosyste-ms/timeline",
             "payload": {},
         }
-        mock_get_client.return_value = mock_client
 
         result = self.runner.invoke(
             self.timeline_group,
@@ -65,13 +64,16 @@ class TestTimelineCommands:
         )
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("timeline", base_url=None, timeout=20, mailto=None)
-        mock_client.call.assert_called_once_with(
+        mock_api_factory.call.assert_called_once_with(
+            "timeline",
             "getEvent",
             path_params={"repoName": "ecosyste-ms/timeline"},
             query_params={
                 "page": 1,
             },
+            timeout=mock.ANY,
+            mailto=mock.ANY,
+            base_url=mock.ANY,
         )
         mock_print_output.assert_called_once()
 

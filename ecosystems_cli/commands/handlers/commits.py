@@ -1,6 +1,6 @@
 """Handler for commits API operations."""
 
-from typing import Any, Dict, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from .base import OperationHandler
 
@@ -8,20 +8,35 @@ from .base import OperationHandler
 class CommitsOperationHandler(OperationHandler):
     """Handler for commits API operations."""
 
-    # CLI parameter names
-    CLI_PARAM_HOST_NAME = "hostname"
-    CLI_PARAM_REPO_NAME = "reponame"
+    # Operation parameter configuration
+    # Maps operation_id -> list of (api_param_name, lowercase_variants)
+    OPERATION_PARAMS = {
+        "getHost": [("hostName", ["hostname"])],
+        "getHostRepositories": [("hostName", ["hostname"])],
+        "getHostRepository": [("hostName", ["hostname"]), ("repoName", ["reponame"])],
+        "getRepositoryCommits": [("hostName", ["hostname"]), ("repoName", ["reponame"])],
+    }
 
-    # OpenAPI parameter names
-    API_PARAM_HOST_NAME = "hostName"
-    API_PARAM_REPO_NAME = "repoName"
+    def _extract_param(self, kwargs: dict, api_name: str, lowercase_variants: List[str]) -> Optional[str]:
+        """Extract parameter from kwargs, trying API name first, then lowercase variants.
 
-    def _extract_param(self, kwargs: dict, cli_name: str, api_name: str) -> str | None:
-        """Extract parameter from kwargs, trying both CLI and API names."""
+        Args:
+            kwargs: Keyword arguments dict
+            api_name: The API parameter name (exact case)
+            lowercase_variants: List of lowercase parameter name variants to try
+
+        Returns:
+            Parameter value if found, None otherwise
+        """
+        # Try exact API name first
         if api_name in kwargs:
             return kwargs.pop(api_name)
-        elif cli_name in kwargs:
-            return kwargs.pop(cli_name)
+
+        # Try lowercase variants
+        for variant in lowercase_variants:
+            if variant in kwargs:
+                return kwargs.pop(variant)
+
         return None
 
     def build_params(self, operation_id: str, args: tuple, kwargs: dict) -> Tuple[Dict[str, Any], Dict[str, Any]]:
@@ -38,54 +53,19 @@ class CommitsOperationHandler(OperationHandler):
         path_params = {}
         query_params = {}
 
-        # Handle path parameters for specific operations
-        if operation_id == "getHost":
-            # The host name is a path parameter
-            if args:
-                path_params[self.API_PARAM_HOST_NAME] = args[0]
-            else:
-                host_name = self._extract_param(kwargs, self.CLI_PARAM_HOST_NAME, self.API_PARAM_HOST_NAME)
-                if host_name:
-                    path_params[self.API_PARAM_HOST_NAME] = host_name
+        # Get parameter configuration for this operation
+        param_config = self.OPERATION_PARAMS.get(operation_id, [])
 
-        elif operation_id == "getHostRepositories":
-            # The host name is a path parameter
-            if args:
-                path_params[self.API_PARAM_HOST_NAME] = args[0]
+        # Extract path parameters from args or kwargs
+        for i, (api_name, lowercase_variants) in enumerate(param_config):
+            if i < len(args):
+                # Use positional argument
+                path_params[api_name] = args[i]
             else:
-                host_name = self._extract_param(kwargs, self.CLI_PARAM_HOST_NAME, self.API_PARAM_HOST_NAME)
-                if host_name:
-                    path_params[self.API_PARAM_HOST_NAME] = host_name
-
-        elif operation_id == "getHostRepository":
-            # The host name and repository name are path parameters
-            if len(args) >= 2:
-                path_params["hostName"] = args[0]
-                path_params["repoName"] = args[1]
-            else:
-                if "hostName" in kwargs:
-                    path_params["hostName"] = kwargs.pop("hostName")
-                elif "hostname" in kwargs:
-                    path_params["hostName"] = kwargs.pop("hostname")
-                if "repoName" in kwargs:
-                    path_params["repoName"] = kwargs.pop("repoName")
-                elif "reponame" in kwargs:
-                    path_params["repoName"] = kwargs.pop("reponame")
-
-        elif operation_id == "getRepositoryCommits":
-            # The host name and repository name are path parameters
-            if len(args) >= 2:
-                path_params["hostName"] = args[0]
-                path_params["repoName"] = args[1]
-            else:
-                if "hostName" in kwargs:
-                    path_params["hostName"] = kwargs.pop("hostName")
-                elif "hostname" in kwargs:
-                    path_params["hostName"] = kwargs.pop("hostname")
-                if "repoName" in kwargs:
-                    path_params["repoName"] = kwargs.pop("repoName")
-                elif "reponame" in kwargs:
-                    path_params["repoName"] = kwargs.pop("reponame")
+                # Try to extract from kwargs
+                value = self._extract_param(kwargs, api_name, lowercase_variants)
+                if value is not None:
+                    path_params[api_name] = value
 
         # For all operations, remaining kwargs are query parameters
         for key, value in kwargs.items():

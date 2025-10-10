@@ -36,7 +36,8 @@ class DockerOperationHandler(OperationHandler):
         """Handle getPackage operation parameters."""
         path_params = {}
 
-        package_name = args[0] if args else kwargs.get("packageName")
+        # Click normalizes parameter names to lowercase, so check both
+        package_name = args[0] if args else (kwargs.get("packageName") or kwargs.get("packagename"))
         if package_name:
             path_params["packageName"] = package_name
 
@@ -47,7 +48,8 @@ class DockerOperationHandler(OperationHandler):
         path_params = {}
         query_params = {}
 
-        package_name = args[0] if args else kwargs.pop("packageName", None)
+        # Click normalizes parameter names to lowercase
+        package_name = args[0] if args else (kwargs.pop("packageName", None) or kwargs.pop("packagename", None))
         if package_name:
             path_params["packageName"] = package_name
 
@@ -64,10 +66,11 @@ class DockerOperationHandler(OperationHandler):
             path_params["packageName"] = args[0]
             path_params["versionNumber"] = args[1]
         else:
-            if "packageName" in kwargs:
-                path_params["packageName"] = kwargs["packageName"]
-            if "versionNumber" in kwargs:
-                path_params["versionNumber"] = kwargs["versionNumber"]
+            # Click normalizes parameter names to lowercase
+            if "packageName" in kwargs or "packagename" in kwargs:
+                path_params["packageName"] = kwargs.get("packageName") or kwargs.get("packagename")
+            if "versionNumber" in kwargs or "versionnumber" in kwargs:
+                path_params["versionNumber"] = kwargs.get("versionNumber") or kwargs.get("versionnumber")
 
         return path_params, {}
 
