@@ -6,7 +6,7 @@ This module provides a client implementation using openapi-core for OpenAPI v3 s
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
-from urllib.parse import urljoin
+from urllib.parse import quote, urljoin
 
 import requests
 import yaml
@@ -63,6 +63,31 @@ class OpenAPIClientFactory:
             return servers[0]["url"]
         return API_BASE_URL_TEMPLATE.format(api_name=api_name)
 
+    def _fix_response_codes(self, spec: Dict[str, Any]) -> Dict[str, Any]:
+        """Convert integer response codes to strings in OpenAPI spec.
+
+        YAML parses numeric response codes (e.g., 200, 301) as integers,
+        but OpenAPI 3.0 spec requires them to be strings.
+
+        Args:
+            spec: The OpenAPI specification dictionary
+
+        Returns:
+            Fixed specification dictionary with string response codes
+        """
+        if "paths" not in spec:
+            return spec
+
+        for path, methods in spec["paths"].items():
+            for method, operation in methods.items():
+                if isinstance(operation, dict) and "responses" in operation:
+                    # Convert integer keys to strings
+                    responses = operation["responses"]
+                    if isinstance(responses, dict):
+                        operation["responses"] = {str(k): v for k, v in responses.items()}
+
+        return spec
+
     def _build_operation_map(self, api_name: str, spec: Dict[str, Any]) -> Dict[str, Any]:
         """Build operation ID to path/method mapping."""
         operation_map = {}
@@ -107,6 +132,9 @@ class OpenAPIClientFactory:
             # Load the OpenAPI spec
             with open(spec_path, "r") as f:
                 spec_dict = yaml.safe_load(f)
+
+            # Fix response codes: OpenAPI spec requires string keys, but YAML parses numeric keys as integers
+            spec_dict = self._fix_response_codes(spec_dict)
 
             # Create OpenAPI instance
             openapi = OpenAPI.from_dict(spec_dict)
@@ -174,11 +202,17 @@ class OpenAPIClientFactory:
         # Build the request URL
         path = operation_info["path"]
 
-        # Replace path parameters
+        # Replace path parameters with URL-encoded values
         if path_params:
             for param_name, param_value in path_params.items():
-                path = path.replace(f"{{{param_name}}}", str(param_value))
+                # URL-encode the parameter value (safe='' means encode everything including '/')
+                encoded_value = quote(str(param_value), safe="")
+                path = path.replace(f"{{{param_name}}}", encoded_value)
 
+        # Ensure proper URL joining by adding trailing slash to base_url
+        # urljoin replaces the last component if base_url doesn't end with /
+        if not base_url.endswith("/"):
+            base_url += "/"
         url = urljoin(base_url, path.lstrip("/"))
 
         # Build headers
