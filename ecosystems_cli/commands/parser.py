@@ -105,7 +105,7 @@ def create_job(
 
                 # Get job status
                 handler_get = OperationHandlerFactory.get_handler("parser")
-                path_params_get, query_params_get = handler_get.build_params("getJob", (), {"jobID": job_id})
+                path_params_get, query_params_get = handler_get.build_params("getJob", (), {"job_id": job_id})
 
                 job_status = api_factory.call(
                     "parser",
