@@ -55,7 +55,7 @@ name = "ecosystems-cli"
 version = "1.0.0"
 description = "CLI for ecosyste.ms API"
 authors = [
-    {name = "Sebastian Schürmann", email = "sebastian.schurmann@gmail.com"}
+    {name = "Sebastian Schürmann", email = "sebs@2xs.org"}
 ]
 license = "MIT"
 readme = "README.md"
