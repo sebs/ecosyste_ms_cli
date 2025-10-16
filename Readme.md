@@ -1,6 +1,6 @@
 # Ecosystems CLI
 
-> The cli is still in a development phase. Some aspects of documentation or dev-x are lacking and some aspects of this software might havew bugs.
+> The cli is still in a development phase. Some aspects of documentation or dev-x are lacking and some aspects of this software might have bugs.
 
 [![build-test-lint](https://github.com/ecosyste-ms/ecosyste_ms_cli/actions/workflows/build-test-lint.yml/badge.svg)](https://github.com/ecosyste-ms/ecosyste_ms_cli/actions/workflows/build-test-lint.yml)
 [![Latest Release](https://img.shields.io/github/v/release/ecosyste-ms/ecosyste_ms_cli)](https://github.com/ecosyste-ms/ecosyste_ms_cli/releases/latest)
@@ -11,7 +11,7 @@ A command-line interface for interacting with ecosyste.ms APIs.
 ## Installation
 
 Requirements:
-- Python >= 3.12
+- Python >= 3.9
 
 ```bash
 # Clone the repository

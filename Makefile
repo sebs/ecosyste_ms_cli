@@ -1,4 +1,4 @@
-.PHONY: setup clean test lint format prepare-release
+.PHONY: setup clean test lint format prepare-release docker-build
 
 PYTHON = python3.12
 VENV = .venv
@@ -78,3 +78,6 @@ prepare-release:
 	git push origin --tags; \
 	echo "Release v$$current_version prepared and pushed!"; \
 	echo "The GitHub Actions workflow will handle the release process."
+
+docker-build:
+	docker build -t ecosystems-cli:dev .
