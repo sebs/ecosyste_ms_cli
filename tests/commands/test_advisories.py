@@ -159,3 +159,86 @@ class TestAdvisoriesCommands:
 
         assert result.exit_code == 0
         mock_print_error.assert_called_once_with("Unexpected error: Invalid PURL format", console=mock.ANY)
+
+    @mock.patch("ecosystems_cli.commands.execution.api_factory")
+    @mock.patch("ecosystems_cli.commands.execution.print_output")
+    def test_get_advisories_with_purl(self, mock_print_output, mock_api_factory):
+        """Test get_advisories with PURL parameter."""
+        mock_api_factory.call.return_value = [{"uuid": "123", "title": "Test Advisory", "severity": "high"}]
+
+        result = self.runner.invoke(
+            self.advisories_group,
+            ["get_advisories", "--purl", "pkg:npm/fsa", "--severity", "high"],
+            obj={"timeout": 20, "format": "json"},
+        )
+
+        assert result.exit_code == 0
+        mock_api_factory.call.assert_called_once_with(
+            "advisories",
+            "getAdvisories",
+            path_params={},
+            query_params={
+                "ecosystem": "npm",
+                "package_name": "fsa",
+                "severity": "high",
+            },
+            timeout=mock.ANY,
+            mailto=mock.ANY,
+            base_url=mock.ANY,
+        )
+        mock_print_output.assert_called_once()
+
+    @mock.patch("ecosystems_cli.commands.execution.api_factory")
+    @mock.patch("ecosystems_cli.commands.execution.print_output")
+    def test_get_advisories_with_scoped_purl(self, mock_print_output, mock_api_factory):
+        """Test get_advisories with scoped package PURL."""
+        mock_api_factory.call.return_value = [{"uuid": "456", "title": "Babel Advisory", "severity": "critical"}]
+
+        result = self.runner.invoke(
+            self.advisories_group,
+            ["get_advisories", "--purl", "pkg:npm/@babel/traverse"],
+            obj={"timeout": 20, "format": "json"},
+        )
+
+        assert result.exit_code == 0
+        mock_api_factory.call.assert_called_once_with(
+            "advisories",
+            "getAdvisories",
+            path_params={},
+            query_params={
+                "ecosystem": "npm",
+                "package_name": "@babel/traverse",
+            },
+            timeout=mock.ANY,
+            mailto=mock.ANY,
+            base_url=mock.ANY,
+        )
+        mock_print_output.assert_called_once()
+
+    @mock.patch("ecosystems_cli.commands.execution.api_factory")
+    @mock.patch("ecosystems_cli.commands.execution.print_output")
+    def test_get_advisories_purl_overrides_ecosystem_package(self, mock_print_output, mock_api_factory):
+        """Test that PURL overrides ecosystem and package-name when both are provided."""
+        mock_api_factory.call.return_value = [{"uuid": "789", "title": "Override Test", "severity": "low"}]
+
+        result = self.runner.invoke(
+            self.advisories_group,
+            ["get_advisories", "--purl", "pkg:npm/fsa", "--ecosystem", "pypi", "--package-name", "django"],
+            obj={"timeout": 20, "format": "json"},
+        )
+
+        assert result.exit_code == 0
+        # PURL should override the explicit ecosystem and package-name
+        mock_api_factory.call.assert_called_once_with(
+            "advisories",
+            "getAdvisories",
+            path_params={},
+            query_params={
+                "ecosystem": "npm",
+                "package_name": "fsa",
+            },
+            timeout=mock.ANY,
+            mailto=mock.ANY,
+            base_url=mock.ANY,
+        )
+        mock_print_output.assert_called_once()
