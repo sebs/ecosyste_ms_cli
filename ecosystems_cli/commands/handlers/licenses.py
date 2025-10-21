@@ -41,7 +41,7 @@ class LicensesOperationHandler(OperationHandler):
         """Handle getJob operation parameters."""
         path_params = {}
 
-        job_id = args[0] if args else kwargs.get("jobID")
+        job_id = args[0] if args else kwargs.get("job_id")
         if job_id:
             path_params["jobID"] = job_id
 

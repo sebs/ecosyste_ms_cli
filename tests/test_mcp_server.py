@@ -1,6 +1,7 @@
 """Tests for MCP server functionality."""
 
-from unittest.mock import MagicMock, patch
+from unittest import mock
+from unittest.mock import patch
 
 import pytest
 
@@ -139,18 +140,16 @@ class TestEcosystemsMCPServer:
         assert schema["properties"]["body"]["type"] == "object"
 
     @pytest.mark.asyncio
-    @patch("ecosystems_cli.mcp_server.get_client")
+    @patch("ecosystems_cli.mcp_server.api_factory")
     @patch("ecosystems_cli.mcp_server.get_domain_with_precedence")
     @patch("ecosystems_cli.mcp_server.build_base_url")
-    async def test_call_api(self, mock_build_url, mock_get_domain, mock_get_client, mcp_server):
+    async def test_call_api(self, mock_build_url, mock_get_domain, mock_api_factory, mcp_server):
         """Test calling an API operation."""
         # Setup mocks
         mock_get_domain.return_value = "api.example.com"
         mock_build_url.return_value = "https://api.example.com/v1"
 
-        mock_client = MagicMock()
-        mock_client.call.return_value = {"status": "success", "data": {"id": 1}}
-        mock_get_client.return_value = mock_client
+        mock_api_factory.call.return_value = {"status": "success", "data": {"id": 1}}
 
         # Call the API
         result = await mcp_server._call_api(
@@ -164,12 +163,14 @@ class TestEcosystemsMCPServer:
         # Verify the calls
         mock_get_domain.assert_called_once_with("repos", None)
         mock_build_url.assert_called_once_with("api.example.com", "repos")
-        mock_get_client.assert_called_once()
-        mock_client.call.assert_called_once_with(
+        mock_api_factory.call.assert_called_once_with(
+            api_name="repos",
             operation_id="get_repository",
             path_params={"host": "github.com", "owner": "test", "name": "repo"},
             query_params={"full": "true"},
             body=None,
+            timeout=mock.ANY,
+            base_url="https://api.example.com/v1",
         )
 
         assert result == {"status": "success", "data": {"id": 1}}
@@ -209,13 +210,13 @@ class TestEcosystemsMCPServer:
         assert result == {"packages": [{"name": "package1"}]}
 
     @pytest.mark.asyncio
-    @patch("ecosystems_cli.mcp_server.get_client")
-    async def test_call_tool_error_handling(self, mock_get_client, mcp_server):
+    @patch("ecosystems_cli.mcp_server.api_factory")
+    async def test_call_tool_error_handling(self, mock_api_factory, mcp_server):
         """Test error handling in call_tool."""
         # Make the client raise an exception
         from ecosystems_cli.exceptions import EcosystemsCLIError
 
-        mock_get_client.side_effect = EcosystemsCLIError("Connection failed")
+        mock_api_factory.call.side_effect = EcosystemsCLIError("Connection failed")
 
         # Test that errors are properly handled
         with pytest.raises(Exception) as exc_info:

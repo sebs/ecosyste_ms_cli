@@ -1,3 +1,5 @@
+import json
+from datetime import datetime
 from typing import Any, List
 
 from rich.console import Console
@@ -9,8 +11,17 @@ from ecosystems_cli.constants import (
     PRIORITY_FIELDS,
     TABLE_HEADER_STYLE,
 )
+from ecosystems_cli.helpers.flatten_dict import flatten_dict
 from ecosystems_cli.helpers.format_value import format_value
-from ecosystems_cli.helpers.parse_endpoints import flatten_dict
+
+
+class DateTimeEncoder(json.JSONEncoder):
+    """Custom JSON encoder that handles datetime objects."""
+
+    def default(self, obj):
+        if isinstance(obj, datetime):
+            return obj.isoformat()
+        return super().default(obj)
 
 
 class TableFieldSelector:
@@ -79,9 +90,7 @@ class TableFieldSelector:
 
 def _format_json(data: Any, console: Console) -> None:
     """Format and print data as JSON."""
-    import json
-
-    json_str = json.dumps(data, indent=2)
+    json_str = json.dumps(data, indent=2, cls=DateTimeEncoder)
     # Use plain print to avoid Rich formatting
     print(json_str)
 
@@ -101,13 +110,11 @@ def _format_tsv(data: Any, console: Console) -> None:
 
 def _format_jsonl(data: Any, console: Console) -> None:
     """Format and print data as JSONL (JSON Lines)."""
-    import json
-
     if isinstance(data, list):
         for item in data:
-            console.print(json.dumps(item))
+            console.print(json.dumps(item, cls=DateTimeEncoder))
     else:
-        console.print(json.dumps(data))
+        console.print(json.dumps(data, cls=DateTimeEncoder))
 
 
 def _select_table_fields(headers: list[str]) -> list[str]:

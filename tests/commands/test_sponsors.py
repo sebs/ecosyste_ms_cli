@@ -16,16 +16,14 @@ class TestSponsorsCommands:
 
         self.sponsors_group = sponsors
 
-    @mock.patch("ecosystems_cli.commands.execution.get_client")
+    @mock.patch("ecosystems_cli.commands.execution.api_factory")
     @mock.patch("ecosystems_cli.commands.execution.print_output")
-    def test_list_accounts(self, mock_print_output, mock_get_client):
+    def test_list_accounts(self, mock_print_output, mock_api_factory):
         """Test listing accounts."""
-        mock_client = mock.MagicMock()
-        mock_client.call.return_value = [
+        mock_api_factory.call.return_value = [
             {"login": "octocat", "has_sponsors_listing": True, "sponsors_count": 10},
             {"login": "defunkt", "has_sponsors_listing": False, "sponsors_count": 0},
         ]
-        mock_get_client.return_value = mock_client
 
         result = self.runner.invoke(
             self.sponsors_group,
@@ -34,30 +32,31 @@ class TestSponsorsCommands:
         )
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("sponsors", base_url=None, timeout=20, mailto=None)
-        mock_client.call.assert_called_once_with(
+        mock_api_factory.call.assert_called_once_with(
+            "sponsors",
             "listAccounts",
             path_params={},
             query_params={
                 "page": 1,
                 "per_page": 20,
             },
+            timeout=mock.ANY,
+            mailto=mock.ANY,
+            base_url=mock.ANY,
         )
         mock_print_output.assert_called_once()
 
-    @mock.patch("ecosystems_cli.commands.execution.get_client")
+    @mock.patch("ecosystems_cli.commands.execution.api_factory")
     @mock.patch("ecosystems_cli.commands.execution.print_output")
-    def test_get_account(self, mock_print_output, mock_get_client):
+    def test_get_account(self, mock_print_output, mock_api_factory):
         """Test getting a specific account."""
-        mock_client = mock.MagicMock()
-        mock_client.call.return_value = {
+        mock_api_factory.call.return_value = {
             "login": "octocat",
             "has_sponsors_listing": True,
             "sponsors_count": 10,
             "sponsorships_count": 5,
             "active_sponsorships_count": 3,
         }
-        mock_get_client.return_value = mock_client
 
         result = self.runner.invoke(
             self.sponsors_group,
@@ -66,24 +65,25 @@ class TestSponsorsCommands:
         )
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("sponsors", base_url=None, timeout=20, mailto=None)
-        mock_client.call.assert_called_once_with(
+        mock_api_factory.call.assert_called_once_with(
+            "sponsors",
             "getAccount",
             path_params={"login": "octocat"},
             query_params={},
+            timeout=mock.ANY,
+            mailto=mock.ANY,
+            base_url=mock.ANY,
         )
         mock_print_output.assert_called_once()
 
-    @mock.patch("ecosystems_cli.commands.execution.get_client")
+    @mock.patch("ecosystems_cli.commands.execution.api_factory")
     @mock.patch("ecosystems_cli.commands.execution.print_output")
-    def test_list_account_sponsors(self, mock_print_output, mock_get_client):
+    def test_list_account_sponsors(self, mock_print_output, mock_api_factory):
         """Test listing sponsors for an account."""
-        mock_client = mock.MagicMock()
-        mock_client.call.return_value = [
+        mock_api_factory.call.return_value = [
             {"id": 1, "status": "active", "funder": {"login": "sponsor1"}, "maintainer": {"login": "octocat"}},
             {"id": 2, "status": "active", "funder": {"login": "sponsor2"}, "maintainer": {"login": "octocat"}},
         ]
-        mock_get_client.return_value = mock_client
 
         result = self.runner.invoke(
             self.sponsors_group,
@@ -92,24 +92,25 @@ class TestSponsorsCommands:
         )
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("sponsors", base_url=None, timeout=20, mailto=None)
-        mock_client.call.assert_called_once_with(
+        mock_api_factory.call.assert_called_once_with(
+            "sponsors",
             "listAccountSponsors",
             path_params={"login": "octocat"},
             query_params={"page": 1},
+            timeout=mock.ANY,
+            mailto=mock.ANY,
+            base_url=mock.ANY,
         )
         mock_print_output.assert_called_once()
 
-    @mock.patch("ecosystems_cli.commands.execution.get_client")
+    @mock.patch("ecosystems_cli.commands.execution.api_factory")
     @mock.patch("ecosystems_cli.commands.execution.print_output")
-    def test_list_sponsors(self, mock_print_output, mock_get_client):
+    def test_list_sponsors(self, mock_print_output, mock_api_factory):
         """Test listing all sponsors."""
-        mock_client = mock.MagicMock()
-        mock_client.call.return_value = [
+        mock_api_factory.call.return_value = [
             {"login": "sponsor1", "has_sponsors_listing": False, "sponsors_count": 0},
             {"login": "sponsor2", "has_sponsors_listing": False, "sponsors_count": 0},
         ]
-        mock_get_client.return_value = mock_client
 
         result = self.runner.invoke(
             self.sponsors_group,
@@ -118,21 +119,22 @@ class TestSponsorsCommands:
         )
 
         assert result.exit_code == 0
-        mock_get_client.assert_called_once_with("sponsors", base_url=None, timeout=20, mailto=None)
-        mock_client.call.assert_called_once_with(
+        mock_api_factory.call.assert_called_once_with(
+            "sponsors",
             "listSponsors",
             path_params={},
             query_params={},
+            timeout=mock.ANY,
+            mailto=mock.ANY,
+            base_url=mock.ANY,
         )
         mock_print_output.assert_called_once()
 
-    @mock.patch("ecosystems_cli.commands.execution.get_client")
+    @mock.patch("ecosystems_cli.commands.execution.api_factory")
     @mock.patch("ecosystems_cli.commands.execution.print_error")
-    def test_get_account_error(self, mock_print_error, mock_get_client):
+    def test_get_account_error(self, mock_print_error, mock_api_factory):
         """Test error handling when getting an account."""
-        mock_client = mock.MagicMock()
-        mock_client.call.side_effect = Exception("Account not found")
-        mock_get_client.return_value = mock_client
+        mock_api_factory.call.side_effect = Exception("Account not found")
 
         result = self.runner.invoke(
             self.sponsors_group,

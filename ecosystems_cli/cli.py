@@ -7,7 +7,6 @@ import click
 from rich.console import Console
 from rich.panel import Panel
 
-from ecosystems_cli.api_client import get_client
 from ecosystems_cli.commands.advisories import advisories
 from ecosystems_cli.commands.archives import archives
 from ecosystems_cli.commands.commits import commits
@@ -38,6 +37,7 @@ from ecosystems_cli.helpers.format_value import format_value
 from ecosystems_cli.helpers.get_domain import build_base_url, get_domain_with_precedence
 from ecosystems_cli.helpers.print_operations import print_operations
 from ecosystems_cli.helpers.print_output import print_output
+from ecosystems_cli.openapi_client import _factory as api_factory
 
 console = Console()
 
@@ -166,15 +166,19 @@ def _call_operation(api: str, operation: str, path_params: str, query_params: st
     base_url = build_base_url(final_domain, api)
 
     try:
-        client = get_client(api, base_url=base_url, timeout=timeout)
-
         # Parse parameters
         path_params_dict = _parse_json_param(path_params)
         query_params_dict = _parse_json_param(query_params)
         body_dict = _parse_json_param(body)
 
-        result = client.call(
-            operation_id=operation, path_params=path_params_dict, query_params=query_params_dict, body=body_dict
+        result = api_factory.call(
+            api_name=api,
+            operation_id=operation,
+            path_params=path_params_dict,
+            query_params=query_params_dict,
+            body=body_dict,
+            timeout=timeout,
+            base_url=base_url,
         )
         _print_output(result, format_type)
     except JSONParseError as e:

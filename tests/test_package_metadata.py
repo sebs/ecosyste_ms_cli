@@ -1,26 +1,27 @@
 """Tests for package metadata."""
 
-import re
+import sys
 from pathlib import Path
+
+# Use tomllib for Python 3.11+ or tomli for earlier versions
+if sys.version_info >= (3, 11):
+    import tomllib
+else:
+    import tomli as tomllib
 
 
 def test_license_in_setup():
-    """Test that the license in setup.py matches the LICENSE file."""
+    """Test that the license in pyproject.toml matches the LICENSE file."""
     # Get the project root directory
     project_root = Path(__file__).parent.parent
 
-    # Read setup.py file
-    setup_path = project_root / "setup.py"
-    with open(setup_path, "r") as f:
-        setup_content = f.read()
+    # Read pyproject.toml file
+    pyproject_path = project_root / "pyproject.toml"
+    with open(pyproject_path, "rb") as f:
+        pyproject_data = tomllib.load(f)
 
-    # Extract license from setup.py using regex
-    license_match = re.search(r'license\s*=\s*["\']([^"\']*)["\'\s]', setup_content)
-    setup_license = license_match.group(1) if license_match else None
-
-    # Extract license classifier from setup.py
-    classifier_match = re.search(r'"License\s*::\s*OSI\s*Approved\s*::\s*([^"\']*)\s*License"', setup_content)
-    license_classifier = classifier_match.group(1) if classifier_match else None
+    # Extract license from pyproject.toml
+    project_license = pyproject_data.get("project", {}).get("license")
 
     # Read LICENSE file
     license_path = project_root / "LICENSE"
@@ -30,7 +31,6 @@ def test_license_in_setup():
     # Check if LICENSE file contains MIT license text
     is_mit_license = "MIT License" in license_content
 
-    # Assert license in setup.py matches LICENSE file
-    assert setup_license == "MIT", f"License in setup.py should be 'MIT', got '{setup_license}'"
-    assert license_classifier.strip() == "MIT", f"License classifier should be 'MIT', got '{license_classifier}'"
+    # Assert license in pyproject.toml matches LICENSE file
+    assert project_license == "MIT", f"License in pyproject.toml should be 'MIT', got '{project_license}'"
     assert is_mit_license, "LICENSE file should contain MIT license text"

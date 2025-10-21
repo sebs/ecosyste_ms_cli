@@ -3,6 +3,7 @@
 import asyncio
 import json
 import logging
+import signal
 from typing import Any, Dict, List
 
 from mcp.server import Server
@@ -10,11 +11,11 @@ from mcp.server.models import InitializationOptions
 from mcp.server.stdio import stdio_server
 from mcp.types import ServerCapabilities, TextContent, Tool
 
-from ecosystems_cli.api_client import get_client
 from ecosystems_cli.constants import DEFAULT_TIMEOUT
 from ecosystems_cli.exceptions import EcosystemsCLIError
 from ecosystems_cli.helpers.get_domain import build_base_url, get_domain_with_precedence
 from ecosystems_cli.helpers.load_api_spec import load_api_spec
+from ecosystems_cli.openapi_client import _factory as api_factory
 
 logger = logging.getLogger(__name__)
 
@@ -203,16 +204,16 @@ class EcosystemsMCPServer:
         domain = get_domain_with_precedence(api, None)
         base_url = build_base_url(domain, api)
 
-        # Get client
-        client = get_client(api, base_url=base_url, timeout=DEFAULT_TIMEOUT)
-
-        # Call the operation
+        # Call the operation using API factory
         try:
-            result = client.call(
+            result = api_factory.call(
+                api_name=api,
                 operation_id=operation,
                 path_params=path_params if path_params else None,
                 query_params=query_params if query_params else None,
                 body=body if body else None,
+                timeout=DEFAULT_TIMEOUT,
+                base_url=base_url,
             )
             return result
         except EcosystemsCLIError as e:
@@ -233,7 +234,28 @@ class EcosystemsMCPServer:
 def run_mcp_server():
     """Entry point for running the MCP server."""
     server = EcosystemsMCPServer()
-    asyncio.run(server.run())
+
+    # Set up signal handlers for graceful shutdown
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+
+    shutdown_event = asyncio.Event()
+
+    def signal_handler(sig, frame):
+        """Handle shutdown signals gracefully."""
+        logger.info(f"Received signal {sig}, initiating graceful shutdown...")
+        loop.call_soon_threadsafe(shutdown_event.set)
+
+    # Register signal handlers
+    signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGTERM, signal_handler)
+
+    try:
+        loop.run_until_complete(server.run())
+    except KeyboardInterrupt:
+        logger.info("Keyboard interrupt received, shutting down gracefully...")
+    finally:
+        loop.close()
 
 
 if __name__ == "__main__":
