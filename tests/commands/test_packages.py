@@ -185,3 +185,231 @@ class TestPackagesCommands:
 
         assert result.exit_code == 0
         mock_print_error.assert_called_once_with("Unexpected error: Package not found", console=mock.ANY)
+
+    @mock.patch("ecosystems_cli.commands.execution.api_factory")
+    @mock.patch("ecosystems_cli.commands.execution.print_output")
+    def test_get_registry_package_with_args(self, mock_print_output, mock_api_factory):
+        """Test getting a package by registry name and package name (positional args)."""
+        mock_api_factory.call.return_value = {
+            "ecosystem": "npm",
+            "name": "lodash",
+            "latest_version": "4.17.21",
+            "description": "Lodash modular utilities.",
+        }
+
+        result = self.runner.invoke(
+            self.packages_group,
+            ["get_registry_package", "npm", "lodash"],
+            obj={"timeout": 20, "format": "json"},
+        )
+
+        assert result.exit_code == 0
+        mock_api_factory.call.assert_called_once_with(
+            "packages",
+            "getRegistryPackage",
+            path_params={
+                "registryName": "npm",
+                "packageName": "lodash",
+            },
+            query_params={},
+            timeout=mock.ANY,
+            mailto=mock.ANY,
+            base_url=mock.ANY,
+        )
+        mock_print_output.assert_called_once()
+
+    @mock.patch("ecosystems_cli.commands.execution.api_factory")
+    @mock.patch("ecosystems_cli.commands.execution.print_output")
+    def test_get_registry_package_with_purl(self, mock_print_output, mock_api_factory):
+        """Test getting a package by PURL."""
+        mock_api_factory.call.return_value = {
+            "ecosystem": "npm",
+            "name": "lodash",
+            "latest_version": "4.17.21",
+            "description": "Lodash modular utilities.",
+        }
+
+        result = self.runner.invoke(
+            self.packages_group,
+            ["get_registry_package", "--purl", "pkg:npm/lodash"],
+            obj={"timeout": 20, "format": "json"},
+        )
+
+        assert result.exit_code == 0
+        mock_api_factory.call.assert_called_once_with(
+            "packages",
+            "getRegistryPackage",
+            path_params={
+                "registryName": "npmjs.org",
+                "packageName": "lodash",
+            },
+            query_params={},
+            timeout=mock.ANY,
+            mailto=mock.ANY,
+            base_url=mock.ANY,
+        )
+        mock_print_output.assert_called_once()
+
+    @mock.patch("ecosystems_cli.commands.execution.api_factory")
+    @mock.patch("ecosystems_cli.commands.execution.print_output")
+    def test_get_registry_package_with_scoped_purl(self, mock_print_output, mock_api_factory):
+        """Test getting a package by scoped PURL (e.g., @types/node)."""
+        mock_api_factory.call.return_value = {
+            "ecosystem": "npm",
+            "name": "@types/node",
+            "latest_version": "20.0.0",
+            "description": "TypeScript definitions for Node.js",
+        }
+
+        result = self.runner.invoke(
+            self.packages_group,
+            ["get_registry_package", "--purl", "pkg:npm/@types/node"],
+            obj={"timeout": 20, "format": "json"},
+        )
+
+        assert result.exit_code == 0
+        mock_api_factory.call.assert_called_once_with(
+            "packages",
+            "getRegistryPackage",
+            path_params={
+                "registryName": "npmjs.org",
+                "packageName": "@types/node",
+            },
+            query_params={},
+            timeout=mock.ANY,
+            mailto=mock.ANY,
+            base_url=mock.ANY,
+        )
+        mock_print_output.assert_called_once()
+
+    @mock.patch("ecosystems_cli.commands.execution.api_factory")
+    @mock.patch("ecosystems_cli.commands.execution.print_output")
+    def test_get_registry_package_version_with_args(self, mock_print_output, mock_api_factory):
+        """Test getting a package version by registry, name, and version (positional args)."""
+        mock_api_factory.call.return_value = {
+            "ecosystem": "npm",
+            "name": "lodash",
+            "version": "4.17.21",
+            "published_at": "2021-02-20T10:00:00Z",
+        }
+
+        result = self.runner.invoke(
+            self.packages_group,
+            ["get_registry_package_version", "npm", "lodash", "4.17.21"],
+            obj={"timeout": 20, "format": "json"},
+        )
+
+        assert result.exit_code == 0
+        mock_api_factory.call.assert_called_once_with(
+            "packages",
+            "getRegistryPackageVersion",
+            path_params={
+                "registryName": "npm",
+                "packageName": "lodash",
+                "versionNumber": "4.17.21",
+            },
+            query_params={},
+            timeout=mock.ANY,
+            mailto=mock.ANY,
+            base_url=mock.ANY,
+        )
+        mock_print_output.assert_called_once()
+
+    @mock.patch("ecosystems_cli.commands.execution.api_factory")
+    @mock.patch("ecosystems_cli.commands.execution.print_output")
+    def test_get_registry_package_version_with_purl(self, mock_print_output, mock_api_factory):
+        """Test getting a package version by PURL."""
+        mock_api_factory.call.return_value = {
+            "ecosystem": "npm",
+            "name": "lodash",
+            "version": "4.17.21",
+            "published_at": "2021-02-20T10:00:00Z",
+        }
+
+        result = self.runner.invoke(
+            self.packages_group,
+            ["get_registry_package_version", "--purl", "pkg:npm/lodash@4.17.21"],
+            obj={"timeout": 20, "format": "json"},
+        )
+
+        assert result.exit_code == 0
+        mock_api_factory.call.assert_called_once_with(
+            "packages",
+            "getRegistryPackageVersion",
+            path_params={
+                "registryName": "npmjs.org",
+                "packageName": "lodash",
+                "versionNumber": "4.17.21",
+            },
+            query_params={},
+            timeout=mock.ANY,
+            mailto=mock.ANY,
+            base_url=mock.ANY,
+        )
+        mock_print_output.assert_called_once()
+
+    @mock.patch("ecosystems_cli.commands.execution.api_factory")
+    @mock.patch("ecosystems_cli.commands.execution.print_output")
+    def test_get_registry_package_version_with_scoped_purl(self, mock_print_output, mock_api_factory):
+        """Test getting a package version by scoped PURL."""
+        mock_api_factory.call.return_value = {
+            "ecosystem": "npm",
+            "name": "@babel/core",
+            "version": "7.22.0",
+            "published_at": "2023-05-26T10:00:00Z",
+        }
+
+        result = self.runner.invoke(
+            self.packages_group,
+            ["get_registry_package_version", "--purl", "pkg:npm/@babel/core@7.22.0"],
+            obj={"timeout": 20, "format": "json"},
+        )
+
+        assert result.exit_code == 0
+        mock_api_factory.call.assert_called_once_with(
+            "packages",
+            "getRegistryPackageVersion",
+            path_params={
+                "registryName": "npmjs.org",
+                "packageName": "@babel/core",
+                "versionNumber": "7.22.0",
+            },
+            query_params={},
+            timeout=mock.ANY,
+            mailto=mock.ANY,
+            base_url=mock.ANY,
+        )
+        mock_print_output.assert_called_once()
+
+    def test_get_registry_package_missing_args(self):
+        """Test error when no arguments or PURL provided."""
+        result = self.runner.invoke(
+            self.packages_group,
+            ["get_registry_package"],
+            obj={"timeout": 20, "format": "json"},
+        )
+
+        assert result.exit_code != 0
+        assert "Either --purl or both REGISTRY_NAME and PACKAGE_NAME arguments are required" in result.output
+
+    def test_get_registry_package_version_missing_args(self):
+        """Test error when insufficient arguments provided for version command."""
+        result = self.runner.invoke(
+            self.packages_group,
+            ["get_registry_package_version", "npm", "lodash"],
+            obj={"timeout": 20, "format": "json"},
+        )
+
+        assert result.exit_code != 0
+        assert "Either --purl (with version) or all three arguments" in result.output
+
+    def test_get_registry_package_version_purl_without_version(self):
+        """Test error when PURL is provided without version."""
+        result = self.runner.invoke(
+            self.packages_group,
+            ["get_registry_package_version", "--purl", "pkg:npm/lodash"],
+            obj={"timeout": 20, "format": "json"},
+        )
+
+        assert result.exit_code != 0
+        assert "Either --purl (with version) or all three arguments" in result.output

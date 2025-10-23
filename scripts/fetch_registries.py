@@ -8,11 +8,11 @@ import json
 import subprocess
 import sys
 from pathlib import Path
-from typing import List
+from typing import Dict, List
 
 
-def fetch_registries() -> List[str]:
-    """Fetch registry names using the ecosystems CLI."""
+def fetch_registries() -> List[Dict[str, str]]:
+    """Fetch registry names and PURL types using the ecosystems CLI."""
     try:
         result = subprocess.run(
             ["ecosystems", "packages", "get_registries", "--per-page", "200", "--format", "json"],
@@ -21,7 +21,8 @@ def fetch_registries() -> List[str]:
             check=True,
         )
         registries = json.loads(result.stdout)
-        return sorted([registry["name"] for registry in registries])
+        registry_list = [{"name": registry["name"], "purl_type": registry["purl_type"]} for registry in registries]
+        return sorted(registry_list, key=lambda x: x["name"])
     except subprocess.CalledProcessError as e:
         print(f"Error fetching registries: {e}", file=sys.stderr)
         print(f"stderr: {e.stderr}", file=sys.stderr)
@@ -34,15 +35,16 @@ def fetch_registries() -> List[str]:
         sys.exit(1)
 
 
-def save_registries_yaml(registries: List[str], output_path: Path) -> None:
-    """Save registry names to a YAML file."""
+def save_registries_yaml(registries: List[Dict[str, str]], output_path: Path) -> None:
+    """Save registry names and PURL types to a YAML file."""
     yaml_content = "# Auto-generated list of available registries\n"
     yaml_content += "# Generated from: https://packages.ecosyste.ms/api/v1/registries\n"
     yaml_content += "# Run: python scripts/fetch_registries.py to update\n\n"
     yaml_content += "registries:\n"
 
     for registry in registries:
-        yaml_content += f"  - {registry}\n"
+        yaml_content += f"  - name: {registry['name']}\n"
+        yaml_content += f"    purl_type: {registry['purl_type']}\n"
 
     output_path.write_text(yaml_content)
     print(f"✓ Saved {len(registries)} registries to {output_path}")

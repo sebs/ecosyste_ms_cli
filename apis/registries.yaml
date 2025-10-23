@@ -3,78 +3,153 @@
 # Run: python scripts/fetch_registries.py to update
 
 registries:
-  - alpine-edge
-  - alpine-v3.10
-  - alpine-v3.11
-  - alpine-v3.12
-  - alpine-v3.13
-  - alpine-v3.14
-  - alpine-v3.15
-  - alpine-v3.16
-  - alpine-v3.17
-  - alpine-v3.18
-  - alpine-v3.19
-  - alpine-v3.20
-  - alpine-v3.21
-  - alpine-v3.22
-  - alpine-v3.3
-  - alpine-v3.4
-  - alpine-v3.5
-  - alpine-v3.6
-  - alpine-v3.7
-  - alpine-v3.8
-  - alpine-v3.9
-  - anaconda.org
-  - artifacts.alfresco.com
-  - bioconductor.org
-  - bower.io
-  - carthage
-  - clojars.org
-  - cocoapods.org
-  - conda-forge.org
-  - cran.r-project.org
-  - crates.io
-  - deno.land
-  - elpa.gnu.org
-  - elpa.nongnu.org
-  - forge.puppet.com
-  - formulae.brew.sh
-  - gem.coop
-  - github actions
-  - hackage.haskell.org
-  - hex.pm
-  - hub.docker.com
-  - juliahub.com
-  - metacpan.org
-  - npmjs.org
-  - nuget.org
-  - open-vsx.org
-  - package.elm-lang.org
-  - packagist.org
-  - pkg.adelielinux.org
-  - pkgs.racket-lang.org
-  - postmarketos-master
-  - postmarketos-v20.05
-  - postmarketos-v21.03
-  - postmarketos-v21.06
-  - postmarketos-v21.12
-  - postmarketos-v22.06
-  - postmarketos-v22.12
-  - postmarketos-v23.06
-  - postmarketos-v23.11
-  - postmarketos-v23.12
-  - postmarketos-v24.06
-  - postmarketos-v24.12
-  - postmarketos-v25.06
-  - proxy.golang.org
-  - pub.dev
-  - pypi.org
-  - repo1.maven.org
-  - repository.apache.org-releases
-  - repository.apache.org-snapshots
-  - repository.cloudera.com
-  - repository.jboss.org
-  - rubygems.org
-  - spack.io
-  - swiftpackageindex.com
-  - vcpkg.io
+  - name: alpine-edge
+    purl_type: alpine
+  - name: alpine-v3.10
+    purl_type: alpine
+  - name: alpine-v3.11
+    purl_type: alpine
+  - name: alpine-v3.12
+    purl_type: alpine
+  - name: alpine-v3.13
+    purl_type: alpine
+  - name: alpine-v3.14
+    purl_type: alpine
+  - name: alpine-v3.15
+    purl_type: alpine
+  - name: alpine-v3.16
+    purl_type: alpine
+  - name: alpine-v3.17
+    purl_type: alpine
+  - name: alpine-v3.18
+    purl_type: alpine
+  - name: alpine-v3.19
+    purl_type: alpine
+  - name: alpine-v3.20
+    purl_type: alpine
+  - name: alpine-v3.21
+    purl_type: alpine
+  - name: alpine-v3.22
+    purl_type: alpine
+  - name: alpine-v3.3
+    purl_type: alpine
+  - name: alpine-v3.4
+    purl_type: alpine
+  - name: alpine-v3.5
+    purl_type: alpine
+  - name: alpine-v3.6
+    purl_type: alpine
+  - name: alpine-v3.7
+    purl_type: alpine
+  - name: alpine-v3.8
+    purl_type: alpine
+  - name: alpine-v3.9
+    purl_type: alpine
+  - name: anaconda.org
+    purl_type: conda
+  - name: artifacts.alfresco.com
+    purl_type: maven
+  - name: bioconductor.org
+    purl_type: bioconductor
+  - name: bower.io
+    purl_type: bower
+  - name: carthage
+    purl_type: carthage
+  - name: clojars.org
+    purl_type: clojars
+  - name: cocoapods.org
+    purl_type: cocoapods
+  - name: conda-forge.org
+    purl_type: conda
+  - name: cran.r-project.org
+    purl_type: cran
+  - name: crates.io
+    purl_type: cargo
+  - name: deno.land
+    purl_type: deno
+  - name: elpa.gnu.org
+    purl_type: melpa
+  - name: elpa.nongnu.org
+    purl_type: melpa
+  - name: forge.puppet.com
+    purl_type: puppet
+  - name: formulae.brew.sh
+    purl_type: brew
+  - name: gem.coop
+    purl_type: gem
+  - name: github actions
+    purl_type: githubactions
+  - name: hackage.haskell.org
+    purl_type: hackage
+  - name: hex.pm
+    purl_type: hex
+  - name: hub.docker.com
+    purl_type: docker
+  - name: juliahub.com
+    purl_type: julia
+  - name: metacpan.org
+    purl_type: cpan
+  - name: npmjs.org
+    purl_type: npm
+  - name: nuget.org
+    purl_type: nuget
+  - name: open-vsx.org
+    purl_type: openvsx
+  - name: package.elm-lang.org
+    purl_type: elm
+  - name: packagist.org
+    purl_type: composer
+  - name: pkg.adelielinux.org
+    purl_type: adelie
+  - name: pkgs.racket-lang.org
+    purl_type: racket
+  - name: postmarketos-master
+    purl_type: postmarketos
+  - name: postmarketos-v20.05
+    purl_type: postmarketos
+  - name: postmarketos-v21.03
+    purl_type: postmarketos
+  - name: postmarketos-v21.06
+    purl_type: postmarketos
+  - name: postmarketos-v21.12
+    purl_type: postmarketos
+  - name: postmarketos-v22.06
+    purl_type: postmarketos
+  - name: postmarketos-v22.12
+    purl_type: postmarketos
+  - name: postmarketos-v23.06
+    purl_type: postmarketos
+  - name: postmarketos-v23.11
+    purl_type: postmarketos
+  - name: postmarketos-v23.12
+    purl_type: postmarketos
+  - name: postmarketos-v24.06
+    purl_type: postmarketos
+  - name: postmarketos-v24.12
+    purl_type: postmarketos
+  - name: postmarketos-v25.06
+    purl_type: postmarketos
+  - name: proxy.golang.org
+    purl_type: golang
+  - name: pub.dev
+    purl_type: pub
+  - name: pypi.org
+    purl_type: pypi
+  - name: repo1.maven.org
+    purl_type: maven
+  - name: repository.apache.org-releases
+    purl_type: maven
+  - name: repository.apache.org-snapshots
+    purl_type: maven
+  - name: repository.cloudera.com
+    purl_type: maven
+  - name: repository.jboss.org
+    purl_type: maven
+  - name: rubygems.org
+    purl_type: gem
+  - name: spack.io
+    purl_type: spack
+  - name: swiftpackageindex.com
+    purl_type: swift
+  - name: vcpkg.io
+    purl_type: vcpkg
