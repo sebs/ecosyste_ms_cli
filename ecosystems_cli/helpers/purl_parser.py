@@ -1,11 +1,11 @@
 """Utility for parsing Package URLs (PURLs)."""
 
-import re
 from functools import lru_cache
 from pathlib import Path
 from typing import Dict, Optional, Tuple
 
 import yaml
+from packageurl import PackageURL
 
 
 @lru_cache(maxsize=1)
@@ -103,18 +103,19 @@ def parse_purl_with_version(purl: str) -> Tuple[Optional[str], Optional[str], Op
     if not purl:
         return None, None, None
 
-    # Basic PURL pattern: pkg:type/...rest@version
-    # We want to extract type (ecosystem), package path, and optional version
-    pattern = r"^pkg:([^/]+)/(.+?)(?:@([^?#]+))?(?:\?[^#]*)?(?:#.*)?$"
-    match = re.match(pattern, purl)
+    try:
+        purl_obj = PackageURL.from_string(purl)
 
-    if not match:
+        # Construct the full package name from namespace and name
+        # For npm scoped packages: namespace='@babel', name='traverse' -> '@babel/traverse'
+        # For maven: namespace='org.apache.commons', name='commons-lang3' -> 'org.apache.commons/commons-lang3'
+        if purl_obj.namespace:
+            # Namespace and name are combined with a forward slash
+            package_name = f"{purl_obj.namespace}/{purl_obj.name}"
+        else:
+            package_name = purl_obj.name
+
+        return purl_obj.type, package_name, purl_obj.version
+    except (ValueError, AttributeError):
+        # Return None for invalid PURLs
         return None, None, None
-
-    purl_type = match.group(1)
-    package_name = match.group(2)
-    version = match.group(3) if match.group(3) else None
-
-    # Return purl_type as ecosystem (e.g., 'npm', 'pypi')
-    # Commands that need registry names should use purl_type_to_registry()
-    return purl_type, package_name, version
