@@ -81,6 +81,7 @@ dependencies = [
     "rich",
     "mcp",
     "openapi-core",
+    "packageurl-python",
 ]
 
 [project.optional-dependencies]
