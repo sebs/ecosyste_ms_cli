@@ -1,5 +1,72 @@
 # Changelog
 
+## v1.1.0 (2025-11-13)
+
+### Feat
+
+- simple purl handling
+- all create_job commands with the same cli interface
+- fetch registries and store as static list
+- improved parameter handling for resolve
+- add parser command with job support
+- integrates with claude
+- dockerized mcp
+- mailto header
+- initial version of rate limiting
+- summary
+- diff
+- archives
+- licenses parser
+- sbom parser
+- dependency resolver tool
+- dependency parser
+- dependabot
+- opencollective
+- docker
+- sponsors
+- add commits api
+- new route on advisories
+- timeline
+- issues api added
+- packages
+- packages
+- autocomplete & mcp
+- autocomplete
+- override domain to request to
+- header incl version
+
+### Fix
+
+- api for queue simplified
+- matching of triggers
+- pre-commit
+- pre-commit hooks now installed with setup
+- tests
+- correct pipeline badge
+- param errors
+- packages api parameters and json output
+- Command Registration Inconsistency
+- display default parameters
+- show base parameters in commands
+
+### Refactor
+
+- remove indent when returning json
+- use purl paser lib
+- job pattern for all
+- start to fix the refactor apis
+- bravado to new openapi client
+- lower and upper case params fixed
+- remove setup.py
+- use 3rd party openapi client to avoid re-invention of wheels (sad jak face)
+- improve handlers
+- simplify parameters
+- now its fine
+- simplify further
+- reduce to just 1 service and do ths right
+- Complex Context Management simplified
+- remove generic api call function from all commands
+
 ## [v1.0.0] - 2025-07-04
 
 ### Changes since v0.3.6
