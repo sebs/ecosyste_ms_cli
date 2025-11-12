@@ -70,8 +70,6 @@ prepare-release:
 		exit 1; \
 	fi
 	@echo "Preparing $(type) release..."
-	$(BIN)/pip install commitizen
-	$(BIN)/cz bump --increment $(type) --changelog
 	@current_version=$$(grep -o 'version = "[0-9]\+\.[0-9]\+\.[0-9]\+"' pyproject.toml | grep -o '[0-9]\+\.[0-9]\+\.[0-9]\+'); \
 	echo "Version bumped to v$$current_version"; \
 	git push origin main; \
