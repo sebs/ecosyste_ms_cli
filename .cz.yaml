@@ -1,10 +1,11 @@
+---
 commitizen:
+  major_version_zero: false
   name: cz_conventional_commits
   tag_format: v$version
-  version: 1.0.0
-  version_files:
-    - pyproject.toml:version
-    - setup.py:version
-    - ecosystems_cli/__init__.py:__version__
   update_changelog_on_bump: true
-  major_version_zero: false
+  version: 1.1.0
+  version_files:
+  - pyproject.toml:version
+  - setup.py:version
+  - ecosystems_cli/__init__.py:__version__
