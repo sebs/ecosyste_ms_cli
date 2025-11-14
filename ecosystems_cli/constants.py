@@ -72,7 +72,6 @@ ERROR_PREFIX = "[bold red]Error:[/bold red]"
 ERROR_PANEL_STYLE = "red"
 
 # File Patterns
-API_SPECS_DIR = "apis"
 OPENAPI_FILE_EXTENSION = ".openapi.yaml"
 
 # HTTP Configuration

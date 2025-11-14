@@ -20,7 +20,7 @@ def _load_purl_type_to_registry_mapping() -> Dict[str, str]:
     """
     # Get the path to registries.yaml
     current_file = Path(__file__)
-    apis_dir = current_file.parent.parent.parent / "apis"
+    apis_dir = current_file.parent.parent / "apis"
     registries_file = apis_dir / "registries.yaml"
 
     if not registries_file.exists():

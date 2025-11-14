@@ -180,7 +180,6 @@ class TestFilePatterns:
 
     def test_file_patterns(self):
         """Test file pattern settings."""
-        assert constants.API_SPECS_DIR == "apis"
         assert constants.OPENAPI_FILE_EXTENSION == ".openapi.yaml"
 
 
@@ -286,7 +285,6 @@ class TestConstantsCompleteness:
             "ERROR_PREFIX",
             "ERROR_PANEL_STYLE",
             # File Patterns
-            "API_SPECS_DIR",
             "OPENAPI_FILE_EXTENSION",
             # HTTP Configuration
             "HTTP_METHODS",

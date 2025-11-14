@@ -48,7 +48,7 @@ include = ["ecosystems_cli*"]
 exclude = ["tests*"]
 
 [tool.setuptools.package-data]
-"*" = ["*.yaml"]
+"ecosystems_cli.apis" = ["*.yaml"]
 
 [project]
 name = "ecosystems-cli"
@@ -82,6 +82,7 @@ dependencies = [
     "mcp",
     "openapi-core",
     "packageurl-python",
+    "importlib-resources; python_version < '3.9'",
 ]
 
 [project.optional-dependencies]
