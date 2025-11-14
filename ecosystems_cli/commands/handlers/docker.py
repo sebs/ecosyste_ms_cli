@@ -27,6 +27,9 @@ class DockerOperationHandler(OperationHandler):
             "usage": self._handle_no_params,
             "usageEcosystem": self._handle_usage_ecosystem,
             "usagePackage": self._handle_usage_package,
+            "getDistros": self._handle_query_params,
+            "getDistro": self._handle_get_distro,
+            "getDistroVersions": self._handle_get_distro_versions,
         }
 
         handler = handlers.get(operation_id, self._handle_default)
@@ -98,6 +101,32 @@ class DockerOperationHandler(OperationHandler):
                 path_params["package"] = kwargs["package"]
 
         return path_params, {}
+
+    def _handle_get_distro(self, args: tuple, kwargs: dict) -> Tuple[Dict[str, Any], Dict[str, Any]]:
+        """Handle getDistro operation parameters."""
+        path_params = {}
+
+        # Click normalizes parameter names to lowercase, so check both
+        slug = args[0] if args else (kwargs.get("slug"))
+        if slug:
+            path_params["slug"] = slug
+
+        return path_params, {}
+
+    def _handle_get_distro_versions(self, args: tuple, kwargs: dict) -> Tuple[Dict[str, Any], Dict[str, Any]]:
+        """Handle getDistroVersions operation parameters."""
+        path_params = {}
+        query_params = {}
+
+        # Click normalizes parameter names to lowercase
+        slug = args[0] if args else kwargs.pop("slug", None)
+        if slug:
+            path_params["slug"] = slug
+
+        # Add remaining kwargs as query parameters
+        query_params.update({k: v for k, v in kwargs.items() if v is not None})
+
+        return path_params, query_params
 
     def _handle_query_params(self, args: tuple, kwargs: dict) -> Tuple[Dict[str, Any], Dict[str, Any]]:
         """Handle operations that only have query parameters."""

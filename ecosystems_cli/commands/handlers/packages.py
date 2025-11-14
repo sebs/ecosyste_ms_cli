@@ -28,6 +28,7 @@ class PackagesOperationHandler(OperationHandler):
         "getRegistryRecentVersions": [("registryName", ["registryname"])],
         "getRegistryPackage": [("registryName", ["registryname"]), ("packageName", ["packagename"])],
         "getRegistryPackageDependentPackages": [("registryName", ["registryname"]), ("packageName", ["packagename"])],
+        "getRegistryPackageCodeMeta": [("registryName", ["registryname"]), ("packageName", ["packagename"])],
         "getRegistryPackageDependentPackageKinds": [("registryName", ["registryname"]), ("packageName", ["packagename"])],
         "getRegistryPackageRelatedPackages": [("registryName", ["registryname"]), ("packageName", ["packagename"])],
         "getRegistryPackageVersionNumbers": [("registryName", ["registryname"]), ("packageName", ["packagename"])],
