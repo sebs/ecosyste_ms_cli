@@ -10,7 +10,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Copy project files
 COPY pyproject.toml setup.py ./
 COPY ecosystems_cli/ ./ecosystems_cli/
-COPY apis/ ./apis/
 COPY README.md LICENSE ./
 
 # Install Python dependencies

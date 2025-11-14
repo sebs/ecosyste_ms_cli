@@ -3,6 +3,7 @@
 This module provides a client implementation using openapi-core for OpenAPI v3 specs.
 """
 
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -12,10 +13,14 @@ import requests
 import yaml
 from openapi_core import OpenAPI
 
+if sys.version_info >= (3, 9):
+    from importlib.resources import files
+else:
+    from importlib_resources import files
+
 from ecosystems_cli import __version__
 from ecosystems_cli.constants import (
     API_BASE_URL_TEMPLATE,
-    API_SPECS_DIR,
     DEFAULT_TIMEOUT,
     OPENAPI_FILE_EXTENSION,
 )
@@ -39,22 +44,29 @@ class OpenAPIClientFactory:
         """Initialize the factory.
 
         Args:
-            specs_dir: Directory containing OpenAPI specs. Defaults to project's apis directory.
+            specs_dir: Directory containing OpenAPI specs. Only used for testing with custom specs.
         """
-        if specs_dir is None:
-            specs_dir = Path(__file__).parent.parent / API_SPECS_DIR
-        self.specs_dir = Path(specs_dir)
+        self.specs_dir = Path(specs_dir) if specs_dir else None
         self._specs: Dict[str, Dict[str, Any]] = {}
         self._openapi: Dict[str, OpenAPI] = {}
         self._operation_map: Dict[str, Dict[str, Any]] = {}
 
     def _discover_apis(self) -> List[str]:
         """Discover all available API specs."""
-        if not self.specs_dir.exists():
-            return []
-        # Extract API name from filename by removing extension
-        # e.g., "test.openapi.yaml" -> "test"
-        return [f.name.replace(OPENAPI_FILE_EXTENSION, "") for f in self.specs_dir.glob(f"*{OPENAPI_FILE_EXTENSION}")]
+        if self.specs_dir:
+            # Custom specs directory for testing
+            if not self.specs_dir.exists():
+                return []
+            return [f.name.replace(OPENAPI_FILE_EXTENSION, "") for f in self.specs_dir.glob(f"*{OPENAPI_FILE_EXTENSION}")]
+        else:
+            # Use importlib.resources to discover specs in the package
+            try:
+                api_files = files("ecosystems_cli.apis").iterdir()
+                return [
+                    f.name.replace(OPENAPI_FILE_EXTENSION, "") for f in api_files if f.name.endswith(OPENAPI_FILE_EXTENSION)
+                ]
+            except (FileNotFoundError, ModuleNotFoundError):
+                return []
 
     def _get_default_base_url(self, api_name: str, spec: Dict[str, Any]) -> str:
         """Get default base URL from OpenAPI specification."""
@@ -123,15 +135,20 @@ class OpenAPIClientFactory:
         if api_name in self._openapi:
             return self._openapi[api_name]
 
-        # Load spec file
-        spec_path = self.specs_dir / f"{api_name}{OPENAPI_FILE_EXTENSION}"
-        if not spec_path.exists():
-            raise InvalidAPIError(api_name)
-
         try:
             # Load the OpenAPI spec
-            with open(spec_path, "r") as f:
-                spec_dict = yaml.safe_load(f)
+            if self.specs_dir:
+                # Custom specs directory for testing
+                spec_path = self.specs_dir / f"{api_name}{OPENAPI_FILE_EXTENSION}"
+                if not spec_path.exists():
+                    raise InvalidAPIError(api_name)
+                with open(spec_path, "r") as f:
+                    spec_dict = yaml.safe_load(f)
+            else:
+                # Use importlib.resources for packaged specs
+                api_file_name = f"{api_name}{OPENAPI_FILE_EXTENSION}"
+                spec_content = files("ecosystems_cli.apis").joinpath(api_file_name).read_text()
+                spec_dict = yaml.safe_load(spec_content)
 
             # Fix response codes: OpenAPI spec requires string keys, but YAML parses numeric keys as integers
             spec_dict = self._fix_response_codes(spec_dict)
@@ -146,7 +163,10 @@ class OpenAPIClientFactory:
 
             return openapi
 
-        except FileNotFoundError:
+        except InvalidAPIError:
+            # Re-raise InvalidAPIError as-is
+            raise
+        except (FileNotFoundError, ModuleNotFoundError):
             raise InvalidAPIError(api_name)
         except Exception as e:
             raise APIConnectionError(f"Failed to load spec for {api_name}: {str(e)}")
