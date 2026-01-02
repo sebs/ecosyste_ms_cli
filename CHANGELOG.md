@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.2.1 (2026-01-02)
+
+### Feat
+
+- new endpoints and api additions
+
 ## v1.2.0 (2025-11-13)
 
 ### Fix
