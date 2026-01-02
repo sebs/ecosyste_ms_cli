@@ -18,6 +18,158 @@ externalDocs:
 servers:
 - url: https://packages.ecosyste.ms/api/v1
 paths:
+  "/critical":
+    get:
+      summary: list critical packages
+      operationId: getCriticalPackages
+      tags:
+      - critical
+      parameters:
+      - name: registry
+        in: query
+        description: filter by registry name
+        required: false
+        schema:
+          type: string
+      - name: page
+        in: query
+        description: pagination page number
+        required: false
+        schema:
+          type: integer
+      - name: per_page
+        in: query
+        description: Number of records to return
+        required: false
+        schema:
+          type: integer
+      - name: sort
+        in: query
+        description: field to sort results by
+        required: false
+        schema:
+          type: string
+      - name: order
+        in: query
+        description: direction to sort results by (asc or desc)
+        required: false
+        schema:
+          type: string
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/PackageWithRegistry"
+  "/critical/sole_maintainers":
+    get:
+      summary: list critical packages with sole maintainers
+      operationId: getCriticalSoleMaintainers
+      tags:
+      - critical
+      parameters:
+      - name: registry
+        in: query
+        description: filter by registry name
+        required: false
+        schema:
+          type: string
+      - name: page
+        in: query
+        description: pagination page number
+        required: false
+        schema:
+          type: integer
+      - name: per_page
+        in: query
+        description: Number of records to return
+        required: false
+        schema:
+          type: integer
+      - name: sort
+        in: query
+        description: field to sort results by
+        required: false
+        schema:
+          type: string
+      - name: order
+        in: query
+        description: direction to sort results by (asc or desc)
+        required: false
+        schema:
+          type: string
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/PackageWithRegistry"
+  "/critical/maintainers":
+    get:
+      summary: list unique maintainers of critical packages
+      operationId: getCriticalMaintainers
+      tags:
+      - critical
+      parameters:
+      - name: registry
+        in: query
+        description: filter by registry name
+        required: false
+        schema:
+          type: string
+      - name: page
+        in: query
+        description: pagination page number
+        required: false
+        schema:
+          type: integer
+      - name: per_page
+        in: query
+        description: Number of records to return
+        required: false
+        schema:
+          type: integer
+      - name: sort
+        in: query
+        description: field to sort results by (login or packages_count)
+        required: false
+        schema:
+          type: string
+      - name: order
+        in: query
+        description: direction to sort results by (asc or desc)
+        required: false
+        schema:
+          type: string
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    login:
+                      type: string
+                    name:
+                      type: string
+                      nullable: true
+                    registry_name:
+                      type: string
+                    packages_count:
+                      type: integer
+                    packages:
+                      type: array
+                      items:
+                        "$ref": "#/components/schemas/PackageWithRegistry"
   "/packages/lookup":
     get:
       summary: lookup a package by repository URL, purl or ecosystem+name
@@ -832,6 +984,32 @@ paths:
                 type: array
                 items:
                   "$ref": "#/components/schemas/Package"
+  "/registries/{registryName}/packages/{packageName}/codemeta":
+    get:
+      summary: get CodeMeta metadata for a package
+      operationId: getRegistryPackageCodeMeta
+      tags:
+      - packages
+      parameters:
+      - in: path
+        name: registryName
+        schema:
+          type: string
+        required: true
+        description: name of registry
+      - in: path
+        name: packageName
+        schema:
+          type: string
+        required: true
+        description: name of package
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/CodeMeta"
   "/registries/{registryName}/packages/{packageName}/dependent_package_kinds":
     get:
       summary: get a list of dependency kinds for a package
@@ -1260,6 +1438,7 @@ components:
       - versions_url
       - dependent_packages_url
       - related_packages_url
+      - codemeta_url
       - docker_usage_url
       - docker_dependents_count
       - docker_downloads_count
@@ -1367,6 +1546,8 @@ components:
         dependent_packages_url:
           type: string
         related_packages_url:
+          type: string
+        codemeta_url:
           type: string
         docker_usage_url:
           type: string
@@ -1800,3 +1981,193 @@ components:
           type: array
           items:
             "$ref": "#/components/schemas/Package"
+    CodeMeta:
+      required:
+      - "@context"
+      - "@type"
+      - identifier
+      - name
+      type: object
+      description: CodeMeta JSON-LD metadata format for software packages, compatible
+        with Software Heritage
+      properties:
+        "@context":
+          type: string
+          description: JSON-LD context URL
+          example: https://w3id.org/codemeta/3.0
+        "@type":
+          type: string
+          description: Type of software artifact
+          example: SoftwareSourceCode
+        identifier:
+          type: string
+          description: Package URL (purl) identifier
+          example: pkg:cargo/rand@0.8.5
+        name:
+          type: string
+          description: Package name
+        description:
+          type: string
+          description: Package description
+          nullable: true
+        version:
+          type: string
+          description: Version number
+          nullable: true
+        softwareVersion:
+          type: string
+          description: Software version
+          nullable: true
+        license:
+          oneOf:
+          - type: string
+          - type: array
+            items:
+              type: string
+          description: SPDX license URL(s)
+          nullable: true
+        codeRepository:
+          type: string
+          description: Source code repository URL
+          nullable: true
+        issueTracker:
+          type: string
+          description: Issue tracker URL
+          nullable: true
+        url:
+          type: string
+          description: Homepage URL
+          nullable: true
+        keywords:
+          type: array
+          items:
+            type: string
+          description: Keywords and tags
+          nullable: true
+        programmingLanguage:
+          type: object
+          description: Programming language information
+          nullable: true
+          properties:
+            "@type":
+              type: string
+              example: ComputerLanguage
+            name:
+              type: string
+              example: Rust
+        maintainer:
+          type: array
+          description: Package maintainers
+          nullable: true
+          items:
+            type: object
+            properties:
+              "@type":
+                type: string
+                example: Person
+              name:
+                type: string
+              url:
+                type: string
+                nullable: true
+        author:
+          type: array
+          description: Package authors
+          nullable: true
+          items:
+            type: object
+            properties:
+              "@type":
+                type: string
+                example: Person
+              name:
+                type: string
+              url:
+                type: string
+                nullable: true
+        copyrightHolder:
+          type: array
+          description: Copyright holders
+          nullable: true
+          items:
+            type: object
+            properties:
+              "@type":
+                type: string
+                example: Person
+              name:
+                type: string
+              url:
+                type: string
+                nullable: true
+        dateCreated:
+          type: string
+          format: date-time
+          description: Creation date (ISO 8601)
+          nullable: true
+        dateModified:
+          type: string
+          format: date-time
+          description: Last modification date (ISO 8601)
+          nullable: true
+        datePublished:
+          type: string
+          format: date-time
+          description: Publication date (ISO 8601)
+          nullable: true
+        copyrightYear:
+          type: integer
+          description: Copyright year
+          nullable: true
+        downloadUrl:
+          type: string
+          description: Package download URL
+          nullable: true
+        softwareHelp:
+          type: object
+          description: Documentation/help resources
+          nullable: true
+          properties:
+            "@type":
+              type: string
+              example: WebSite
+            url:
+              type: string
+        applicationCategory:
+          type: string
+          description: Package ecosystem/category
+          nullable: true
+        runtimePlatform:
+          type: string
+          description: Runtime platform/ecosystem
+          nullable: true
+        developmentStatus:
+          type: string
+          description: Development status
+          nullable: true
+        sameAs:
+          type: array
+          items:
+            type: string
+          description: Alternative identifiers/URLs
+          nullable: true
+        funder:
+          type: array
+          description: Funding sources
+          nullable: true
+          items:
+            type: object
+            properties:
+              "@type":
+                type: string
+                example: Organization
+              url:
+                type: string
+        https://www.w3.org/ns/activitystreams#likes:
+          type: integer
+          description: Star/like count (ActivityStreams)
+          nullable: true
+        https://forgefed.org/ns#forks:
+          type: integer
+          description: Fork count (ForgeFed)
+          nullable: true

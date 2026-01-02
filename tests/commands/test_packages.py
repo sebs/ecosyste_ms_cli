@@ -413,3 +413,183 @@ class TestPackagesCommands:
 
         assert result.exit_code != 0
         assert "Either --purl (with version) or all three arguments" in result.output
+
+    @mock.patch("ecosystems_cli.commands.execution.api_factory")
+    @mock.patch("ecosystems_cli.commands.execution.print_output")
+    def test_get_critical_packages(self, mock_print_output, mock_api_factory):
+        """Test getting critical packages."""
+        mock_api_factory.call.return_value = [
+            {
+                "ecosystem": "npm",
+                "name": "lodash",
+                "critical": True,
+                "dependent_packages_count": 100000,
+            },
+            {
+                "ecosystem": "npm",
+                "name": "react",
+                "critical": True,
+                "dependent_packages_count": 80000,
+            },
+        ]
+
+        result = self.runner.invoke(
+            self.packages_group,
+            ["get_critical_packages", "--page", "1", "--per-page", "20"],
+            obj={"timeout": 20, "format": "table"},
+        )
+
+        assert result.exit_code == 0
+        mock_api_factory.call.assert_called_once_with(
+            "packages",
+            "getCriticalPackages",
+            path_params={},
+            query_params={
+                "page": 1,
+                "per_page": 20,
+            },
+            timeout=mock.ANY,
+            mailto=mock.ANY,
+            base_url=mock.ANY,
+        )
+        mock_print_output.assert_called_once()
+
+    @mock.patch("ecosystems_cli.commands.execution.api_factory")
+    @mock.patch("ecosystems_cli.commands.execution.print_output")
+    def test_get_critical_packages_by_registry(self, mock_print_output, mock_api_factory):
+        """Test getting critical packages filtered by registry."""
+        mock_api_factory.call.return_value = [
+            {
+                "ecosystem": "npm",
+                "name": "lodash",
+                "critical": True,
+                "dependent_packages_count": 100000,
+            },
+        ]
+
+        result = self.runner.invoke(
+            self.packages_group,
+            ["get_critical_packages", "--registry", "npmjs.org"],
+            obj={"timeout": 20, "format": "json"},
+        )
+
+        assert result.exit_code == 0
+        mock_api_factory.call.assert_called_once_with(
+            "packages",
+            "getCriticalPackages",
+            path_params={},
+            query_params={
+                "registry": "npmjs.org",
+            },
+            timeout=mock.ANY,
+            mailto=mock.ANY,
+            base_url=mock.ANY,
+        )
+        mock_print_output.assert_called_once()
+
+    @mock.patch("ecosystems_cli.commands.execution.api_factory")
+    @mock.patch("ecosystems_cli.commands.execution.print_output")
+    def test_get_critical_sole_maintainers(self, mock_print_output, mock_api_factory):
+        """Test getting critical packages with sole maintainers."""
+        mock_api_factory.call.return_value = [
+            {
+                "ecosystem": "npm",
+                "name": "some-package",
+                "critical": True,
+                "maintainers": [{"login": "sole-maintainer"}],
+            },
+        ]
+
+        result = self.runner.invoke(
+            self.packages_group,
+            ["get_critical_sole_maintainers"],
+            obj={"timeout": 20, "format": "json"},
+        )
+
+        assert result.exit_code == 0
+        mock_api_factory.call.assert_called_once_with(
+            "packages",
+            "getCriticalSoleMaintainers",
+            path_params={},
+            query_params={},
+            timeout=mock.ANY,
+            mailto=mock.ANY,
+            base_url=mock.ANY,
+        )
+        mock_print_output.assert_called_once()
+
+    @mock.patch("ecosystems_cli.commands.execution.api_factory")
+    @mock.patch("ecosystems_cli.commands.execution.print_output")
+    def test_get_critical_maintainers(self, mock_print_output, mock_api_factory):
+        """Test getting unique maintainers of critical packages."""
+        mock_api_factory.call.return_value = [
+            {
+                "login": "maintainer1",
+                "name": "Maintainer One",
+                "packages_count": 5,
+                "packages": [],
+            },
+            {
+                "login": "maintainer2",
+                "name": "Maintainer Two",
+                "packages_count": 3,
+                "packages": [],
+            },
+        ]
+
+        result = self.runner.invoke(
+            self.packages_group,
+            ["get_critical_maintainers", "--sort", "packages_count", "--order", "desc"],
+            obj={"timeout": 20, "format": "table"},
+        )
+
+        assert result.exit_code == 0
+        mock_api_factory.call.assert_called_once_with(
+            "packages",
+            "getCriticalMaintainers",
+            path_params={},
+            query_params={
+                "sort": "packages_count",
+                "order": "desc",
+            },
+            timeout=mock.ANY,
+            mailto=mock.ANY,
+            base_url=mock.ANY,
+        )
+        mock_print_output.assert_called_once()
+
+    @mock.patch("ecosystems_cli.commands.execution.api_factory")
+    @mock.patch("ecosystems_cli.commands.execution.print_output")
+    def test_get_registry_package_codemeta(self, mock_print_output, mock_api_factory):
+        """Test getting CodeMeta metadata for a package."""
+        mock_api_factory.call.return_value = {
+            "@context": "https://w3id.org/codemeta/3.0",
+            "@type": "SoftwareSourceCode",
+            "identifier": "pkg:npm/lodash@4.17.21",
+            "name": "lodash",
+            "description": "Lodash modular utilities.",
+            "version": "4.17.21",
+            "license": "https://spdx.org/licenses/MIT",
+            "codeRepository": "https://github.com/lodash/lodash",
+        }
+
+        result = self.runner.invoke(
+            self.packages_group,
+            ["get_registry_package_code_meta", "lodash", "npm"],
+            obj={"timeout": 20, "format": "json"},
+        )
+
+        assert result.exit_code == 0
+        mock_api_factory.call.assert_called_once_with(
+            "packages",
+            "getRegistryPackageCodeMeta",
+            path_params={
+                "registryName": "npm",
+                "packageName": "lodash",
+            },
+            query_params={},
+            timeout=mock.ANY,
+            mailto=mock.ANY,
+            base_url=mock.ANY,
+        )
+        mock_print_output.assert_called_once()
