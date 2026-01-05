@@ -1,55 +1,88 @@
 name: release
 
 on:
-  workflow_run:
-    workflows: ["build-test-lint"]
-    types: [completed]
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+      - 'v[0-9]+.[0-9]+.[0-9]+-*'
 
 permissions:
   contents: write
-  packages: write
 
 jobs:
   release:
     runs-on: ubuntu-latest
-    if: github.event.workflow_run.conclusion == 'success'
     steps:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - name: Validate semver tag
+        run: |
+          TAG=${GITHUB_REF#refs/tags/}
+          if [[ ! "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.]+)?$ ]]; then
+            echo "Error: Tag '$TAG' is not a valid semver tag"
+            exit 1
+          fi
+          echo "TAG_NAME=$TAG" >> $GITHUB_ENV
+
+      - name: Get previous tag
+        id: prev_tag
+        run: |
+          PREV_TAG=$(git tag --sort=-v:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+' | sed -n '2p')
+          if [ -z "$PREV_TAG" ]; then
+            echo "PREV_TAG=" >> $GITHUB_OUTPUT
+            echo "No previous tag found, will generate full changelog"
+          else
+            echo "PREV_TAG=$PREV_TAG" >> $GITHUB_OUTPUT
+            echo "Previous tag: $PREV_TAG"
+          fi
+
+      - name: Generate changelog
+        run: |
+          echo "# Changelog for ${{ env.TAG_NAME }}" > CHANGELOG.md
+          echo "" >> CHANGELOG.md
+          if [ -n "${{ steps.prev_tag.outputs.PREV_TAG }}" ]; then
+            echo "## Changes since ${{ steps.prev_tag.outputs.PREV_TAG }}" >> CHANGELOG.md
+            echo "" >> CHANGELOG.md
+            git log ${{ steps.prev_tag.outputs.PREV_TAG }}..${{ env.TAG_NAME }} --pretty=format:"- %s (%h)" --no-merges >> CHANGELOG.md
+          else
+            echo "## All Changes" >> CHANGELOG.md
+            echo "" >> CHANGELOG.md
+            git log --pretty=format:"- %s (%h)" --no-merges >> CHANGELOG.md
+          fi
+          echo "" >> CHANGELOG.md
+          cat CHANGELOG.md
 
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.12'
 
-      - name: Install dependencies
-        run: pip install twine
+      - name: Build package
+        run: |
+          pip install build wheel
+          python -m build
 
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
+      - name: Upload changelog artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: changelog
+          path: CHANGELOG.md
+          retention-days: 90
+
+      - name: Upload dist artifact
+        uses: actions/upload-artifact@v4
         with:
           name: dist
           path: dist/
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          run-id: ${{ github.event.workflow_run.id }}
-
-      - name: Check if tag push
-        id: check_tag
-        run: |
-          git fetch --tags
-          if [[ $(git tag --points-at HEAD) ]]; then
-            echo "IS_TAG=true" >> $GITHUB_OUTPUT
-            echo "TAG_NAME=$(git tag --points-at HEAD)" >> $GITHUB_OUTPUT
-          else
-            echo "IS_TAG=false" >> $GITHUB_OUTPUT
-          fi
+          retention-days: 90
 
       - name: Create GitHub Release
-        if: steps.check_tag.outputs.IS_TAG == 'true'
         uses: softprops/action-gh-release@v1
         with:
-          files: dist/*
-          generate_release_notes: true
-          tag_name: ${{ steps.check_tag.outputs.TAG_NAME }}
+          files: |
+            dist/*
+            CHANGELOG.md
+          body_path: CHANGELOG.md
+          tag_name: ${{ env.TAG_NAME }}
