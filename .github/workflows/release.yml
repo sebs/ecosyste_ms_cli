@@ -6,16 +6,25 @@ on:
       - 'v[0-9]+.[0-9]+.[0-9]+'
       - 'v[0-9]+.[0-9]+.[0-9]+-*'
 
-permissions:
-  contents: write
+# Prevent concurrent releases
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+# Restrict default permissions; jobs define their own
+permissions: {}
 
 jobs:
   release:
+    name: Create Release
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # Create GitHub releases and upload assets
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Validate semver tag
         run: |
@@ -39,13 +48,16 @@ jobs:
           fi
 
       - name: Generate changelog
+        env:
+          TAG_NAME: ${{ env.TAG_NAME }}
+          PREV_TAG: ${{ steps.prev_tag.outputs.PREV_TAG }}
         run: |
-          echo "# Changelog for ${{ env.TAG_NAME }}" > CHANGELOG.md
+          echo "# Changelog for $TAG_NAME" > CHANGELOG.md
           echo "" >> CHANGELOG.md
-          if [ -n "${{ steps.prev_tag.outputs.PREV_TAG }}" ]; then
-            echo "## Changes since ${{ steps.prev_tag.outputs.PREV_TAG }}" >> CHANGELOG.md
+          if [ -n "$PREV_TAG" ]; then
+            echo "## Changes since $PREV_TAG" >> CHANGELOG.md
             echo "" >> CHANGELOG.md
-            git log ${{ steps.prev_tag.outputs.PREV_TAG }}..${{ env.TAG_NAME }} --pretty=format:"- %s (%h)" --no-merges >> CHANGELOG.md
+            git log "$PREV_TAG".."$TAG_NAME" --pretty=format:"- %s (%h)" --no-merges >> CHANGELOG.md
           else
             echo "## All Changes" >> CHANGELOG.md
             echo "" >> CHANGELOG.md
@@ -67,7 +79,7 @@ jobs:
           grep "__version__" ecosystems_cli/__init__.py
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
         with:
           python-version: '3.12'
 
@@ -77,21 +89,21 @@ jobs:
           python -m build
 
       - name: Upload changelog artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: changelog
           path: CHANGELOG.md
           retention-days: 180
 
       - name: Upload dist artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: dist
           path: dist/
           retention-days: 90
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b # v2.5.0
         with:
           files: |
             dist/*
